@@ -1,5 +1,8 @@
 {% extends "layouts/blank.html" %}
 {% block content %}
+<div class="columns-3 ...">
+  {% component "input_institution_search" %}{% endcomponent %}
   {% component "input_chip_search" %}{% endcomponent %}
   {% component "input_sample_search" %}{% endcomponent %}
+</div>
 {% endblock content %}

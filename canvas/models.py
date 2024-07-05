@@ -1,7 +1,7 @@
 from django.core.validators import RegexValidator
 from django.db import models
 from taggit.managers import TaggableManager
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 
 # Create your models here.
@@ -44,9 +44,19 @@ class SampleType(models.Model):
 
 class Institution(models.Model):
     name = models.CharField(max_length=100)
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name="institutions"
+    )
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # Check if a group with the same name exists
+        group, created = Group.objects.get_or_create(name=self.name)
+        # Assign the group to the institution
+        self.group = group
+        super().save(*args, **kwargs)
 
 
 def validate_position(value):
@@ -72,7 +82,7 @@ class Sample(models.Model):
     repeat = models.ManyToManyField("self")
 
     def __str__(self):
-        return f"{self.protocol_id} - {self.date}"
+        return f"{self.protocol_id} - {self.arrival_date}"
 
 
 class SampleChip(models.Model):

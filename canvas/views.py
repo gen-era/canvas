@@ -5,17 +5,12 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return render(request, "canvas/index.html")
-
-
-def chip_search(request):
-    print("Canvas view chip_search!")
 
     return render(
         request,
-        "canvas/chip_search.html",
+        "canvas/index.html",
         {
-            "title": "Chip Search",
+            "title": "Index",
             "description": "Chip search of a Django model",
         },
     )
