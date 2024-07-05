@@ -1,9 +1,5 @@
-{% extends 'layouts/blank.html' %}
-
+{% extends "layouts/blank.html" %}
 {% block content %}
-
-    <div class="max-w-4xl mx-auto px-8 py-24">
-        <h1>Merhaba</h1>
-    </div>
-
-{% endblock %}
+  {% component "input_chip_search" %}{% endcomponent %}
+  {% component "input_sample_search" %}{% endcomponent %}
+{% endblock content %}
