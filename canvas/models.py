@@ -93,3 +93,8 @@ class SampleChip(models.Model):
 
     def __str__(self):
         return f"{self.protocol_id} - {self.study_date}"
+
+
+class IDAT(models.Model):
+    idat = models.FileField(upload_to="idats/")
+    sample = models.ForeignKey(SampleChip, on_delete=models.PROTECT)
