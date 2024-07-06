@@ -8,7 +8,7 @@ from datetime import timedelta
 def get_presigned_url(bucket_name, file_name, expiration=600):
 
     client = minio.Minio(
-        "192.168.1.124:9000",
+        settings.MINIO_STORAGE_ENDPOINT,
         settings.MINIO_STORAGE_ACCESS_KEY,
         settings.MINIO_STORAGE_SECRET_KEY,
         secure=False,
