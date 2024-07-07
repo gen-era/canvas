@@ -4,6 +4,9 @@ from django.conf import settings
 import minio
 from datetime import timedelta
 
+import json
+from canvas.models import IDAT
+
 
 def get_presigned_url(bucket_name, file_name, expiration=600):
 
@@ -21,25 +24,24 @@ def get_presigned_url(bucket_name, file_name, expiration=600):
 
 @component.register("chip_upload")
 class ChipUpload(component.Component):
-    """
-    We render the page with or without data for a presigned post upload.
-    """
 
     template_name = "uploader.html"
 
-    def post(self, *args, **kwargs):
-        file = self.request.FILES["file"]
-        name = file.name
-        # content_type = file.content_type
-
-        # Add any Django form validation here to check the file is valid, correct size, type, etc.
-
+    def post(self, request, *args, **kwargs):
         bucket_name = settings.MINIO_STORAGE_MEDIA_BUCKET_NAME
-        presigned_url = get_presigned_url(bucket_name, name)
+
+        idats = request.FILES.getlist("file")
+
+        presigned_urls = {}
+        for idat in idats:
+            presigned_urls[idat.name] = get_presigned_url(bucket_name, idat.name)
+            idat_obj = IDAT(idat=f"{bucket_name}/{idat.name}")
+            idat_obj.save()
 
         context = {
-            "url": presigned_url,
-            "path": f"to {bucket_name}/{name}",
+            "presigned_urls": json.dumps(presigned_urls),
+            "path": f"to {bucket_name}",
         }
+        print(context)
 
         return self.render_to_response(context)

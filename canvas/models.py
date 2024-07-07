@@ -1,4 +1,5 @@
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, FileExtensionValidator
+
 from django.db import models
 from taggit.managers import TaggableManager
 from django.contrib.auth.models import User, Group
@@ -85,7 +86,7 @@ class Sample(models.Model):
         return f"{self.protocol_id} - {self.arrival_date}"
 
 
-class SampleChip(models.Model):
+class ChipSample(models.Model):
     sample = models.ForeignKey(Sample, on_delete=models.PROTECT)
     call_rate = models.DecimalField(max_digits=10, decimal_places=7)
     chip = models.ForeignKey(Chip, on_delete=models.PROTECT, null=True, blank=True)
@@ -96,5 +97,24 @@ class SampleChip(models.Model):
 
 
 class IDAT(models.Model):
-    idat = models.FileField(upload_to="idats/")
-    sample = models.ForeignKey(SampleChip, on_delete=models.PROTECT)
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    idat = models.FileField(
+        upload_to="idats/",
+        validators=[FileExtensionValidator(allowed_extensions=["idat"])],
+    )
+    chip_sample = models.ForeignKey(
+        ChipSample, on_delete=models.PROTECT, null=True, blank=True
+    )
+
+
+class GTC(models.Model):
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    gtc = models.FileField(
+        upload_to="gtcs/",
+        validators=[FileExtensionValidator(allowed_extensions=["gtc"])],
+    )
+    chip_sample = models.ForeignKey(ChipSample, on_delete=models.PROTECT)

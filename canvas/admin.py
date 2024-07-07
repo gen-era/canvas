@@ -1,7 +1,17 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Lot, Chip, ChipType, SampleType, Institution, Sample, SampleChip
+from .models import (
+    Lot,
+    Chip,
+    ChipType,
+    SampleType,
+    Institution,
+    Sample,
+    ChipSample,
+    IDAT,
+    GTC,
+)
 
 
 class ChipAdmin(admin.ModelAdmin):
@@ -39,7 +49,7 @@ class SampleAdmin(admin.ModelAdmin):
     search_fields = ("protocol_id", "institution__name")
 
 
-class SampleChipAdmin(admin.ModelAdmin):
+class ChipSampleAdmin(admin.ModelAdmin):
     list_display = (
         "get_protocol_id",
         "chip",
@@ -52,10 +62,28 @@ class SampleChipAdmin(admin.ModelAdmin):
         return obj.sample.protocol_id
 
 
+class IDATAdmin(admin.ModelAdmin):
+    list_display = ["idat", "get_protocol_id"]
+    search_fields = ["idat", "get_protocol_id"]
+
+    def get_protocol_id(self, obj):
+        return obj.chip_sample.sample.protocol_id
+
+
+class GTCAdmin(admin.ModelAdmin):
+    list_display = ["gtc", "get_protocol_id"]
+    search_fields = ["gtc", "get_protocol_id"]
+
+    def get_protocol_id(self, obj):
+        return obj.chip_sample.sample.protocol_id
+
+
 admin.site.register(Lot)
 admin.site.register(Chip, ChipAdmin)
 admin.site.register(ChipType, ChipTypeAdmin)
 admin.site.register(SampleType, SampleTypeAdmin)
 admin.site.register(Institution, InstitutionAdmin)
 admin.site.register(Sample, SampleAdmin)
-admin.site.register(SampleChip, SampleChipAdmin)
+admin.site.register(ChipSample, ChipSampleAdmin)
+admin.site.register(IDAT, IDATAdmin)
+admin.site.register(GTC, GTCAdmin)
