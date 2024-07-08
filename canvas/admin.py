@@ -67,7 +67,10 @@ class IDATAdmin(admin.ModelAdmin):
     search_fields = ["idat", "get_protocol_id"]
 
     def get_protocol_id(self, obj):
-        return obj.chip_sample.sample.protocol_id
+        if obj.chip_sample:
+            return obj.chip_sample.sample.protocol_id
+        else:
+            return "none"
 
 
 class GTCAdmin(admin.ModelAdmin):
