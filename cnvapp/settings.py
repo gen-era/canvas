@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,7 +40,6 @@ INSTALLED_APPS = [
     # "django.contrib.staticfiles",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.sites",
-    "organizations",
     "canvas",
     "taggit",
     "allauth",
@@ -162,8 +162,12 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 
-DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
-STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
+if os.getenv("DJANGO_DEVELOPMENT") == "true":
+    pass
+else:
+    DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
+    STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
+
 MINIO_STORAGE_USE_HTTPS = False
 MINIO_STORAGE_ENDPOINT = "192.168.1.87:9000"
 MINIO_STORAGE_ACCESS_KEY = "U3g6WGWch6lZh3oZC193"
