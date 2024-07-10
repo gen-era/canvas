@@ -1,0 +1,181 @@
+<form hx-trigger="submit"
+      hx-encoding="multipart/form-data"
+      id="form"
+>
+    <div id="presigned-urls" style="display:none;">{{ presigned_urls }}</div>
+    {% for field, value in fields.items %}
+    <input type="hidden" name="{{ field }}" value="{{ value }}">
+    {% endfor %}
+
+    <input type="file" name="file" id="id_file_field"
+           hx-post="{% url 'chip_upload' %}"
+           hx-target="#form"
+           hx-select="#form"
+           hx-swap="outerHTML"
+           hx-trigger="change"
+           hx-preserve="true"
+           multiple
+    >
+
+    <div id="progress-display" >
+        <progress id='progress' value='0' max='100'></progress>
+        <div id="percent-wrapper">
+            <input id='percent' value="0" type="number" contenteditable="false" disabled/>
+            <span>%</span>
+        </div>
+    </div>
+
+    <button <button onclick="upload()" type="submit" id="upload-btn">
+        <span id="start-upload">Upload</span>
+        <span id="loader">Uploading...</span>
+    </button>
+
+    <div id="upload-path">
+        Uploaded {{ path }}
+    </div>
+</form>
+
+<script type="text/javascript">
+htmx.on('htmx:xhr:progress', function (evt) {
+    if (evt.detail.elt.id === 'form') {
+        console.log("evt.detail = ", evt.detail)
+        const progressValue = evt.detail.loaded / evt.detail.total * 100;
+        htmx.find('#progress').setAttribute('value', progressValue);
+        htmx.find('#percent').setAttribute('value', Math.round(progressValue));
+    }
+});
+
+htmx.on('htmx:beforeRequest', (evt) => {
+    if (evt.detail.elt.id === 'form') {
+        htmx.find('#start-upload').style.display = 'none';
+        htmx.find('#loader').style.display = 'block';
+        htmx.find('#upload-path').style.visibility = 'hidden';
+        htmx.find('#percent-wrapper').style.visibility = 'visible';
+    }
+});
+
+ // htmx.on('htmx:configRequest', (evt) => {
+ //     if (evt.detail.elt.id === 'form') {
+ //         event.detail.headers = []; // We clear the headers due to a bug in htmx: https://github.com/bigskysoftware/htmx/issues/779#issuecomment-1019373147
+ //     }
+ // });
+
+htmx.on('htmx:afterOnLoad', (evt) => {
+    if (evt.detail.elt.id === 'form') {
+        htmx.find('#loader').style.display = 'none';
+        htmx.find('#upload-path').style.visibility = 'visible';
+        htmx.find('#start-upload').style.display = 'block';
+    }
+});
+function upload() {
+      // Get selected files from the input element.
+     presigned_urls_div = document.querySelector("#presigned-urls");
+     var presigned_urls = JSON.parse(presigned_urls_div.textContent);
+
+     console.log(presigned_urls);
+     files = document.querySelector("#id_file_field").files;
+
+     for (var i = 0; i < files.length; i++) {
+         var file = files[i];
+         console.log(file)
+         uploadFile(file, presigned_urls[file.name]);
+     }
+ }
+function uploadFile(file, url) {
+     console.log(url)
+     fetch(url, {
+         method: 'PUT',
+         body: file
+     })
+}
+</script>
+
+
+<style>
+    /* General styling */
+    body {
+        font-family: Arial, sans-serif;
+        margin: auto;
+        height: 100vh;
+    }
+
+    /* Form styling */
+    #form {
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 300px;
+        padding: 50px;
+    }
+
+    #progress-display {
+        display: flex;
+        gap: 10px;
+    }
+
+    #percent-wrapper{
+        width: 90px;
+        visibility: hidden;
+    }
+
+    #percent {
+        border: none;
+        text-align: right;
+        width: 40px;
+        background: transparent;
+    }
+
+    #file-input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #upload-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #upload-btn:hover {
+        background-color: #0056b3;
+    }
+
+    #upload-path {
+        visibility: hidden;
+    }
+
+    /* Progress bar */
+    #progress {
+        width: 100%;
+        height: 20px;
+        border: none;
+        border-radius: 10px;
+        background: #f3f3f3;
+    }
+
+    #progress[value]::-webkit-progress-bar {
+        border-radius: 10px;
+        background: #f3f3f3;
+    }
+
+    #progress[value]::-webkit-progress-value {
+        border-radius: 10px;
+        background: #007bff;
+    }
+
+    #progress[value]::-moz-progress-bar {
+        border-radius: 10px;
+        background: #007bff;
+    }
+
+    /* Loader and Success messages */
+    #loader{
+        display: none;
+    }
+
+</style>

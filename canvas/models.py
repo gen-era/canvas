@@ -35,6 +35,9 @@ class Chip(models.Model):
     protocol_start_date = models.DateTimeField("Entry date")
     scan_date = models.DateTimeField("Entry date")
 
+    def __str__(self):
+        return self.chip_id
+
 
 class SampleType(models.Model):
     name = models.CharField(max_length=100)
@@ -87,13 +90,15 @@ class Sample(models.Model):
 
 
 class ChipSample(models.Model):
-    sample = models.ForeignKey(Sample, on_delete=models.PROTECT)
+    sample = models.ForeignKey(
+        Sample, on_delete=models.PROTECT, related_name="chipsample"
+    )
     call_rate = models.DecimalField(max_digits=10, decimal_places=7)
     chip = models.ForeignKey(Chip, on_delete=models.PROTECT, null=True, blank=True)
     position = models.CharField(max_length=10, validators=[validate_position])
 
     def __str__(self):
-        return f"{self.protocol_id} - {self.study_date}"
+        return f"{self.sample.protocol_id} - {self.chip.scan_date}"
 
 
 class IDAT(models.Model):

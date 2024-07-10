@@ -51,22 +51,22 @@ class SampleAdmin(admin.ModelAdmin):
 
 class ChipSampleAdmin(admin.ModelAdmin):
     list_display = (
-        "get_protocol_id",
+        "protocol_id",
         "chip",
         "position",
         "call_rate",
     )
     search_fields = ("protocol_id", "chip__name", "institution__name")
 
-    def get_protocol_id(self, obj):
+    def protocol_id(self, obj):
         return obj.sample.protocol_id
 
 
 class IDATAdmin(admin.ModelAdmin):
-    list_display = ["idat", "get_protocol_id"]
-    search_fields = ["idat", "get_protocol_id"]
+    list_display = ["idat", "protocol_id"]
+    search_fields = ["idat", "protocol_id"]
 
-    def get_protocol_id(self, obj):
+    def protocol_id(self, obj):
         if obj.chip_sample:
             return obj.chip_sample.sample.protocol_id
         else:
@@ -74,10 +74,10 @@ class IDATAdmin(admin.ModelAdmin):
 
 
 class GTCAdmin(admin.ModelAdmin):
-    list_display = ["gtc", "get_protocol_id"]
-    search_fields = ["gtc", "get_protocol_id"]
+    list_display = ["gtc", "protocol_id"]
+    search_fields = ["gtc", "protocol_id"]
 
-    def get_protocol_id(self, obj):
+    def protocol_id(self, obj):
         return obj.chip_sample.sample.protocol_id
 
 

@@ -1,0 +1,19 @@
+<div class="mb-4">
+    <input class="input form-control" type="search"
+        name="chip_search" placeholder="Search for a chip"
+        hx-post="{% url 'omni_search' %}"
+        hx-trigger="input changed delay:500ms, search"
+        hx-target="#chip-results">
+
+<table class="table">
+    <thead class="thead">
+        <tr>
+            <th class="th">Chip Id</th>
+            <th class="th">Chip Type</th>
+            <th class="th">Scan Date</th>
+        </tr>
+    </thead>
+    <tbody id="chip-results">
+    </tbody>
+</table>
+</div>

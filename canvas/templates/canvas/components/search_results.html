@@ -1,0 +1,22 @@
+{% for institution in institutions %}
+    <tr class="tr">
+        <td class="td">{{ institution.name }}</td>
+    </tr>
+{% endfor %}
+
+{% for chip in chips %}
+    <tr class="tr">
+        <td class="td">{{ chip.chip_id }}</td>
+        <td class="td">{{ chip.chip_type }}</td>
+        <td class="td">{{ chip.scan_date }}</td>
+    </tr>
+{% endfor %}
+
+{% for sample in samples %}
+    <tr class="tr">
+        <td class="td">{{ sample.protocol_id }}</td>
+        <td class="td">{{ sample.sample_type }}</td>
+        <td class="td">{{ sample.arrival_date }}</td>
+        <td class="td">{{ sample.institution.name }}</td>
+    </tr>
+{% endfor %}
