@@ -1,0 +1,20 @@
+<form
+    hx-post="{% url 'search' %}"
+    hx-trigger="change"
+    hx-target="#search-results">
+
+
+    <div class="grid grid-cols-3 gap-12">
+    <input class="input form-control" type="search"
+        name="institution_search" placeholder="Search for a institution">
+
+    <input class="input form-control" type="search"
+        name="chip_search" placeholder="Search for a chip">
+
+    <input class="input form-control" type="search"
+        name="sample_search" placeholder="Search for a sample">
+    </div>
+</form>
+
+<div id="search-results">
+</div>

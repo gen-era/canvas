@@ -37,10 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     # "django.contrib.staticfiles",
-    "django_components.safer_staticfiles",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.sites",
-    "django_components",
     "organizations",
     "canvas",
     "taggit",
@@ -85,12 +83,8 @@ TEMPLATES = [
                     [
                         "django.template.loaders.filesystem.Loader",
                         "django.template.loaders.app_directories.Loader",
-                        "django_components.template_loader.Loader",
                     ],
                 )
-            ],
-            "builtins": [
-                "django_components.templatetags.component_tags",
             ],
         },
     },
@@ -152,7 +146,6 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "components",
 ]
 
 # Default primary key field type
@@ -172,7 +165,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
 STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
 MINIO_STORAGE_USE_HTTPS = False
-MINIO_STORAGE_ENDPOINT = "192.168.1.124:9000"
+MINIO_STORAGE_ENDPOINT = "192.168.1.87:9000"
 MINIO_STORAGE_ACCESS_KEY = "U3g6WGWch6lZh3oZC193"
 MINIO_STORAGE_SECRET_KEY = "04aMpugrcWUyighNY4J6yzdPg7j9XaXCnBY42Q2r"
 
