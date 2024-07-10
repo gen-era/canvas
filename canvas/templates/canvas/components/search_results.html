@@ -1,22 +1,60 @@
-{% for institution in institutions %}
-    <tr class="tr">
-        <td class="td">{{ institution.name }}</td>
-    </tr>
-{% endfor %}
 
-{% for chip in chips %}
-    <tr class="tr">
-        <td class="td">{{ chip.chip_id }}</td>
-        <td class="td">{{ chip.chip_type }}</td>
-        <td class="td">{{ chip.scan_date }}</td>
-    </tr>
-{% endfor %}
+<div class="grid grid-cols-3 gap-12">
+<table class="table">
+    <thead class="thead">
+        <tr>
+            <th class="th">institution Id</th>
+            <th class="th">institution Type</th>
+            <th class="th">Scan Date</th>
+        </tr>
+    </thead>
+    <tbody id="institution-results">
+    {% for institution in institutions %}
+            <tr class="tr">
+                <td class="td">{{ institution.name }}</td>
+            </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-{% for sample in samples %}
-    <tr class="tr">
-        <td class="td">{{ sample.protocol_id }}</td>
-        <td class="td">{{ sample.sample_type }}</td>
-        <td class="td">{{ sample.arrival_date }}</td>
-        <td class="td">{{ sample.institution.name }}</td>
-    </tr>
-{% endfor %}
+
+<table class="table">
+    <thead class="thead">
+        <tr>
+            <th class="th">Chip Id</th>
+            <th class="th">Chip Type</th>
+            <th class="th">Scan Date</th>
+        </tr>
+    </thead>
+    <tbody id="chip-results">
+    {% for chip in chips %}
+        <tr class="tr">
+            <td class="td">{{ chip.chip_id }}</td>
+            <td class="td">{{ chip.chip_type }}</td>
+            <td class="td">{{ chip.scan_date }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<table class="table">
+    <thead class="thead">
+        <tr>
+            <th class="th">sample Id</th>
+            <th class="th">sample Type</th>
+            <th class="th">Scan Date</th>
+        </tr>
+    </thead>
+    <tbody id="sample-results">
+    {% for sample in samples %}
+        <tr class="tr">
+            <td class="td">{{ sample.protocol_id }}</td>
+            <td class="td">{{ sample.sample_type }}</td>
+            <td class="td">{{ sample.arrival_date }}</td>
+            <td class="td">{{ sample.institution.name }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>

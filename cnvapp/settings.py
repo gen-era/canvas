@@ -37,10 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     # "django.contrib.staticfiles",
-    "django_components.safer_staticfiles",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.sites",
-    "django_components",
     "organizations",
     "canvas",
     "taggit",
@@ -85,12 +83,8 @@ TEMPLATES = [
                     [
                         "django.template.loaders.filesystem.Loader",
                         "django.template.loaders.app_directories.Loader",
-                        "django_components.template_loader.Loader",
                     ],
                 )
-            ],
-            "builtins": [
-                "django_components.templatetags.component_tags",
             ],
         },
     },
@@ -152,7 +146,6 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "components",
 ]
 
 # Default primary key field type
