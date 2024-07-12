@@ -1,9 +1,12 @@
-from django.shortcuts import render
 from django.conf import settings
-from django.views import View
+from django.db.models import Prefetch
 from django.http import HttpResponse
+from django.shortcuts import render
+from django.views import View
+
 
 from canvas.models import Sample, Chip, ChipSample, Institution, IDAT
+
 
 from datetime import timedelta
 import json
@@ -30,22 +33,80 @@ class Search(View):
         institution_search = request.POST.get("institution_search", None)
         chip_search = request.POST.get("chip_search", None)
         sample_search = request.POST.get("sample_search", None)
+        print(f"""
+        {institution_search=}
+        {sample_search=}
+        {chip_search=}
+        """)
 
-        institutions = Institution.objects.filter(name__icontains=institution_search)
+        if institution_search and chip_search and sample_search:
+            print(f"""
+            {institution_search=}
+            {sample_search=}
+            {chip_search=}
+            """)
+            pass
+        elif institution_search and chip_search:
+            print(f"""
+            {institution_search=}
+            {chip_search=}
+            """)
+            pass
 
-        chips = Chip.objects.filter(
-            chip_id__icontains=chip_search
-        ) | Chip.objects.filter(chip_type__name__icontains=chip_search)
+        elif institution_search and sample_search:
+            print(f"""
+            {institution_search=}
+            {sample_search=}
+            """)
+            institutions = Institution.objects.filter(name__icontains=institution_search)
 
-        samples = Sample.objects.filter(
-            protocol_id__icontains=sample_search
-        ) | Sample.objects.filter(sample_type__name__icontains=sample_search)
+            samples = Sample.objects.filter(
+                protocol_id__icontains=sample_search,
+                institution__in = institutions
+            )
+            chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
+            chips = Chip.objects.filter(id__in=chip_ids)
+
+        elif chip_search and sample_search:
+            print(f"""
+            {sample_search=}
+            {chip_search=}
+            """)
+            pass
+
+        elif institution_search:
+            print(f"""
+            {institution_search=}
+            """)
+            institutions = Institution.objects.filter(name__icontains=institution_search)
+            samples = Sample.objects.filter(institution__in = institutions)
+            chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
+            chips = Chip.objects.filter(id__in=chip_ids)
+
+        elif chip_search:
+            print(f"""
+            {chip_search=}
+            """)
+            pass
+
+        elif sample_search:
+            print(f"""
+            {sample_search=}
+            """)
+            pass
+        else:
+            print(f"""
+            Arama yok.
+            """)
+            # En son eklenenleri getir.
+            pass
+
+
         context = {
-            "samples": samples.order_by("id")[:10],
-            "chips": chips.order_by("id")[:10],
-            "institutions": institutions.order_by("id")[:10],
+            "samples": samples.order_by("id"),
+            "chips": chips.order_by("id"),
+            "institutions": institutions.order_by("id"),
         }
-
         return render(request, self.tbody_temp, context)
 
 

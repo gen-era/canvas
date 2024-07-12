@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    # "django.contrib.staticfiles",
+    "django.contrib.staticfiles",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.sites",
     "canvas",
@@ -169,7 +169,7 @@ else:
     STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
 
 MINIO_STORAGE_USE_HTTPS = False
-MINIO_STORAGE_ENDPOINT = "192.168.1.87:9000"
+MINIO_STORAGE_ENDPOINT = "192.168.1.89:9000"
 MINIO_STORAGE_ACCESS_KEY = "U3g6WGWch6lZh3oZC193"
 MINIO_STORAGE_SECRET_KEY = "04aMpugrcWUyighNY4J6yzdPg7j9XaXCnBY42Q2r"
 

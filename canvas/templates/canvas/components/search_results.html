@@ -43,6 +43,9 @@
         <tr>
             <th class="th">sample Id</th>
             <th class="th">sample Type</th>
+            <th class="th">Arr. Date</th>
+            <th class="th">Inst</th>
+            <th class="th">Chip</th>
             <th class="th">Scan Date</th>
         </tr>
     </thead>
@@ -53,6 +56,8 @@
             <td class="td">{{ sample.sample_type }}</td>
             <td class="td">{{ sample.arrival_date }}</td>
             <td class="td">{{ sample.institution.name }}</td>
+            <td class="td">{{ sample.chipsample.first.chip.chip_id }}</td>
+            <td class="td">{{ sample.chipsample.first.ch.scan_dateip.scan_date }}</td>
         </tr>
     {% endfor %}
     </tbody>
