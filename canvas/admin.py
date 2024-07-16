@@ -15,7 +15,7 @@ from .models import (
 
 
 class ChipAdmin(admin.ModelAdmin):
-    list_display = ["chip_id", "lot", "protocol_start_date", "scan_date"]
+    list_display = ["chip_id", "lot", "entry_date", "protocol_start_date", "scan_date"]
     search_fields = ["chip_id", "lot__lot_number"]
 
 

@@ -32,8 +32,8 @@ class Chip(models.Model):
     chip_type = models.ForeignKey(ChipType, on_delete=models.PROTECT)
     lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
     entry_date = models.DateTimeField(auto_now_add=True)
-    protocol_start_date = models.DateTimeField("Entry date")
-    scan_date = models.DateTimeField("Entry date")
+    protocol_start_date = models.DateTimeField("Start date")
+    scan_date = models.DateTimeField("Scan date")
 
     def __str__(self):
         return self.chip_id
@@ -79,7 +79,7 @@ class Sample(models.Model):
     study_date = models.DateField(null=True)
     protocol_id = models.CharField(max_length=100)
     concentration = models.DecimalField(max_digits=5, decimal_places=1)
-    institution = models.ForeignKey(Institution, on_delete=models.PROTECT)
+    institution = models.ForeignKey(Institution, on_delete=models.PROTECT, related_name="sample")
     data_info = TaggableManager()
     description = models.CharField(max_length=255, null=True)
     sample_type = models.ForeignKey(SampleType, on_delete=models.PROTECT)
@@ -88,13 +88,18 @@ class Sample(models.Model):
     def __str__(self):
         return f"{self.protocol_id} - {self.arrival_date}"
 
+    @property
+    def chipsample(self):
+        return ChipSample.objects.get(sample=self)
+
 
 class ChipSample(models.Model):
     sample = models.ForeignKey(
         Sample, on_delete=models.PROTECT, related_name="chipsample"
     )
+
     call_rate = models.DecimalField(max_digits=10, decimal_places=7)
-    chip = models.ForeignKey(Chip, on_delete=models.PROTECT, null=True, blank=True)
+    chip = models.ForeignKey(Chip, on_delete=models.PROTECT, null=True, blank=True, related_name="chipsample")
     position = models.CharField(max_length=10, validators=[validate_position])
 
     def __str__(self):
