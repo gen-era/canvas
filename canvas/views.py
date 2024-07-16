@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
-
 from canvas.models import Sample, Chip, ChipSample, Institution, IDAT
+from canvas.tables import create_table_class
 
 
 from datetime import timedelta
@@ -144,3 +144,9 @@ class ChipUpload(View):
         }
 
         return render(request, self.template_name, context)
+
+def institution_list(request):
+    table_class = create_table_class(Institution)
+    table = table_class(Institution.objects.all())
+    RequestConfig(request).configure(table)
+    return render(request, 'canvas/institution_table.html', {'table': table})
