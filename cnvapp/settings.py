@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "taggit",
     "allauth",
     "allauth.account",
+    "django_tables2",
     "django_htmx",
     "minio_storage",
     "home",

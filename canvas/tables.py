@@ -1,17 +1,23 @@
 import django_tables2 as tables
 from canvas.models import Institution, Chip, Sample
 
-class InstitutionHTMxTable(tables.Table):
+
+class InstitutionTable(tables.Table):
     class Meta:
         model = Institution
         template_name = "canvas/bootstrap_htmx.html"
 
-class ChipHTMxTable(tables.Table):
+
+class ChipTable(tables.Table):
     class Meta:
         model = Chip
         template_name = "canvas/bootstrap_htmx.html"
 
-class SampleHTMxTable(tables.Table):
+
+class SampleTable(tables.Table):
+    chip = tables.Column(accessor = 'chipsample.first.chip.chip_id')
+    position = tables.Column(accessor = 'chipsample.first.position')
+
     class Meta:
         model = Sample
         template_name = "canvas/bootstrap_htmx.html"
