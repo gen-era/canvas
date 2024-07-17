@@ -6,12 +6,15 @@ class InstitutionTable(tables.Table):
     class Meta:
         model = Institution
         template_name = "canvas/bootstrap_htmx.html"
+        fields = ("name", )
+
 
 
 class ChipTable(tables.Table):
     class Meta:
         model = Chip
         template_name = "canvas/bootstrap_htmx.html"
+        fields = ("chip_id", "chip_type",)
 
 
 class SampleTable(tables.Table):
@@ -21,3 +24,4 @@ class SampleTable(tables.Table):
     class Meta:
         model = Sample
         template_name = "canvas/bootstrap_htmx.html"
+        fields = ("protocol_id", "chip", "position", "sample_type", "institution")

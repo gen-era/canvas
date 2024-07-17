@@ -25,7 +25,7 @@
 
 {# Pagination block overrides #}
 {% block pagination.previous %}
-    <li class="previous page-item">
+    <li class="previous page-item inline-block">
         <div hx-get="search/{% querystring table.prefixed_page_field=table.page.previous_page_number %}"
              hx-trigger="click"
              hx-target="#search-results"
@@ -38,7 +38,7 @@
 {% endblock pagination.previous %}
 {% block pagination.range %}
     {% for p in table.page|table_page_range:table.paginator %}
-        <li class="page-item{% if table.page.number == p %} active{% endif %}">
+        <li class="page-item{% if table.page.number == p %} active{% endif %} inline-block ">
             <div class="page-link" 
                  {% if p != '...' %}hx-get="search/{% querystring table.prefixed_page_field=p %}"{% endif %}
                  hx-trigger="click"
@@ -50,7 +50,7 @@
     {% endfor %}
 {% endblock pagination.range %}
 {% block pagination.next %}
-    <li class="next page-item">
+    <li class="next page-item inline-block">
         <div hx-get="search/{% querystring table.prefixed_page_field=table.page.next_page_number %}"
              hx-trigger="click"
              hx-target="#search-results"
