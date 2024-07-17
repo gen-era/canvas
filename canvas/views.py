@@ -27,45 +27,214 @@ def index(request):
 
 from django_tables2 import MultiTableMixin
 from .tables import InstitutionTable, ChipTable, SampleTable
+from django.views.generic.base import TemplateView
 
 
-class Search(MultiTableMixin, View):
+
+class Search(MultiTableMixin, TemplateView):
     table_pagination = {
         "per_page": 5
     }
 
     # def get(self, request, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        print(f"{context=}")
-        print(f"{request.GET=}")
-        institution_query = request.GET.get("instituion_search", None)
-        chip_query = request.GET.get("chip_search", None)
-        sample_query = request.GET.get("sample_search", None)
+    #     context = super().get_context_data(**kwargs)
+    #     print(f"{context=}")
+    #     print(f"{request.GET=}")
+    #     institution_search = request.GET.get("instituion_search", None)
+    #     chip_search = request.GET.get("chip_search", None)
+    #     sample_search = request.GET.get("sample_search", None)
 
+    #     if institution_search and chip_search and sample_search:
+    #         print(f"""
+    #         {institution_search=}
+    #         {sample_search=}
+    #         {chip_search=}
+    #         """)
+    #         institutions = Institution.objects.filter(name__icontains=institution_search)
+    #         samples = Sample.objects.filter(protocol_id__icontains=sample_search, institution__in=institutions)
+    #         chips = Chip.objects.filter(chip_id__icontains=chip_search)
+
+    #         chip_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("chip", flat=True)
+    #         sample_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("sample", flat=True)
+
+    #         chips = Chip.objects.filter(id__in=chip_ids)
+    #         samples = Sample.objects.filter(id__in=sample_ids)
+
+    #     elif institution_search and chip_search:
+    #         print(f"""
+    #         {institution_search=}
+    #         {chip_search=}
+    #         """)
+    #         pass
+
+    #     elif institution_search and sample_search:
+    #         print(f"""
+    #         {institution_search=}
+    #         {sample_search=}
+    #         """)
+    #         institutions = Institution.objects.filter(name__icontains=institution_search)
+
+    #         samples = Sample.objects.filter(
+    #             protocol_id__icontains=sample_search,
+    #             institution__in = institutions
+    #         )
+    #         chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
+    #         chips = Chip.objects.filter(id__in=chip_ids)
+
+    #     elif chip_search and sample_search:
+    #         print(f"""
+    #         {sample_search=}
+    #         {chip_search=}
+    #         """)
+    #         pass
+
+    #     elif institution_search:
+    #         print(f"""
+    #         {institution_search=}
+    #         """)
+    #         institutions = Institution.objects.filter(name__icontains=institution_search)
+    #         samples = Sample.objects.filter(institution__in = institutions)
+    #         chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
+    #         chips = Chip.objects.filter(id__in=chip_ids)
+
+    #     elif chip_search:
+    #         print(f"""
+    #         {chip_search=}
+    #         """)
+    #         chips = Chip.objects.filter(chip_id__icontains=chip_search)
+    #         chip_samples = ChipSample.objects.filter(chip__in=chips)
+    #         sample_ids = chip_samples.values_list("sample", flat=True)
+    #         samples = Sample.objects.filter(id__in=sample_ids)
+    #         institution_ids = samples.values_list("institution", flat=True)
+    #         institutions = Institution.objects.filter(id__in=institution_ids)
+
+    #     elif sample_search:
+    #         print(f"""
+    #         {sample_search=}
+    #         """)
+    #         pass
+    #     else:
+    #         print(f"""
+    #         Arama yok.
+    #         """)
+    #         # En son eklenenleri getir.
+    #         pass
+
+    #     tables = [
+    #         InstitutionTable(
+    #             institutions
+    #         ),
+    #         ChipTable(
+    #             chips
+    #         )
+    #         ,
+    #         SampleTable(
+    #             samples
+    #         ),
+    #     ]
+
+    #     context = {
+    #         'tables': self.tables,
+    #     }
+    #     return render(request, self.get_template_names(), context)
+
+    def get_tables(self):
+        institution_search = self.request.GET.get("institution_search", None)
+        chip_search = self.request.GET.get("chip_search", None)
+        sample_search = self.request.GET.get("sample_search", None)
+
+        if institution_search and chip_search and sample_search:
+            print(f"""
+            {institution_search=}
+            {sample_search=}
+            {chip_search=}
+            """)
+            institutions = Institution.objects.filter(name__icontains=institution_search)
+            samples = Sample.objects.filter(protocol_id__icontains=sample_search, institution__in=institutions)
+            chips = Chip.objects.filter(chip_id__icontains=chip_search)
+
+            chip_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("chip", flat=True)
+            sample_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("sample", flat=True)
+
+            chips = Chip.objects.filter(id__in=chip_ids)
+            samples = Sample.objects.filter(id__in=sample_ids)
+
+        elif institution_search and chip_search:
+            print(f"""
+            {institution_search=}
+            {chip_search=}
+            """)
+            institutions = Institution.objects.filter(name__icontains=institution_search)
+            chips = Chip.objects.filter(chip_id__icontains=chip_search)
+            sample_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("sample", flat=True)
+            samples = Sample.objects.filter(id__in=sample_ids)
+
+        elif institution_search and sample_search:
+            print(f"""
+            {institution_search=}
+            {sample_search=}
+            """)
+            institutions = Institution.objects.filter(name__icontains=institution_search)
+
+            samples = Sample.objects.filter(
+                protocol_id__icontains=sample_search,
+                institution__in = institutions
+            )
+            chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
+            chips = Chip.objects.filter(id__in=chip_ids)
+
+        elif chip_search and sample_search:
+            print(f"""
+            {sample_search=}
+            {chip_search=}
+            """)
+            pass
+
+        elif institution_search:
+            print(f"""
+            {institution_search=}
+            """)
+            institutions = Institution.objects.filter(name__icontains=institution_search)
+            samples = Sample.objects.filter(institution__in = institutions)
+            chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
+            chips = Chip.objects.filter(id__in=chip_ids)
+
+        elif chip_search:
+            print(f"""
+            {chip_search=}
+            """)
+            chips = Chip.objects.filter(chip_id__icontains=chip_search)
+            chip_samples = ChipSample.objects.filter(chip__in=chips)
+            sample_ids = chip_samples.values_list("sample", flat=True)
+            samples = Sample.objects.filter(id__in=sample_ids)
+            institution_ids = samples.values_list("institution", flat=True)
+            institutions = Institution.objects.filter(id__in=institution_ids)
+
+        elif sample_search:
+            print(f"""
+            {sample_search=}
+            """)
+            pass
+        else:
+            print(f"""
+            Arama yok.
+            """)
+            # En son eklenenleri getir.
+            pass
 
         tables = [
             InstitutionTable(
-                institution_filter(
-                Institution.objects.all()
-                )
+                institutions
             ),
             ChipTable(
-                chip_filter(
-                Chip.objects.all())
-                )
+                chips
+            )
             ,
             SampleTable(
-                sample_filter(
-                Sample.objects.all()
-                )
+                samples
             ),
         ]
-
-        context = {
-            'tables': self.tables,
-        }
-        return render(request, self.get_template_names(), context)
-
+        return tables
 
     def get_template_names(self):
         if self.request.htmx:
