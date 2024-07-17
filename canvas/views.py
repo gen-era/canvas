@@ -36,6 +36,7 @@ class Search(MultiTableMixin, TemplateView):
         "per_page": 5
     }
 
+<<<<<<< HEAD
     # def get(self, request, *args, **kwargs):
     #     context = super().get_context_data(**kwargs)
     #     print(f"{context=}")
@@ -143,6 +144,13 @@ class Search(MultiTableMixin, TemplateView):
         chip_search = self.request.GET.get("chip_search", None)
         sample_search = self.request.GET.get("sample_search", None)
 
+=======
+    def get_tables(self):
+        institution_search = self.request.GET.get("institution_search", None)
+        chip_search = self.request.GET.get("chip_search", None)
+        sample_search = self.request.GET.get("sample_search", None)
+
+>>>>>>> 9c89858 (Hande değişiklikler eklendi filtreler çıkarıldı)
         if institution_search and chip_search and sample_search:
             print(f"""
             {institution_search=}
