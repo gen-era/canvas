@@ -25,99 +25,47 @@ def index(request):
     )
 
 
-class Search(View):
-    tbody_temp = "canvas/components/search_results.html"
+from django_tables2 import MultiTableMixin
+from django_filters.views import FilterView
+from .tables import InstitutionTable, ChipTable, SampleTable
+# from .filters import InstitutionFilter, ChipFilter, SampleFilter
+from django.views.generic.base import TemplateView
 
-    def post(self, request, *args, **kwargs):
-        institution_search = request.POST.get("institution_search", None)
-        chip_search = request.POST.get("chip_search", None)
-        sample_search = request.POST.get("sample_search", None)
-        print(f"""
-        {institution_search=}
-        {sample_search=}
-        {chip_search=}
-        """)
 
-        if institution_search and chip_search and sample_search:
-            print(f"""
-            {institution_search=}
-            {sample_search=}
-            {chip_search=}
-            """)
-            institutions = Institution.objects.filter(name__icontains=institution_search)
-            samples = Sample.objects.filter(protocol_id__icontains=sample_search, institution__in=institutions)
-            chips = Chip.objects.filter(chip_id__icontains=chip_search)
-            chip_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("chip", flat=True)
-            chips = Chip.objects.filter(chip_id__in=chip_ids)
 
-        elif institution_search and chip_search:
-            print(f"""
-            {institution_search=}
-            {chip_search=}
-            """)
-            pass
+class Search(MultiTableMixin, FilterView):
+    tables = [
+        InstitutionTable(Institution.objects.all()[:10]),
+        ChipTable(Chip.objects.all()[:10]),
+        SampleTable(Sample.objects.all()[:10]),
+    ]
 
-        elif institution_search and sample_search:
-            print(f"""
-            {institution_search=}
-            {sample_search=}
-            """)
-            institutions = Institution.objects.filter(name__icontains=institution_search)
-            
-            samples = Sample.objects.filter(
-                protocol_id__icontains=sample_search,
-                institution__in = institutions
-            )
-            chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
-            chips = Chip.objects.filter(id__in=chip_ids)
+    table_pagination = {
+        "per_page": 5
+    }
 
-        elif chip_search and sample_search:
-            print(f"""
-            {sample_search=}
-            {chip_search=}
-            """)
-            pass
-
-        elif institution_search:
-            print(f"""
-            {institution_search=}
-            """)
-            institutions = Institution.objects.filter(name__icontains=institution_search)
-            samples = Sample.objects.filter(institution__in = institutions)
-            chip_ids = ChipSample.objects.filter(sample__in=samples).values_list("chip")
-            chips = Chip.objects.filter(id__in=chip_ids)
-
-        elif chip_search:
-            print(f"""
-            {chip_search=}
-            """)
-            chips = Chip.objects.filter(chip_id__icontains=chip_search)
-            chip_samples = ChipSample.objects.filter(chip__in=chips)
-            sample_ids = chip_samples.values_list("sample", flat=True)
-            samples = Sample.objects.filter(id__in=sample_ids)
-            institution_ids = samples.values_list("institution", flat=True)
-            institutions = Institution.objects.filter(id__in=institution_ids)
-            pass
-
-        elif sample_search:
-            print(f"""
-            {sample_search=}
-            """)
-            pass
-        else:
-            print(f"""
-            Arama yok.
-            """)
-            # En son eklenenleri getir.
-            pass
-
+    def get(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(f"{context=}")
+        print(f"{request.GET=}")
+        institution_query = request.GET.get("instituion_search", None)
+        chip_query = request.GET.get("chip_search", None)
+        sample_query = request.GET.get("sample_search", None)
 
         context = {
-            "samples": samples.order_by("id"),
-            "chips": chips.order_by("id"),
-            "institutions": institutions.order_by("id"),
+            'tables': self.tables,
         }
-        return render(request, self.tbody_temp, context)
+        return render(request, self.get_template_names(), context)
+
+    def get_template_names(self):
+        if self.request.htmx:
+            template_name = "canvas/components/search_results.html"
+        else:
+            template_name = "canvas/components/search.html"
+
+        return template_name
+
+
 
 
 def get_presigned_url(bucket_name, file_name, expiration=600):
@@ -154,4 +102,3 @@ class ChipUpload(View):
         }
 
         return render(request, self.template_name, context)
-
