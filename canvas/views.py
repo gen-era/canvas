@@ -26,60 +26,45 @@ def index(request):
 
 
 from django_tables2 import MultiTableMixin
-from django_filters.views import FilterView
 from .tables import InstitutionTable, ChipTable, SampleTable
-from .filters import InstitutionFilter, ChipFilter, SampleFilter
-from django.views.generic.base import TemplateView
 
 
-
-class Search(MultiTableMixin, FilterView):
-
-    filterset_class = SearchFilter
+class Search(MultiTableMixin, View):
     table_pagination = {
         "per_page": 5
     }
 
     # def get(self, request, *args, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     print(f"{context=}")
-    #     print(f"{request.GET=}")
-    #     institution_query = request.GET.get("instituion_search", None)
-    #     chip_query = request.GET.get("chip_search", None)
-    #     sample_query = request.GET.get("sample_search", None)
+        context = super().get_context_data(**kwargs)
+        print(f"{context=}")
+        print(f"{request.GET=}")
+        institution_query = request.GET.get("instituion_search", None)
+        chip_query = request.GET.get("chip_search", None)
+        sample_query = request.GET.get("sample_search", None)
 
-    #     institution_filter = InstitutionFilter(institution_query)
-    #     chip_filter = ChipFilter(chip_query)
-    #     sample_filter = SampleFilter(sample_query)
 
-    #     tables = [
-    #         InstitutionTable(
-    #             institution_filter(
-    #             Institution.objects.all()
-    #             )
-    #         ),
-    #         ChipTable(
-    #             chip_filter(
-    #             Chip.objects.all())
-    #             )
-    #         ,
-    #         SampleTable(
-    #             sample_filter(
-    #             Sample.objects.all()
-    #             )
-    #         ),
-    #     ]
+        tables = [
+            InstitutionTable(
+                institution_filter(
+                Institution.objects.all()
+                )
+            ),
+            ChipTable(
+                chip_filter(
+                Chip.objects.all())
+                )
+            ,
+            SampleTable(
+                sample_filter(
+                Sample.objects.all()
+                )
+            ),
+        ]
 
-    #     context = {
-    #         'tables': self.tables,
-    #     }
-    #     return render(request, self.get_template_names(), context)
-    def get_tables(self, request, *args, **kwargs):
-        context = super().get_tables(**kwargs)
-
-    def get_queryset(self, request, *args, **kwargs):
-        context = super().get_queryset(**kwargs)
-
+        context = {
+            'tables': self.tables,
+        }
+        return render(request, self.get_template_names(), context)
 
 
     def get_template_names(self):
