@@ -44,7 +44,12 @@ class Search(View):
             {sample_search=}
             {chip_search=}
             """)
-            pass
+            institutions = Institution.objects.filter(name__icontains=institution_search)
+            samples = Sample.objects.filter(protocol_id__icontains=sample_search, institution__in=institutions)
+            chips = Chip.objects.filter(chip_id__icontains=chip_search)
+            chip_ids = ChipSample.objects.filter(sample__in=samples, chip__in=chips).values_list("chip", flat=True)
+            chips = Chip.objects.filter(chip_id__in=chip_ids)
+
         elif institution_search and chip_search:
             print(f"""
             {institution_search=}
@@ -58,7 +63,7 @@ class Search(View):
             {sample_search=}
             """)
             institutions = Institution.objects.filter(name__icontains=institution_search)
-
+            
             samples = Sample.objects.filter(
                 protocol_id__icontains=sample_search,
                 institution__in = institutions
@@ -86,6 +91,12 @@ class Search(View):
             print(f"""
             {chip_search=}
             """)
+            chips = Chip.objects.filter(chip_id__icontains=chip_search)
+            chip_samples = ChipSample.objects.filter(chip__in=chips)
+            sample_ids = chip_samples.values_list("sample", flat=True)
+            samples = Sample.objects.filter(id__in=sample_ids)
+            institution_ids = samples.values_list("institution", flat=True)
+            institutions = Institution.objects.filter(id__in=institution_ids)
             pass
 
         elif sample_search:
