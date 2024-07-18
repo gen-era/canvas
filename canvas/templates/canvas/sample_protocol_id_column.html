@@ -1,0 +1,9 @@
+<form
+  hx-get="{% url 'sample' %}"
+  hx-target="#sample-results"
+>
+    <input type="hidden" name="sample_pk" value={{ record.pk }}>
+    <button>
+{{ record.protocol_id }}
+    </button>
+</form>

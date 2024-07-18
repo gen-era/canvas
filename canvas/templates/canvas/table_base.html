@@ -1,5 +1,4 @@
-{# templates/tables/bootstrap_htmx.html #}
-{% extends "django_tables2/bootstrap4.html" %}
+{% extends "django_tables2/table.html" %}
 
 {% load django_tables2 %}
 {% load i18n %}
@@ -38,7 +37,7 @@
 {% endblock pagination.previous %}
 {% block pagination.range %}
     {% for p in table.page|table_page_range:table.paginator %}
-        <li class="page-item{% if table.page.number == p %} active{% endif %} inline-block ">
+        <li class="page-item{% if table.page.number == p %} border-2 border-sky-500 rounded {% endif %} inline-block ">
             <div class="page-link" 
                  {% if p != '...' %}hx-get="search/{% querystring table.prefixed_page_field=p %}"{% endif %}
                  hx-trigger="click"
