@@ -5,4 +5,7 @@
 
 <!-- {% include "canvas/components/uploader.html" %} -->
   {% include "canvas/components/sample.html" %}
+  <button hx-get="{% url 'load_igv_browser' %}" hx-target="#igv-container" hx-trigger="click">Load IGV Browser</button>
+  <div id="igv-container"></div>
 {% endblock content %}
+
