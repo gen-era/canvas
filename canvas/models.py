@@ -128,3 +128,32 @@ class GTC(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=["gtc"])],
     )
     chip_sample = models.ForeignKey(ChipSample, on_delete=models.PROTECT)
+
+class VCF(models.Model):
+    chip_sample = models.ForeignKey(
+        ChipSample, on_delete=models.PROTECT, null=True, blank=True
+        )
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    vcf = models.FileField(
+        upload_to="vcfs/",
+        validators=[FileExtensionValidator(allowed_extensions=["vcf.gz"])],
+    )
+
+class BedGraph(models.Model):
+    bedgraph_types = [
+    ("LRR", "Log R Ratio"),
+    ("BAF", "B Allele Frequency")
+]
+    chip_sample = models.ForeignKey(
+        ChipSample, on_delete=models.PROTECT, null=True, blank=True
+        )
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    type = models.CharField(max_length=50,choices=bedgraph_types)
+    bedGraph = models.FileField(
+        upload_to="bedGraphs/",
+        validators=[FileExtensionValidator(allowed_extensions=["bedgraph.gz"])],
+    )

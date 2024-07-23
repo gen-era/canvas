@@ -203,4 +203,4 @@ class ChipUpload(View):
         return render(request, self.template_name, context)
 
 def load_igv_browser(request):
-    return render(request, 'igv_browser.html')
+    return render(request, 'canvas/components/igv_browser.html')
