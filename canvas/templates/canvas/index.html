@@ -11,10 +11,10 @@
     
   
       <script>
-        function addNewTab(event, protocolId, sample_pk) {
+        function addNewTab(event, protocolId, chipsample_pk) {
             event.preventDefault();
     
-            const newTabId = `tab-${sample_pk}`;
+            const newTabId = `tab-${chipsample_pk}`;
             const existingTab = document.getElementById(newTabId + '-tab');
     
             if (existingTab) {
@@ -42,7 +42,7 @@
                 newTabContent.role = 'tabpanel';
                 newTabContent.ariaLabelledby = `${newTabId}-tab`;
                 const samplediv = document.createElement('div');    
-                samplediv.id = "sample-results-"+ sample_pk
+                samplediv.id = "chipsample-results-"+ chipsample_pk
                 newTabContent.appendChild(samplediv);
                 // Append new tab pane
                 document.getElementById('myTabContent').appendChild(newTabContent);

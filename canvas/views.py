@@ -9,7 +9,7 @@ from django_tables2 import MultiTableMixin
 from .tables import InstitutionTable, ChipTable, SampleTable
 from django.views.generic.base import TemplateView
 
-from canvas.models import Sample, Chip, ChipSample, Institution, IDAT
+from canvas.models import Sample, Chip, ChipSample, Institution, IDAT, BedGraph
 
 
 from datetime import timedelta
@@ -161,12 +161,10 @@ class SampleView(TemplateView):
     template_name = "canvas/components/sample.html"
 
     def get(self, request, *args, **kwargs):
-        sample_pk = request.GET.get("sample_pk")
-        sample = Sample.objects.get(id=sample_pk)
-        bedgraph_url= "http://192.168.1.102:9000/canvas/bedgraphs/{sample.p.bedgraph.gz" 
-        context = {"sample": sample,
-        "bedgraph_url": bedgraph_url}
-
+        chipsample_pk = request.GET.get("chipsample_pk")
+        chipsample = ChipSample.objects.get(id=chipsample_pk)
+        bedgraph_urls = chipsample.bedgraph.all()
+        context = {"chipsample": chipsample, "bedgraph_url": bedgraph_urls}
 
         return render(request, self.template_name, context=context)
 
@@ -184,6 +182,7 @@ def put_presigned_url(bucket_name, file_name, expiration=600):
         bucket_name, file_name, expires=timedelta(hours=2)
     )
 
+
 def get_presigned_url(bucket_name, file_path, expiration=600):
 
     client = minio.Minio(
@@ -196,6 +195,7 @@ def get_presigned_url(bucket_name, file_path, expiration=600):
     return client.presigned_get_object(
         bucket_name, file_path, expires=timedelta(seconds=expiration)
     )
+
 
 class ChipUpload(View):
     template_name = "canvas/components/uploader.html"
@@ -217,4 +217,3 @@ class ChipUpload(View):
         }
 
         return render(request, self.template_name, context)
-
