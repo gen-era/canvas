@@ -1,31 +1,9 @@
-{% extends "layouts/blank.html" %}
+{% extends "base.html" %}
+
 {% block content %}
 
 {% include "canvas/components/search.html" %}
 
-<!-- {% include "canvas/components/uploader.html" %} -->
 {% include "canvas/components/sample.html" %}
-<button hx-get="{% url 'load_igv_browser' %}" hx-target="#igv-container" hx-trigger="click">Load IGV Browser</button>
-<div id="igv-container"></div>
-<div class="bootstrapTabs">
-  <ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab"
-        aria-controls="home" aria-selected="true">Home</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab"
-        aria-controls="profile" aria-selected="false">Profile</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab"
-        aria-controls="contact" aria-selected="false">Contact</button>
-    </li>
-  </ul>
-  <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">deneme</div>
-    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">deneme2</div>
-    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">deneme3</div>
-  </div>
-</div>
+{#% include "canvas/components/uploader.html" %#}
 {% endblock content %}
