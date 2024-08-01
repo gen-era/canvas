@@ -1,6 +1,8 @@
 <form
+  onsubmit="addNewTab(event, '{{ record.protocol_id }}', '{{ record.pk }}'); return false;"
   hx-get="{% url 'sample' %}"
-  hx-target="#sample-results"
+  hx-target="#sample-results-{{ record.pk }}"
+  hx-swap="innerHTML"
 >
     <input type="hidden" name="sample_pk" value={{ record.pk }}>
     <button>

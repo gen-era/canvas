@@ -163,11 +163,15 @@ class SampleView(TemplateView):
     def get(self, request, *args, **kwargs):
         sample_pk = request.GET.get("sample_pk")
         sample = Sample.objects.get(id=sample_pk)
-        context = {"sample": sample}
+        bedgraph_url= "http://192.168.1.102:9000/canvas/bedgraphs/{sample.p.bedgraph.gz" 
+        context = {"sample": sample,
+        "bedgraph_url": bedgraph_url}
+
+
         return render(request, self.template_name, context=context)
 
 
-def get_presigned_url(bucket_name, file_name, expiration=600):
+def put_presigned_url(bucket_name, file_name, expiration=600):
 
     client = minio.Minio(
         settings.MINIO_STORAGE_ENDPOINT,
@@ -180,6 +184,18 @@ def get_presigned_url(bucket_name, file_name, expiration=600):
         bucket_name, file_name, expires=timedelta(hours=2)
     )
 
+def get_presigned_url(bucket_name, file_path, expiration=600):
+
+    client = minio.Minio(
+        settings.MINIO_STORAGE_ENDPOINT,
+        settings.MINIO_STORAGE_ACCESS_KEY,
+        settings.MINIO_STORAGE_SECRET_KEY,
+        secure=False,
+    )
+
+    return client.presigned_get_object(
+        bucket_name, file_path, expires=timedelta(seconds=expiration)
+    )
 
 class ChipUpload(View):
     template_name = "canvas/components/uploader.html"
@@ -191,7 +207,7 @@ class ChipUpload(View):
 
         presigned_urls = {}
         for idat in idats:
-            presigned_urls[idat.name] = get_presigned_url(bucket_name, idat.name)
+            presigned_urls[idat.name] = put_presigned_url(bucket_name, idat.name)
             idat_obj = IDAT(idat=f"{bucket_name}/{idat.name}")
             idat_obj.save()
 
@@ -202,5 +218,3 @@ class ChipUpload(View):
 
         return render(request, self.template_name, context)
 
-def load_igv_browser(request):
-    return render(request, 'canvas/components/igv_browser.html')

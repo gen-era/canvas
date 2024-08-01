@@ -1,3 +1,24 @@
-<div id="sample-results">
-    {{ sample.chipsample.first.chip.chip_id }}
-</div>
+<div id="igv-div-{{ sample.pk }}" style="width: 100%; height: 500px;"></div>
+<script>
+    function initializeIgv() {
+        var igvDiv = document.getElementById("igv-div-{{ sample.pk }}");
+        var options = {
+            genome: "hg19",
+            tracks: [
+            {
+                        name: 'BEDGraph Track',
+                        type: 'wig',
+                        format: 'bedgraph',
+                        url: '{{ bedgraph_url }}',
+                        color: 'blue',  // Customize the color of your track
+                    }
+            ]
+        };
+
+        igv.createBrowser(igvDiv, options).then(function (browser) {
+            console.log("Created IGV browser");
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", initializeIgv());
+</script>
