@@ -161,7 +161,7 @@ class BedGraph(models.Model):
     entry_date = models.DateTimeField(
         auto_now_add=True
     )  # Change to DateTimeField with auto_now_add=True
-    type = models.CharField(max_length=50, choices=bedgraph_types)
+    bedgraph_type = models.CharField(max_length=50, choices=bedgraph_types)
     bedgraph = models.FileField(
         upload_to="bedGraphs/",
         validators=[FileExtensionValidator(allowed_extensions=["bedgraph.gz"])],

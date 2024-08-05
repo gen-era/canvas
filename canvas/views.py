@@ -163,8 +163,9 @@ class SampleView(TemplateView):
     def get(self, request, *args, **kwargs):
         chipsample_pk = request.GET.get("chipsample_pk")
         chipsample = ChipSample.objects.get(id=chipsample_pk)
-        bedgraph_urls = chipsample.bedgraph.all()
-        context = {"chipsample": chipsample, "bedgraph_url": bedgraph_urls}
+        bedgraphs = chipsample.bedgraph.all()
+
+        context = {"chipsample": chipsample, "bedgraphs": bedgraphs}
 
         return render(request, self.template_name, context=context)
 

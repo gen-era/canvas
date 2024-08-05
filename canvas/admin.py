@@ -90,7 +90,7 @@ class VCFAdmin(admin.ModelAdmin):
         return obj.chip_sample.sample.protocol_id
     
 class BedGraphAdmin(admin.ModelAdmin):
-    list_display = ["bedgraph", "protocol_id"]
+    list_display = ["chip_sample", "bedgraph", "bedgraph_type", "protocol_id"]
     search_fields = ["bedgraph", "protocol_id"]
 
     def protocol_id(self, obj):
