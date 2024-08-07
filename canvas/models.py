@@ -164,7 +164,7 @@ class BedGraph(models.Model):
     bedgraph_type = models.CharField(max_length=50, choices=bedgraph_types)
     bedgraph = models.FileField(
         upload_to="bedGraphs/",
-        validators=[FileExtensionValidator(allowed_extensions=["bedgraph.gz"])],
+        validators=[FileExtensionValidator(allowed_extensions=["gz"])],
     )
 
 

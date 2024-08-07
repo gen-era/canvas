@@ -58,7 +58,7 @@ class ChipSampleAdmin(admin.ModelAdmin):
         "position",
         "call_rate",
     )
-    search_fields = ("protocol_id", "chip__name", "institution__name")
+    search_fields = ("sample__protocol_id", "chip__chip_id", "sample__institution__name")
 
     def protocol_id(self, obj):
         return obj.sample.protocol_id
@@ -93,11 +93,14 @@ class BedGraphAdmin(admin.ModelAdmin):
     list_display = ["chipsample", "bedgraph", "bedgraph_type", "protocol_id"]
     search_fields = ["bedgraph", "protocol_id"]
 
+    autocomplete_fields = ["chipsample"]
+
     def protocol_id(self, obj):
         try:
             return obj.chipsample.sample.protocol_id
         except:
             return "abc"
+
 admin.site.register(Lot)
 admin.site.register(Chip, ChipAdmin)
 admin.site.register(ChipType, ChipTypeAdmin)
