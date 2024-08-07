@@ -69,8 +69,8 @@ class IDATAdmin(admin.ModelAdmin):
     search_fields = ["idat", "protocol_id"]
 
     def protocol_id(self, obj):
-        if obj.chip_sample:
-            return obj.chip_sample.sample.protocol_id
+        if obj.chipsample:
+            return obj.chipsample.sample.protocol_id
         else:
             return "none"
 
@@ -80,22 +80,22 @@ class GTCAdmin(admin.ModelAdmin):
     search_fields = ["gtc", "protocol_id"]
 
     def protocol_id(self, obj):
-        return obj.chip_sample.sample.protocol_id
+        return obj.chipsample.sample.protocol_id
 
 class VCFAdmin(admin.ModelAdmin):
     list_display = ["vcf", "protocol_id"]
     search_fields = ["vcf", "protocol_id"]
 
     def protocol_id(self, obj):
-        return obj.chip_sample.sample.protocol_id
+        return obj.chipsample.sample.protocol_id
     
 class BedGraphAdmin(admin.ModelAdmin):
-    list_display = ["chip_sample", "bedgraph", "bedgraph_type", "protocol_id"]
+    list_display = ["chipsample", "bedgraph", "bedgraph_type", "protocol_id"]
     search_fields = ["bedgraph", "protocol_id"]
 
     def protocol_id(self, obj):
         try:
-            return obj.chip_sample.sample.protocol_id
+            return obj.chipsample.sample.protocol_id
         except:
             return "abc"
 admin.site.register(Lot)

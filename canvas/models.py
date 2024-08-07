@@ -120,7 +120,7 @@ class IDAT(models.Model):
         upload_to="idats/",
         validators=[FileExtensionValidator(allowed_extensions=["idat"])],
     )
-    chip_sample = models.ForeignKey(
+    chipsample = models.ForeignKey(
         ChipSample, on_delete=models.PROTECT, null=True, blank=True
     )
 
@@ -133,11 +133,11 @@ class GTC(models.Model):
         upload_to="gtcs/",
         validators=[FileExtensionValidator(allowed_extensions=["gtc"])],
     )
-    chip_sample = models.ForeignKey(ChipSample, on_delete=models.PROTECT)
+    chipsample = models.ForeignKey(ChipSample, on_delete=models.PROTECT)
 
 
 class VCF(models.Model):
-    chip_sample = models.ForeignKey(
+    chipsample = models.ForeignKey(
         ChipSample, on_delete=models.PROTECT, null=True, blank=True
     )
     entry_date = models.DateTimeField(
@@ -151,7 +151,7 @@ class VCF(models.Model):
 
 class BedGraph(models.Model):
     bedgraph_types = [("LRR", "Log R Ratio"), ("BAF", "B Allele Frequency")]
-    chip_sample = models.ForeignKey(
+    chipsample = models.ForeignKey(
         ChipSample,
         on_delete=models.PROTECT,
         null=True,
@@ -165,4 +165,21 @@ class BedGraph(models.Model):
     bedgraph = models.FileField(
         upload_to="bedGraphs/",
         validators=[FileExtensionValidator(allowed_extensions=["bedgraph.gz"])],
+    )
+
+
+class SampleSheet(models.Model):
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    chip = models.ForeignKey(
+        Chip,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="samplesheet",
+    )
+    samplesheet = models.FileField(
+        upload_to="samplesheets/",
+        validators=[FileExtensionValidator(allowed_extensions=["tsv"])],
     )

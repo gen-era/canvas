@@ -27,11 +27,11 @@ class SampleTable(tables.Table):
         template_name="canvas/sample_protocol_id_column.html"
     )
 
-    chip_sample = tables.TemplateColumn(template_name="canvas/chip_sample_column.html")
+    chipsample = tables.TemplateColumn(template_name="canvas/chipsample_column.html")
     chip = tables.Column(accessor="chipsample.first.chip.chip_id")
     position = tables.Column(accessor="chipsample.first.position")
 
     class Meta:
         model = Sample
         template_name = "canvas/table_base.html"
-        fields = ("protocol_id", "chip_sample", "sample_type", "institution")
+        fields = ("protocol_id", "chipsample", "sample_type", "institution")

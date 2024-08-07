@@ -127,8 +127,8 @@ class Search(MultiTableMixin, TemplateView):
             """
             )
             chips = Chip.objects.filter(chip_id__icontains=chip_search)
-            chip_samples = ChipSample.objects.filter(chip__in=chips)
-            sample_ids = chip_samples.values_list("sample", flat=True)
+            chipsamples = ChipSample.objects.filter(chip__in=chips)
+            sample_ids = chipsamples.values_list("sample", flat=True)
             samples = Sample.objects.filter(id__in=sample_ids)
             institution_ids = samples.values_list("institution", flat=True)
             institutions = Institution.objects.filter(id__in=institution_ids)
