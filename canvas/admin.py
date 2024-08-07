@@ -11,6 +11,8 @@ from .models import (
     ChipSample,
     IDAT,
     GTC,
+    VCF,
+    BedGraph
 )
 
 
@@ -80,7 +82,22 @@ class GTCAdmin(admin.ModelAdmin):
     def protocol_id(self, obj):
         return obj.chip_sample.sample.protocol_id
 
+class VCFAdmin(admin.ModelAdmin):
+    list_display = ["vcf", "protocol_id"]
+    search_fields = ["vcf", "protocol_id"]
 
+    def protocol_id(self, obj):
+        return obj.chip_sample.sample.protocol_id
+    
+class BedGraphAdmin(admin.ModelAdmin):
+    list_display = ["chip_sample", "bedgraph", "bedgraph_type", "protocol_id"]
+    search_fields = ["bedgraph", "protocol_id"]
+
+    def protocol_id(self, obj):
+        try:
+            return obj.chip_sample.sample.protocol_id
+        except:
+            return "abc"
 admin.site.register(Lot)
 admin.site.register(Chip, ChipAdmin)
 admin.site.register(ChipType, ChipTypeAdmin)
@@ -90,3 +107,5 @@ admin.site.register(Sample, SampleAdmin)
 admin.site.register(ChipSample, ChipSampleAdmin)
 admin.site.register(IDAT, IDATAdmin)
 admin.site.register(GTC, GTCAdmin)
+admin.site.register(VCF, VCFAdmin)
+admin.site.register(BedGraph,BedGraphAdmin)

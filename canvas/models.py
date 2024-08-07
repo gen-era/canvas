@@ -1,4 +1,5 @@
 from django.core.validators import RegexValidator, FileExtensionValidator
+from django.core.exceptions import ValidationError
 
 from django.db import models
 from taggit.managers import TaggableManager
@@ -63,14 +64,6 @@ class Institution(models.Model):
         super().save(*args, **kwargs)
 
 
-def validate_position(value):
-    pattern = r"^R\d{2}C\d{2}$"  # Regex pattern for R01C01, R02C01, R03C01, etc.
-    if not bool(re.match(pattern, value)):
-        raise ValidationError(
-            "Position must follow the format R01C01, R02C01, R03C01, etc."
-        )
-
-
 class Sample(models.Model):
     entry_date = models.DateTimeField(
         auto_now_add=True
@@ -79,7 +72,9 @@ class Sample(models.Model):
     study_date = models.DateField(null=True)
     protocol_id = models.CharField(max_length=100)
     concentration = models.DecimalField(max_digits=5, decimal_places=1)
-    institution = models.ForeignKey(Institution, on_delete=models.PROTECT, related_name="sample")
+    institution = models.ForeignKey(
+        Institution, on_delete=models.PROTECT, related_name="sample"
+    )
     data_info = TaggableManager()
     description = models.CharField(max_length=255, null=True)
     sample_type = models.ForeignKey(SampleType, on_delete=models.PROTECT)
@@ -99,8 +94,19 @@ class ChipSample(models.Model):
     )
 
     call_rate = models.DecimalField(max_digits=10, decimal_places=7)
-    chip = models.ForeignKey(Chip, on_delete=models.PROTECT, null=True, blank=True, related_name="chipsample")
-    position = models.CharField(max_length=10, validators=[validate_position])
+    chip = models.ForeignKey(
+        Chip, on_delete=models.PROTECT, null=True, blank=True, related_name="chipsample"
+    )
+    position = models.CharField(
+        max_length=10,
+        validators=[
+            RegexValidator(
+                regex=r"^R\d{2}C\d{2}$",
+                message="Position should follow this structure: R01C01",
+                code="invalid_position",
+            ),
+        ],
+    )
 
     def __str__(self):
         return f"{self.sample.protocol_id} - {self.chip.scan_date}"
@@ -128,3 +134,35 @@ class GTC(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=["gtc"])],
     )
     chip_sample = models.ForeignKey(ChipSample, on_delete=models.PROTECT)
+
+
+class VCF(models.Model):
+    chip_sample = models.ForeignKey(
+        ChipSample, on_delete=models.PROTECT, null=True, blank=True
+    )
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    vcf = models.FileField(
+        upload_to="vcfs/",
+        validators=[FileExtensionValidator(allowed_extensions=["vcf.gz"])],
+    )
+
+
+class BedGraph(models.Model):
+    bedgraph_types = [("LRR", "Log R Ratio"), ("BAF", "B Allele Frequency")]
+    chip_sample = models.ForeignKey(
+        ChipSample,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="bedgraph",
+    )
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    bedgraph_type = models.CharField(max_length=50, choices=bedgraph_types)
+    bedgraph = models.FileField(
+        upload_to="bedGraphs/",
+        validators=[FileExtensionValidator(allowed_extensions=["bedgraph.gz"])],
+    )

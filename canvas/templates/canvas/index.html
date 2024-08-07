@@ -1,8 +1,73 @@
-{% extends "layouts/blank.html" %}
+{% extends "base.html" %}
+
 {% block content %}
 
-  {% include "canvas/components/search.html" %}
+{% include "canvas/components/search.html" %}
 
-<!-- {% include "canvas/components/uploader.html" %} -->
-  {% include "canvas/components/sample.html" %}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    </ul>
+  <div class="tab-content" id="myTabContent">
+      </div>
+    
+  
+      <script>
+        function addNewTab(event, protocolId, chipsample_pk) {
+            event.preventDefault();
+    
+            const newTabId = `tab-${chipsample_pk}`;
+            const existingTab = document.getElementById(newTabId + '-tab');
+    
+            if (existingTab) {
+                // If the tab already exists, activate it
+                existingTab.click();
+            } else {
+                // Create new tab button with close icon
+                const newTab = document.createElement('li');
+                newTab.className = 'nav-item';
+                newTab.role = 'presentation';
+                newTab.innerHTML = `
+                    <button class="nav-link" id="${newTabId}-tab" data-bs-toggle="tab" data-bs-target="#${newTabId}" type="button" role="tab" aria-controls="${newTabId}" aria-selected="false">
+                        ${protocolId}
+                        <span class="tab-close" onclick="closeTab('${newTabId}')">&times;</span>
+                    </button>
+                `;
+    
+                // Append new tab button
+                document.getElementById('myTab').appendChild(newTab);
+    
+                // Create new tab pane
+                const newTabContent = document.createElement('div');
+                newTabContent.className = 'tab-pane fade';
+                newTabContent.id = newTabId;
+                newTabContent.role = 'tabpanel';
+                newTabContent.ariaLabelledby = `${newTabId}-tab`;
+                const samplediv = document.createElement('div');    
+                samplediv.id = "chipsample-results-"+ chipsample_pk
+                newTabContent.appendChild(samplediv);
+                // Append new tab pane
+                document.getElementById('myTabContent').appendChild(newTabContent);
+    
+                // Activate the new tab
+                newTab.querySelector('button').click();
+            }
+        }
+    
+        function closeTab(tabId) {
+            // Remove tab and tab content
+            const tab = document.getElementById(`${tabId}-tab`).parentElement;
+            const tabContent = document.getElementById(tabId);
+            tab.remove();
+            tabContent.remove();
+    
+            // Activate the first available tab if the closed tab was active
+            if (tab.classList.contains('active')) {
+                const firstTab = document.querySelector('#myTab .nav-link');
+                if (firstTab) {
+                    firstTab.click();
+                }
+            }
+        }
+    </script>
+
+{#% include "canvas/components/uploader.html" %#}
 {% endblock content %}
