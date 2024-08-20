@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "taggit",
     "allauth",
     "allauth.account",
-    "django_tables2",
     "django_htmx",
     "minio_storage",
     "home",
@@ -182,6 +181,3 @@ MINIO_STORAGE_MEDIA_BACKUP_FORMAT = "%c/"
 
 MINIO_STORAGE_STATIC_BUCKET_NAME = "canvas-static"
 MINIO_STORAGE_AUTO_CREATE_STATIC_BUCKET = True
-
-
-DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5.html"

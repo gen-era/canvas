@@ -78,7 +78,7 @@ class Sample(models.Model):
     data_info = TaggableManager()
     description = models.CharField(max_length=255, null=True)
     sample_type = models.ForeignKey(SampleType, on_delete=models.PROTECT)
-    repeat = models.ManyToManyField("self", blank=True, null=True)
+    repeat = models.ManyToManyField("self", blank=True)
 
     def __str__(self):
         return f"{self.protocol_id} - {self.arrival_date}"
