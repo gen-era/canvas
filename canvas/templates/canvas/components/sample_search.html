@@ -1,0 +1,47 @@
+<div class="p-4 space-y-4">
+    <input
+        id="sample-search"
+    class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+        type="search"
+        name="search"
+        placeholder="Search Samples..."
+        hx-get="{% url 'sample_search' %}"
+        hx-trigger="input changed delay:500ms"
+        hx-target="#sample-results"
+        hx-vals='{"page": 1}'
+    />
+
+    <div class="flex space-x-4">
+        {% include "canvas/components/institution_search.html" %}
+
+        {% include "canvas/components/chip_search.html" %}
+    </div>
+
+    <div id="sample-results"
+        class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {% include "canvas/partials/sample_results.html" %}
+    </div>
+</div>
+
+<script>
+function createSearchComponent(type) {
+    return {
+        open: false,
+        searchQuery: '',
+        selectedItems: [],
+        selectItem(item) {
+            if (!this.selectedItems.includes(item)) {
+                this.selectedItems.push(item);
+            }
+            this.clearSearch();
+        },
+        clearSearch() {
+            this.searchQuery = '';
+            this.open = false;
+        },
+        removeItem(item) {
+            this.selectedItems = this.selectedItems.filter(i => i !== item);
+        }
+    }
+}
+</script>

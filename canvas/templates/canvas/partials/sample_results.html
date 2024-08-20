@@ -1,0 +1,58 @@
+{% for sample in samples %}
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-6 border border-gray-200"
+         {% if forloop.last and samples.has_next %}
+                hx-get="{% url 'sample_search'  %}"
+                hx-trigger="revealed"
+                hx-swap="afterend"
+                hx-target="this"
+                hx-vals='{"page": "{{ samples.next_page_number }}", "search": "{{ query }}"}'
+         {% endif %}
+    >
+        <h3 class="text-lg font-semibold mb-2">Sample ID: {{ sample.protocol_id }}</h3>
+        <p class="text-gray-800">Arrival Date: {{ sample.arrival_date }}</p>
+        <p class="text-gray-600 mb-4">Entry Date: {{ sample.entry_date }}</p>
+
+        <ul class="list-disc pl-5 mb-4">
+        {% for chipsample in sample.chipsample.all %}
+        <li class="mb-2">
+        <div
+            hx-get="{% url 'chipsample_tab_button' %}"
+            hx-target="#tab-buttons"
+            hx-trigger="click"
+            hx-swap="beforeend"
+            hx-on::before-request="
+                const existingTabIds = Array.from(
+                    document.getElementsByClassName('tab-button')
+                ).map(e => e.id)
+                const tabId = 'tab-button-{{  chipsample.pk }}';
+                if (existingTabIds.includes(tabId)) {
+                    event.preventDefault();  // Stop the request
+                    document.getElementById(tabId).click()
+                }
+                "
+            hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'
+        >
+            <div
+                hx-get="{% url 'chipsample_tab_content' %}"
+                hx-target="#tab-contents"
+                hx-trigger="click"
+                hx-swap="beforeend"
+                hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'
+            >
+                <p class="text-gray-800">Scan Date: {{  chipsample.chip.scan_date }}</p>
+                <button
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                {{ chipsample.chip.chip_id }}_{{ chipsample.position }}
+                </button>
+            </div>
+        </div>
+        </li>
+        {% endfor %}
+        </ul>
+        <p class="text-gray-800 mb-2">Chip ID: {{ sample.chipsample.first.chip.chip_id }}</p>
+        <p class="text-gray-800">Institute: {{ sample.institution }}</p>
+        <p class="text-gray-800">Institute: {{ sample.sample_type }}</p>
+        <!-- Other sample details -->
+    </div>
+{% endfor %}
