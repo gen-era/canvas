@@ -1,0 +1,20 @@
+<button
+    :class="activeTab === {{ chipsample.pk }} ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'"
+    @click="activeTab = {{ chipsample.pk }}"
+    x-init="activeTab = {{ chipsample.pk }}"
+    class="tab-button px-4 py-2 focus:outline-none"
+    id="tab-button-{{ chipsample.pk }}"
+>
+    {{  chipsample.chip.chip_id }} - {{  chipsample.position }}
+
+    <span
+        @click="
+        document.getElementById('tab-button-{{ chipsample.pk }}').remove();
+        document.getElementById('tab-content-{{ chipsample.pk }}').remove();
+        if (activeTab === {{ chipsample.pk }}) {
+            const remainingTabs = Array.from(document.querySelectorAll('.tab-button')).map(btn => parseInt(btn.id.replace('tab-button-', '')));
+            activeTab = remainingTabs.length > 0 ? remainingTabs[remainingTabs.length - 1] : null;
+        }
+        "
+    >  &times;</span>
+</button>
