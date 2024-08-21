@@ -2,8 +2,9 @@
     <div class="flex flex-wrap items-center border border-gray-300 rounded-lg">
         <!-- Chips Display -->
         <template x-for="item in selectedItems" :key="item">
-            <span class="inline-block bg-blue-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
-                <span x-text="item"></span>
+            <span class="inline-block bg-orange-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
+                <!-- Class selected-institutions is used to capture the span items. -->
+                <span class="selected-institutions" x-text="item"></span>
                 <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
             </span>
         </template>

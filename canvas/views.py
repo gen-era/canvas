@@ -64,8 +64,22 @@ def chip_search(request):
 def sample_search(request):
     query = request.GET.get("search", "")
     page = request.GET.get("page")
+    institutions = request.GET.getlist("institutions")
+    chips = request.GET.getlist("chips")
 
-    samples = Sample.objects.filter(protocol_id__icontains=query).order_by("entry_date")
+    # Start with filtering by protocol ID
+    samples = Sample.objects.filter(protocol_id__icontains=query)
+
+    # Filter by institutions if any are selected
+    if institutions:
+        samples = samples.filter(institution__name__in=institutions)
+
+    # Assuming a relationship exists, filter by chips
+    if chips:
+        samples = samples.filter(chipsample__chip__chip_id__in=chips)
+
+    # Order by entry date
+    samples = samples.order_by("entry_date")
 
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)

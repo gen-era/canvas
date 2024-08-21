@@ -6,9 +6,9 @@
         name="search"
         placeholder="Search Samples..."
         hx-get="{% url 'sample_search' %}"
-        hx-trigger="input changed delay:500ms"
+        hx-trigger="input changed delay:500ms, searchSamples from:document"
         hx-target="#sample-results"
-        hx-vals='{"page": 1}'
+        hx-vals='js:{"page": 1, "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
     />
 
     <div class="flex space-x-4">
@@ -24,6 +24,13 @@
 </div>
 
 <script>
+function getSelectedInstitutions() {
+     return Array.from(document.getElementsByClassName("selected-institutions")).map(e => e.innerText)
+}
+
+function getSelectedChips() {
+     return Array.from(document.getElementsByClassName("selected-chips")).map(e => e.innerText)
+}
 function createSearchComponent(type) {
     return {
         open: false,
@@ -32,6 +39,11 @@ function createSearchComponent(type) {
         selectItem(item) {
             if (!this.selectedItems.includes(item)) {
                 this.selectedItems.push(item);
+
+                setTimeout(() => {
+                    document.dispatchEvent(new Event("searchSamples")),
+                    50
+                });
             }
             this.clearSearch();
         },
@@ -41,6 +53,10 @@ function createSearchComponent(type) {
         },
         removeItem(item) {
             this.selectedItems = this.selectedItems.filter(i => i !== item);
+            setTimeout(() => {
+                document.dispatchEvent(new Event("searchSamples")),
+                50
+            });
         }
     }
 }
