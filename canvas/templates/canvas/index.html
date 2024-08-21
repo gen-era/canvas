@@ -1,4 +1,5 @@
 {% extends "canvas/base.html" %}
+{% load static %}
 
 {% block head %}
 {% endblock head %}
@@ -9,7 +10,12 @@
         <!-- Sidebar -->
         <div :class="sidebarExpanded ? 'w-1/5' : 'w-16'" class="bg-gray-100 border-r border-gray-300 flex flex-col">
             <div class="flex justify-between p-4">
-                <div x-show="sidebarExpanded" class="font-bold text-lg">CaNVas</div>
+                <div x-show="sidebarExpanded" class="font-bold text-lg">
+
+                    <img
+                        class="inline-block h-12"
+                        src="{% static 'canvas/img/canvas_logo.png' %}" alt="canvas_logo">
+                    CaNVas</div>
                 <button
                     @click="sidebarExpanded = !sidebarExpanded"
                     class="text-gray-600 focus:outline-none"
