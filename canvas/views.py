@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.views.generic.base import TemplateView
 
 from canvas.models import Sample, Chip, ChipSample, Institution, IDAT, BedGraph
-
+from django.contrib.auth.decorators import login_required
 
 from datetime import timedelta
 import json
@@ -17,7 +17,7 @@ import minio
 def index(request):
 
     samples = Sample.objects.order_by("entry_date")
-    paginator = Paginator(Sample.objects.order_by("id"), 5)
+    paginator = Paginator(Sample.objects.order_by("id"), 12)
     samples = paginator.get_page(1)
 
     return render(
@@ -30,6 +30,7 @@ def index(request):
     )
 
 
+@login_required
 def institution_search(request):
     query = request.POST.get("search", "")
     if query:
@@ -44,6 +45,7 @@ def institution_search(request):
     )
 
 
+@login_required
 def chip_search(request):
     query = request.POST.get("search", "")
     if query:
@@ -58,13 +60,14 @@ def chip_search(request):
     )
 
 
+@login_required
 def sample_search(request):
     query = request.GET.get("search", "")
     page = request.GET.get("page")
 
     samples = Sample.objects.filter(protocol_id__icontains=query).order_by("entry_date")
 
-    paginator = Paginator(samples, 5)
+    paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)
     return render(
         request,
@@ -73,6 +76,7 @@ def sample_search(request):
     )
 
 
+@login_required
 def chipsample_tab_button(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
@@ -83,6 +87,7 @@ def chipsample_tab_button(request):
     )
 
 
+@login_required
 def chipsample_tab_content(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
@@ -95,6 +100,7 @@ def chipsample_tab_content(request):
     )
 
 
+@login_required
 def put_presigned_url(bucket_name, file_name, expiration=600):
 
     client = minio.Minio(
@@ -109,6 +115,7 @@ def put_presigned_url(bucket_name, file_name, expiration=600):
     )
 
 
+@login_required
 def get_presigned_url(bucket_name, file_path, expiration=600):
 
     client = minio.Minio(

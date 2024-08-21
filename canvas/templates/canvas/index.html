@@ -1,19 +1,72 @@
 {% extends "canvas/base.html" %}
 
 {% block head %}
-
 {% endblock head %}
 
 {% block content %}
+{% if user.is_authenticated %}
+    <div id="authenticated-content" x-data="{ showSampleSearch: true, sidebarExpanded: true }" class="flex h-screen">
+        <!-- Sidebar -->
+        <div :class="sidebarExpanded ? 'w-1/5' : 'w-16'" class="bg-gray-100 border-r border-gray-300 flex flex-col">
+            <div class="flex justify-between p-4">
+                <div x-show="sidebarExpanded" class="font-bold text-lg">CaNVas</div>
+                <button
+                    @click="sidebarExpanded = !sidebarExpanded"
+                    class="text-gray-600 focus:outline-none"
+                >
+                    <svg x-show="sidebarExpanded" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <svg x-show="!sidebarExpanded" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+            <ul class="flex-grow">
+                <li>
+                    <button
+                        @click="showSampleSearch = !showSampleSearch; $nextTick(() => { window.dispatchEvent(new Event('resize')); })"
+                        class="w-full py-2 px-4 flex items-center justify-start text-left bg-blue-500 text-white"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span x-show="sidebarExpanded" class="ml-2">Samples</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="w-full py-2 px-4 flex items-center justify-start text-left bg-white hover:bg-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span x-show="sidebarExpanded" class="ml-2">Variants</span>
+                    </button>
+                </li>
+            </ul>
+            <!-- Include Logout Form -->
+            <div class="mt-auto p-4">
+                {% include "canvas/logout.html" %}
+            </div>
+        </div>
 
-    <div style="height:40vh; overflow: auto;">
-    {% include "canvas/components/sample_search.html" %}
+        <!-- Main content -->
+        <div class="flex flex-1">
+            <!-- Left Section: Sample Search -->
+            <div
+                class="w-1/2 border-r border-gray-300 p-4 overflow-auto"
+                x-show="showSampleSearch"
+                x-cloak
+            >
+                {% include "canvas/components/sample_search.html" %}
+            </div>
+
+            <!-- Right Section: Chip Tabs -->
+            <div class="flex-1 p-4 overflow-auto">
+                {% include "canvas/components/chipsample_tabs.html" %}
+            </div>
+        </div>
     </div>
-
-    <div style="height:40vh; overflow: auto;">
-    {% include "canvas/components/chipsample_tabs.html" %}
-    </div>
-
-    {#% include "canvas/components/sample.html" %#}
-
+{% else %}
+    {% include "canvas/login.html" %}
+{% endif %}
 {% endblock content %}

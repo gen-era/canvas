@@ -1,0 +1,4 @@
+<form hx-post="{% url 'account_logout' %}" hx-target="#authenticated-content" hx-swap="outerHTML">
+    {% csrf_token %}
+    <button type="submit" class="text-indigo-600 hover:text-indigo-900">Logout</button>
+</form>

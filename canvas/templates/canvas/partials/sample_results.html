@@ -8,7 +8,7 @@
                 hx-vals='{"page": "{{ samples.next_page_number }}", "search": "{{ query }}"}'
          {% endif %}
     >
-        <h3 class="text-lg font-semibold mb-2">Sample ID: {{ sample.protocol_id }}</h3>
+        <h3 class="text-lg font-semibold mb-2">Protocol ID: {{ sample.protocol_id }}</h3>
         <p class="text-gray-800">Arrival Date: {{ sample.arrival_date }}</p>
         <p class="text-gray-600 mb-4">Entry Date: {{ sample.entry_date }}</p>
 
@@ -43,7 +43,8 @@
                 <button
                 class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 >
-                {{ chipsample.chip.chip_id }}_{{ chipsample.position }}
+                {{ chipsample.chip.chip_id }}
+                    {{ chipsample.position }}
                 </button>
             </div>
         </div>
