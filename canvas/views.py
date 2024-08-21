@@ -16,8 +16,8 @@ import minio
 
 def index(request):
 
-    samples = Sample.objects.order_by("entry_date")
-    paginator = Paginator(Sample.objects.order_by("id"), 12)
+    samples = Sample.objects.order_by("-entry_date")
+    paginator = Paginator(samples, 12)
     samples = paginator.get_page(1)
 
     return render(
@@ -79,7 +79,7 @@ def sample_search(request):
         samples = samples.filter(chipsample__chip__chip_id__in=chips)
 
     # Order by entry date
-    samples = samples.order_by("entry_date")
+    samples = samples.order_by("-entry_date")
 
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)
