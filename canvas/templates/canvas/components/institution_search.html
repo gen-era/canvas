@@ -1,13 +1,28 @@
+{% if label == "sample-search" %}
 <div x-data="createSearchComponent('institution')" class="flex-1 relative">
+  {% else %}
+<div x-data="createSearchComponent('institution', true)" class="flex-1 relative">
+{% endif %}
+
     <div class="flex flex-wrap items-center border border-gray-300 rounded-lg">
         <!-- Chips Display -->
-        <template x-for="item in selectedItems" :key="item">
+        <template x-if="!isSingleSelect">
+            <template x-for="item in selectedItems" :key="item">
+                <span class="inline-block bg-orange-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
+                    <span class="selected-institutions-{{ label }}" x-text="item"></span>
+                    <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
+                </span>
+            </template>
+        </template>
+
+        <!-- Single Selected Item Display -->
+        <template x-if="isSingleSelect && selectedItem">
             <span class="inline-block bg-orange-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
-                <!-- Class selected-institutions is used to capture the span items. -->
-                <span class="selected-institutions-{{ label }}" x-text="item"></span>
-                <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
+                <span class="selected-institution-{{ label }}" x-text="selectedItem"></span>
+                <button type="button" @click="removeItem()" class="ml-2 text-white">x</button>
             </span>
         </template>
+
 
         <!-- Input Field -->
         <input
@@ -16,6 +31,7 @@
           type="search"
           name="search"
           x-model="searchQuery"
+          x-show="!isSingleSelect || !selectedItem"
           placeholder="Search Institutions..."
           hx-post="{% url 'institution_search' %}"
           hx-trigger="input changed delay:500ms"
