@@ -1,7 +1,12 @@
-<div id="sample-input-row-{{ label }}" class="sample-input-row">
-    <input type="text" name="protocol_id" class="form-control" required>
+<div
+    id="sample-input-row-{{ label }}"
+    class="sample-input-row"
+    hx-get="{% url 'get_sample_input_row' %}"
+    hx-trigger="input from:.sample-input-row:last-child once"
+    hx-swap="afterend"
+>
+    <input class="protocol-id-input" type="text" name="protocol_id" class="form-control" required>
 
-    <input type="text" name="name" class="form-control" required>
     {% include "canvas/components/institution_search.html" %}
 
         <div class="relative" x-data="{ openSampleType: false, selectedSampleType: '' }" @click.away="open = false">
@@ -18,23 +23,8 @@
             </ul>
         </div>
 
-
-    <input type="date" name="arrival_date" class="form-control" required>
-
-        <div class="relative" x-data="{ openChipType: false, selectedChipType: '' }" @click.away="open = false">
-            <input
-                class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-150 ease-in-out"
-                type="search" name="chip-type-search" placeholder="Search chip types..."
-                hx-post="{% url 'chip_type_search' %}" 
-                hx-trigger="input changed delay:500ms"
-                hx-target="#chip-results"
-                @input="openChipType = true" 
-                x-model="selectedChipType"/>
-            <ul x-show="openChipType" class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
-                id="chip-results" @click.away="openChipType = false" @click="selectedChipType = $event.target.textContent.trim(), openChipType= false">
-            </ul>
-        </div>
-    <input type="date" name="study_date" class="form-control">
-    <input type="text" name="description" class="form-control">
+    <input type="date" name="arrival_date" required>
+    <input type="date" name="study_date">
+    <input type="text" name="description">
     <input type="number" name="concentration" min="0" step="0.1" class="form-control" required>
 </div>

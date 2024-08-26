@@ -1,12 +1,11 @@
-<!-- form göndermece divi -->
 <div>
-    <!-- yeni satır eklemece divi -->
     <div
         id="sample-input-rows"
         hx-get="{% url 'get_sample_input_row' %}"
-        hx-trigger="input delay:500ms from:(.sample-input-row :last-child)"
+        hx-trigger="click target:.sample-input-row:last-child"
         hx-swap="beforeend"
     >
+        <!-- Initial row -->
         {% include "canvas/partials/sample_input_row.html" %}
     </div>
 </div>
