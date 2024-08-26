@@ -49,6 +49,13 @@
                         <span x-show="sidebarExpanded" class="ml-2"> Variants</span>
                     </button>
                 </li>
+                <li>
+                    <a href="{% url 'sample_input_page' %}" class="w-full py-2 px-4 flex items-center justify-start text-left bg-white hover:bg-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+                        class="w-6 h-6"><path d="M256 0C114.61 0 0 114.6 0 256s114.61 256 256 256c141.4 0 256-114.6 256-256S397.41 0 256 0zM144 368V320h224v48H144zm224-112H144v-48h224v48zM144 192V144h224v48H144z"/></svg>
+                        <span x-show="sidebarExpanded" class="ml-2">Input Samples</span>
+                    </a>
+                </li>
             </ul>
             <!-- Include Logout Form -->
             <div class="mt-auto p-4">

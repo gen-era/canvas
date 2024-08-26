@@ -1,0 +1,28 @@
+{% extends "canvas/index.html" %}
+
+{% block content %}
+    <form id="sample-form" method="post" hx-post="{% url 'save_form' %}" hx-target="#form-container">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Protocol ID</th>
+                    <th>Name</th>
+                    <th>Institution</th>
+                    <th>Sample Type</th>
+                    <th>Arrival Date</th>
+                    <th>Chip Type</th>
+                    <th>Study Date</th>
+                    <th>Description</th>
+                    <th>Concentration</th>
+                </tr>
+            </thead>
+            <tbody id="form-container">
+                {% include 'canvas/partials/sample_input_row.html' with index=1 %}
+            </tbody>
+        </table>
+        <button type="button" hx-get="{% url 'get_form_row' %}" hx-target="#form-container" hx-swap="afterend">Add Row</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

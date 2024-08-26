@@ -3,9 +3,9 @@ from django.shortcuts import render
 from django.views import View
 from django.core.paginator import Paginator
 
-from django.views.generic.base import TemplateView
+from django.http import JsonResponse
 
-from canvas.models import Sample, Chip, ChipSample, Institution, IDAT, BedGraph
+from canvas.models import Sample, Chip, ChipSample, Institution, IDAT, BedGraph, SampleType, ChipType
 from django.contrib.auth.decorators import login_required
 
 from datetime import timedelta
@@ -164,3 +164,66 @@ class ChipUpload(View):
         }
 
         return render(request, self.template_name, context)
+    
+def get_form_row(request):
+    row_index = request.GET.get('index', 2)
+    return render(request, 'canvas/partials/sample_input_row.html', {'index': row_index})
+
+def save_form(request):
+    if request.method == 'POST':
+        protocol_id = request.POST.getlist('protocol_id')
+        name = request.POST.getlist('name')
+        institution = request.POST.getlist('institution')
+        sample_type = request.POST.getlist('sample_type')
+        arrival_date = request.POST.getlist('arrival_date')
+        chip_type = request.POST.getlist('chip_type')
+        study_date = request.POST.getlist('study_date')
+        description = request.POST.getlist('description')
+        concentration = request.POST.getlist('concentration')
+
+        for i in range(len(protocol_id)):
+            Sample.objects.create(
+                protocol_id=protocol_id[i],
+                institution=Institution.objects.get(name=institution[i]),
+                sample_type=SampleType.objects.get(name=sample_type[i]),
+                chip_type=ChipType.objects.get(name=chip_type[i]),
+                arrival_date=arrival_date[i],
+                study_date=study_date[i],
+                description=description[i],
+                concentration=concentration[i],
+            )
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'failed'})
+
+def sample_input_page(request):
+    return render(request, 'canvas/sample_input.html', {'index': 1})
+
+@login_required
+def sample_type_search(request):
+    query = request.POST.get("sample-type-search", "")
+    if query:
+        types = SampleType.objects.filter(name__icontains=query)
+    else:
+        types = SampleType.objects.none()
+
+    return render(
+        request,
+        "canvas/partials/search_results.html",
+        {"items": types},
+    )
+
+@login_required
+def chip_type_search(request):
+    query = request.POST.get("chip-type-search", "")
+    if query:
+        chips = ChipType.objects.filter(name__icontains=query)
+    else:
+        chips = ChipType.objects.none()
+
+    return render(
+        request,
+        "canvas/partials/search_results.html",
+        {"items": chips},
+    )
