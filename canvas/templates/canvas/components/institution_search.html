@@ -4,28 +4,30 @@
         <template x-for="item in selectedItems" :key="item">
             <span class="inline-block bg-orange-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
                 <!-- Class selected-institutions is used to capture the span items. -->
-                <span class="selected-institutions" x-text="item"></span>
+                <span class="selected-institutions-{{ label }}" x-text="item"></span>
                 <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
             </span>
         </template>
 
         <!-- Input Field -->
         <input
-          id="institution-search{{ label }}"
-          class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none  transition duration-150 ease-in-out"
+          id="institution-search-{{ label }}"
+          class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-150 ease-in-out"
           type="search"
           name="search"
           x-model="searchQuery"
           placeholder="Search Institutions..."
           hx-post="{% url 'institution_search' %}"
           hx-trigger="input changed delay:500ms"
-          hx-target="#institution-results{{label}}"
-          @click="open = ! open"
+          hx-target="#institution-results-{{ label }}"
+          hx-swap="innerHTML"
+          @focus="open = true"
+          @input="open = true"
         />
     </div>
     <ul
       class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
-      id="institution-results{{  label }}"
+      id="institution-results-{{ label }}"
       x-show="open"
       @click.outside="open = false">
       <!-- Search results will be inserted here -->

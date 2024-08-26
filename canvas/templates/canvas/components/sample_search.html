@@ -12,9 +12,13 @@
     />
 
     <div class="flex space-x-4">
-        {% include "canvas/components/institution_search.html" %}
+        {% with label="sample-search" %}
+            {% include "canvas/components/institution_search.html" %}
+        {% endwith %}
 
-        {% include "canvas/components/chip_search.html" %}
+        {% with label="sample-search" %}
+            {% include "canvas/components/chip_search.html" %}
+        {% endwith %}
     </div>
 
     <div id="sample-results"

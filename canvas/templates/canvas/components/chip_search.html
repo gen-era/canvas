@@ -1,34 +1,37 @@
-        <div x-data="createSearchComponent('chip')" class="flex-1 relative">
-            <div class="flex flex-wrap items-center border border-gray-300 rounded-lg">
-                <!-- Chips Display -->
-                <template x-for="item in selectedItems" :key="item">
-                    <span class="inline-block bg-green-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
-                    <!-- Class selected-chips is used to capture the span items. -->
-                        <span class="selected-chips" x-text="item"></span>
-                        <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
-                    </span>
-                </template>
+<div x-data="createSearchComponent('chip')" class="flex-1 relative">
+    <div class="flex flex-wrap items-center border border-gray-300 rounded-lg">
+        <!-- Chips Display -->
+        <template x-for="item in selectedItems" :key="item">
+            <span class="inline-block bg-green-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
+            <!-- Class selected-chips is used to capture the span items. -->
+                <span class="selected-chips-{{ label }}" x-text="item"></span>
+                <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
+            </span>
+        </template>
 
-                <!-- Input Field -->
-                <input
-                  id="chip-search"
-                  class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none  transition duration-150 ease-in-out"
-                  type="search"
-                  name="search"
-                  x-model="searchQuery"
-                  placeholder="Search Chips..."
-                  hx-post="{% url 'chip_search' %}"
-                  hx-trigger="input changed delay:500ms"
-                  hx-target="#chip-results"
-                  @click="open = ! open"
-                />
-            </div>
+        <!-- Input Field -->
+        <input
+          id="chip-search"
+          class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none  transition duration-150 ease-in-out"
+          type="search"
+          name="search"
+          x-model="searchQuery"
+          placeholder="Search Chips..."
+          hx-post="{% url 'chip_search' %}"
+          hx-trigger="input changed delay:500ms"
+          hx-target="#chip-results"
+          hx-swap="innerHTML"
+          @click="open = ! open"
+          @focus="open = true"
+          @input="open = true"
+        />
+    </div>
 
-            <ul
-              id="chip-results"
-              class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
-              x-show="open"
-              @click.outside="open = false">
-              <!-- Search results will be inserted here -->
-            </ul>
-        </div>
+    <ul
+      id="chip-results"
+      class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
+      x-show="open"
+      @click.outside="open = false">
+      <!-- Search results will be inserted here -->
+    </ul>
+</div>

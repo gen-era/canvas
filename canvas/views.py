@@ -212,10 +212,6 @@ def save_form(request):
     return JsonResponse({"status": "failed"})
 
 
-def sample_input_page(request):
-    return render(request, "canvas/sample_input.html")
-
-
 @login_required
 def sample_type_search(request):
     query = request.POST.get("sample-type-search", "")
