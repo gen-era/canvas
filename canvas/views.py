@@ -5,12 +5,22 @@ from django.core.paginator import Paginator
 
 from django.http import JsonResponse
 
-from canvas.models import Sample, Chip, ChipSample, Institution, IDAT, BedGraph, SampleType, ChipType
+from canvas.models import (
+    Sample,
+    Chip,
+    ChipSample,
+    Institution,
+    IDAT,
+    BedGraph,
+    SampleType,
+    ChipType,
+)
 from django.contrib.auth.decorators import login_required
 
 from datetime import timedelta
 import json
 
+import secrets
 import minio
 
 
@@ -20,12 +30,14 @@ def index(request):
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(1)
 
+    label = secrets.token_urlsafe(6)
     return render(
         request,
         "canvas/index.html",
         {
             "title": "Index",
             "samples": samples,
+            "label": label,
         },
     )
 
@@ -164,22 +176,24 @@ class ChipUpload(View):
         }
 
         return render(request, self.template_name, context)
-    
-def get_form_row(request):
-    row_index = request.GET.get('index', 2)
-    return render(request, 'canvas/partials/sample_input_row.html', {'index': row_index})
+
+
+def get_sample_input_row(request):
+    label = secrets.token_urlsafe(6)
+    return render(request, "canvas/partials/sample_input_row.html", {"label": label})
+
 
 def save_form(request):
-    if request.method == 'POST':
-        protocol_id = request.POST.getlist('protocol_id')
-        name = request.POST.getlist('name')
-        institution = request.POST.getlist('institution')
-        sample_type = request.POST.getlist('sample_type')
-        arrival_date = request.POST.getlist('arrival_date')
-        chip_type = request.POST.getlist('chip_type')
-        study_date = request.POST.getlist('study_date')
-        description = request.POST.getlist('description')
-        concentration = request.POST.getlist('concentration')
+    if request.method == "POST":
+        protocol_id = request.POST.getlist("protocol_id")
+        name = request.POST.getlist("name")
+        institution = request.POST.getlist("institution")
+        sample_type = request.POST.getlist("sample_type")
+        arrival_date = request.POST.getlist("arrival_date")
+        chip_type = request.POST.getlist("chip_type")
+        study_date = request.POST.getlist("study_date")
+        description = request.POST.getlist("description")
+        concentration = request.POST.getlist("concentration")
 
         for i in range(len(protocol_id)):
             Sample.objects.create(
@@ -193,12 +207,14 @@ def save_form(request):
                 concentration=concentration[i],
             )
 
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({"status": "success"})
 
-    return JsonResponse({'status': 'failed'})
+    return JsonResponse({"status": "failed"})
+
 
 def sample_input_page(request):
-    return render(request, 'canvas/sample_input.html', {'index': 1})
+    return render(request, "canvas/sample_input.html")
+
 
 @login_required
 def sample_type_search(request):
@@ -213,6 +229,7 @@ def sample_type_search(request):
         "canvas/partials/search_results.html",
         {"items": types},
     )
+
 
 @login_required
 def chip_type_search(request):

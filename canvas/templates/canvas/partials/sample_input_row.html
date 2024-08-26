@@ -1,23 +1,9 @@
-<tr >
-    <td>{{ index }}</td>
-    <td><input type="text" name="protocol_id" class="form-control" required></td>
-    <td><input type="text" name="name" class="form-control" required></td>
-    <td>
-        <div class="relative" x-data="{ openInstitution: false, selectedIns: '' }" @click.away="openInstitution = false">
-            <input
-                class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-150 ease-in-out"
-                type="search" name="search" placeholder="Search Institutions..."
-                hx-post="{% url 'institution_search' %}" 
-                hx-trigger="input changed delay:500ms"
-                hx-target="#institution-results"
-                @input="openInstitution = true" 
-                x-model="selectedIns"/>
-            <ul x-show="openInstitution" class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
-                id="institution-results" @click.away="openInstitution = false" @click="selectedIns = $event.target.textContent.trim(), openInstitution= false">
-            </ul>
-        </div>        
-    </td>
-    <td>
+<div id="sample-input-row-{{ label }}" class="sample-input-row">
+    <input type="text" name="protocol_id" class="form-control" required>
+
+    <input type="text" name="name" class="form-control" required>
+    {% include "canvas/components/institution_search.html" %}
+
         <div class="relative" x-data="{ openSampleType: false, selectedSampleType: '' }" @click.away="open = false">
             <input
                 class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-150 ease-in-out"
@@ -31,9 +17,10 @@
                 id="sample-results" @click.away="openSampleType = false" @click="selectedSampleType = $event.target.textContent.trim(), openSampleType= false">
             </ul>
         </div>
-    </td>
-    <td><input type="date" name="arrival_date" class="form-control" required></td>
-    <td>
+
+
+    <input type="date" name="arrival_date" class="form-control" required>
+
         <div class="relative" x-data="{ openChipType: false, selectedChipType: '' }" @click.away="open = false">
             <input
                 class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-150 ease-in-out"
@@ -47,13 +34,7 @@
                 id="chip-results" @click.away="openChipType = false" @click="selectedChipType = $event.target.textContent.trim(), openChipType= false">
             </ul>
         </div>
-    </td>
-    <td><input type="date" name="study_date" class="form-control"></td>
-    <td><input type="text" name="description" class="form-control"></td>
-    <td><input type="number" name="concentration" step="0.1" class="form-control" required></td>
-</tr>
-<script>
-    function selectItem(item) {
-            return item
-        }
-</script>
+    <input type="date" name="study_date" class="form-control">
+    <input type="text" name="description" class="form-control">
+    <input type="number" name="concentration" min="0" step="0.1" class="form-control" required>
+</div>

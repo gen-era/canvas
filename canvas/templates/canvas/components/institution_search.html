@@ -11,7 +11,7 @@
 
         <!-- Input Field -->
         <input
-          id="institution-search"
+          id="institution-search{{ label }}"
           class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none  transition duration-150 ease-in-out"
           type="search"
           name="search"
@@ -19,13 +19,13 @@
           placeholder="Search Institutions..."
           hx-post="{% url 'institution_search' %}"
           hx-trigger="input changed delay:500ms"
-          hx-target="#institution-results"
+          hx-target="#institution-results{{label}}"
           @click="open = ! open"
         />
     </div>
     <ul
       class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
-      id="institution-results"
+      id="institution-results{{  label }}"
       x-show="open"
       @click.outside="open = false">
       <!-- Search results will be inserted here -->
