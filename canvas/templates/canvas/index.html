@@ -6,17 +6,28 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<div id="authenticated-content"
-     x-data="layoutManager()"
-     class="flex h-screen">
+<div x-data="{
+        sidebar: { isExpanded: true },
+        views: { currentView: 'sampleSearch' },
+        collapseSampleSearch: false,
+        showSampleSearch() {
+            this.views.currentView = 'sampleSearch';
+            this.collapseSampleSearch = !this.collapseSampleSearch; // Toggle visibility of sample search
+        },
+        showSampleInput() {
+            this.views.currentView = 'sampleInput';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        }
+    }"
+    class="flex h-screen">
     <!-- Sidebar -->
-        {% include "canvas/sidebar.html" %}
+    {% include "canvas/sidebar.html" %}
 
     <!-- Main content area -->
     <div class="flex-1 overflow-hidden">
         <!-- Sample Search View -->
         <div x-show="views.currentView === 'sampleSearch'" class="h-full flex">
-            <div class="w-1/2 border-r border-gray-300 p-4 overflow-auto">
+            <div :class="collapseSampleSearch ? 'hidden' : 'w-1/2 border-r border-gray-300 p-4 overflow-auto'">
                 {% include "canvas/components/sample_search.html" %}
             </div>
             <div class="flex-1 p-4 overflow-auto">
@@ -70,31 +81,6 @@ function createSearchComponent(type) {
             });
         }
     }
-}
-function layoutManager() {
-  return {
-    sidebar: {
-      isExpanded: true,
-    },
-    views: {
-      currentView: 'sampleSearch', // 'sampleSearch' or 'sampleInput'
-    },
-    toggleSidebar() {
-      this.sidebar.isExpanded = !this.sidebar.isExpanded;
-    },
-    showSampleSearch() {
-      this.views.currentView = 'sampleSearch';
-      this.$nextTick(() => {
-        window.dispatchEvent(new Event('resize'));
-      });
-    },
-    showSampleInput() {
-      this.views.currentView = 'sampleInput';
-      this.$nextTick(() => {
-        window.dispatchEvent(new Event('resize'));
-      });
-    }
-  }
 }
 </script>
 {% endblock content %}
