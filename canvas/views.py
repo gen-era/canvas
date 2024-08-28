@@ -118,11 +118,24 @@ def chipsample_tab_content(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
     bedgraphs = chipsample.bedgraph.all()
+    print(f"{bedgraphs=}")
+    for bedgraph in bedgraphs:
+        if bedgraph.bedgraph_type == "LRR":
+            lrr_bedgraph = bedgraph
+        elif bedgraph.bedgraph_type == "BAF":
+            baf_bedgraph = bedgraph
+
+    print(lrr_bedgraph)
+    print(baf_bedgraph)
 
     return render(
         request,
         "canvas/partials/chipsample_tab_content.html",
-        {"chipsample": chipsample, "bedgraphs": bedgraphs},
+        {
+            "chipsample": chipsample,
+            "lrr_bedgraph": lrr_bedgraph,
+            "baf_bedgraph": baf_bedgraph,
+        },
     )
 
 
