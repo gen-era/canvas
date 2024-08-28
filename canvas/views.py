@@ -183,7 +183,7 @@ def get_sample_input_row(request):
     return render(request, "canvas/partials/sample_input_row.html", {"label": label})
 
 
-def save_form(request):
+def save_samples(request):
     if request.method == "POST":
         protocol_id = request.POST.getlist("protocol_id")
         name = request.POST.getlist("name")
@@ -214,7 +214,7 @@ def save_form(request):
 
 @login_required
 def sample_type_search(request):
-    query = request.POST.get("sample-type-search", "")
+    query = request.POST.get("search", "")
     if query:
         types = SampleType.objects.filter(name__icontains=query)
     else:
@@ -239,4 +239,18 @@ def chip_type_search(request):
         request,
         "canvas/partials/search_results.html",
         {"items": chips},
+    )
+
+@login_required
+def sample_input_sample_search(request):
+    query = request.POST.get("search", "")
+    if query:
+        samples = Sample.objects.filter(protocol_id__icontains=query)
+    else:
+        samples = Sample.objects.none()
+
+    return render(
+        request,
+        "canvas/partials/search_results.html",
+        {"items": samples},
     )

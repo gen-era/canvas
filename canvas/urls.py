@@ -25,7 +25,7 @@ urlpatterns = [
     path(
         "get_sample_input_row/", views.get_sample_input_row, name="get_sample_input_row"
     ),
-    path("save_form/", views.save_form, name="save_form"),
+    path("save_samples/", views.save_samples, name="save_samples"),
     path(
         "sample_type_search/",
         views.sample_type_search,
@@ -35,5 +35,10 @@ urlpatterns = [
         "chip_type_search/",
         views.chip_type_search,
         name="chip_type_search",
+    ),
+    path(
+        "sample_input_sample_search/",
+        views.sample_input_sample_search,
+        name="sample_input_sample_search",
     ),
 ]
