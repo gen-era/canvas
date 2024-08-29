@@ -2,6 +2,7 @@ from pathlib import Path
 from collections import defaultdict
 from django.core.management.base import BaseCommand
 from canvas.models import ChipSample, BedGraph, IDAT, GTC, VCF
+import csv
 
 class Command(BaseCommand):
     help = "Associate files with ChipSample models"
@@ -45,11 +46,65 @@ class Command(BaseCommand):
                 i.stem.split("_")[1]: i for i in iscns
             }
                     
-        print(gather_scoresheets())
-        print(gather_cnvs())
 
 
-            # try:
+        # Function to process CNV file
+        def process_cnv_file(file_path):
+            cnv_data = {}
+            with open(file_path, 'r') as f:
+                for line in f:
+                    parts = line.strip().split()
+                    chr_info, numsnp_info, length_info, state_info, file_info, startsnp_info, endsnp_info, conf, iscn = parts
+                    region = chr_info.split(":")
+                    chr_start_end = f"{region[0]}_{region[1].split('-')[0]}_{region[1].split('-')[1]}"
+                    cnv = {
+                        "iscn": iscn,
+                        "chr_info": chr_info,
+                        "numsnp_info": numsnp_info,
+                        "length_info": length_info,
+                        "state_info": state_info,
+                        "file_info": file_info,
+                        "startsnp_info": startsnp_info,
+                        "endsnp_info": endsnp_info,
+                        "conf": conf
+                    }
+                    cnv_data[chr_start_end] = cnv
+            return cnv_data
+
+        # Function to process Scoresheet file
+        def process_scoresheet_file(file_path):
+            scoresheet_data = {}
+            with open(file_path, 'r') as f:
+                reader = csv.DictReader(f, delimiter='\t')
+                for row in reader:
+                    variant_id = row['VariantID']
+                    # Remove _DEL and _DUP from VariantID
+                    clean_variant_id = variant_id.replace('_DEL', '').replace('_DUP', '')
+                    scoresheet_data[clean_variant_id] = dict(row)
+            return scoresheet_data
+
+
+        scoresheets = gather_scoresheets()
+        cnvs= gather_cnvs()
+        
+        for position, scoresheet in scoresheets.items():
+                
+            cnv_data = process_cnv_file(cnvs[position])
+            scoresheet_data = process_scoresheet_file(scoresheet)
+
+            cnvs = {}
+            for variant_id, cnv_dict in cnv_data.items():
+                score_dict = scoresheet_data.get(variant_id, {})
+                merged_dict = {**cnv_dict, **score_dict}
+                cnvs[variant_id] = merged_dict
+            
+            
+
+
+
+
+
+# try:
             #     chipsample = ChipSample.objects.get(
             #         chip__chip_id=chip_id, position=position
             #     )
