@@ -22,4 +22,18 @@ urlpatterns = [
         name="chipsample_tab_button",
     ),
     path("chip_upload", views.ChipUpload.as_view(), name="chip_upload"),
+    path(
+        "get_sample_input_row/", views.get_sample_input_row, name="get_sample_input_row"
+    ),
+    path("save_form/", views.save_form, name="save_form"),
+    path(
+        "sample_type_search/",
+        views.sample_type_search,
+        name="sample_type_search",
+    ),
+    path(
+        "chip_type_search/",
+        views.chip_type_search,
+        name="chip_type_search",
+    ),
 ]

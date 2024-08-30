@@ -6,74 +6,121 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-    <div id="authenticated-content" x-data="{ showSampleSearch: true, sidebarExpanded: true }" class="flex h-screen">
-        <!-- Sidebar -->
-        <div :class="sidebarExpanded ? 'w-1/5' : 'w-16'" class="bg-gray-100 border-r border-gray-300 flex flex-col">
-            <div class="flex justify-between p-4">
-                <div x-show="sidebarExpanded" class="font-bold text-lg">
+<div x-data="{
+        sidebar: { isExpanded: true },
+        views: { currentView: 'sampleSearch' },
+        collapseSampleSearch: false,
+        showSampleSearch() {
+            this.views.currentView = 'sampleSearch';
+            this.collapseSampleSearch = !this.collapseSampleSearch; // Toggle visibility of sample search
+        },
+        showSampleInput() {
+            this.views.currentView = 'sampleInput';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        }
+    }"
+     id="authenticated-content"
+     class="container-fluid main"
+     style="padding-top:1em;"
+>
+    <!-- Sidebar -->
+    {% include "canvas/sidebar.html" %}
 
-                    <img
-                        class="inline-block h-12"
-                        src="{% static 'canvas/img/canvas_logo.png' %}" alt="canvas_logo">
-                    CaNVas</div>
-                <button
-                    @click="sidebarExpanded = !sidebarExpanded"
-                    class="text-gray-600 focus:outline-none"
-                >
-                    <svg x-show="sidebarExpanded" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <svg x-show="!sidebarExpanded" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                </button>
-            </div>
-            <ul class="flex-grow">
-                <li>
-                    <button
-                        @click="showSampleSearch = !showSampleSearch; $nextTick(() => { window.dispatchEvent(new Event('resize')); })"
-                        class="w-full py-2 px-4 flex items-center justify-start text-left bg-blue-500 text-white"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-                        class="w-6 h-6" <!-- Adjust size here -->
-                        ><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L28.1 342.6C10.1 360.6 0 385 0 410.5L0 416c0 53 43 96 96 96l5.5 0c25.5 0 49.9-10.1 67.9-28.1L448 205.3l9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-32-32-96-96-32-32zM205.3 256L352 109.3 402.7 160l-96 96-101.5 0z"/></svg>
-                        <span x-show="sidebarExpanded" class="ml-2">
-                            Samples</span>
-                    </button>
-                </li>
-                <li>
-                    <button class="w-full py-2 px-4 flex items-center justify-start text-left bg-white hover:bg-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-                        class="w-6 h-6" <!-- Adjust size here -->
-                        ><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM64 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L96 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
-                        <span x-show="sidebarExpanded" class="ml-2"> Variants</span>
-                    </button>
-                </li>
-            </ul>
-            <!-- Include Logout Form -->
-            <div class="mt-auto p-4">
-                {% include "canvas/logout.html" %}
-            </div>
-        </div>
-
-        <!-- Main content -->
-        <div class="flex flex-1">
-            <!-- Left Section: Sample Search -->
-            <div
-                class="w-1/2 border-r border-gray-300 p-4 overflow-auto"
-                x-show="showSampleSearch"
-                x-cloak
-            >
+    <!-- Main content area -->
+        <!-- Sample Search View -->
+        <div
+            x-show="views.currentView === 'sampleSearch'"
+            class="container-fluid sample-container"
+        >
+            <div>
                 {% include "canvas/components/sample_search.html" %}
             </div>
-
-            <!-- Right Section: Chip Tabs -->
-            <div class="flex-1 p-4 overflow-auto">
+            <div>
                 {% include "canvas/components/chipsample_tabs.html" %}
             </div>
         </div>
-    </div>
+        <div x-show="views.currentView === 'sampleInput'">
+            {% include "canvas/components/sample_input.html" %}
+        </div>
+        <!-- Full-sized Sample Input View -->
+</div>
+
 {% else %}
     {% include "canvas/login.html" %}
 {% endif %}
+
+<style>
+ .main {
+    display: grid;
+    grid-template-columns: 1fr 11fr;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+    justify-items: stretch;
+    align-items: stretch;
+ }
+ .sample-container {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+    justify-items: stretch;
+    align-items: stretch;
+ }
+</style>
+
+<script>
+function getSelectedInstitutions() {
+     return Array.from(document.getElementsByClassName("selected-institutions-sample-search")).map(e => e.innerText)
+}
+
+function getSelectedChips() {
+     return Array.from(document.getElementsByClassName("selected-chips-sample-search")).map(e => e.innerText)
+}
+function createSearchComponent(type, isSingleSelect = false) {
+     return {
+         searchQuery: '',
+         selectedItems: [],
+         selectedItem: null,
+         isSingleSelect: isSingleSelect,
+         selectItem(item) {
+             if (this.isSingleSelect) {
+                 this.selectedItem = item;
+             } else {
+                 if (!this.selectedItems.includes(item)) {
+                     this.selectedItems.push(item);
+                 }
+             }
+             setTimeout(() => {
+                 document.dispatchEvent(new Event("searchSamples")),
+                 50
+             });
+             this.closeDropdown();
+             this.clearSearch();
+         },
+         clearSearch() {
+             this.searchQuery = '';
+             this.open = false;
+         },
+         removeItem(item = null) {
+             if (this.isSingleSelect) {
+                 this.selectedItem = null;
+             } else {
+                 this.selectedItems = this.selectedItems.filter(i => i !== item);
+             }
+             setTimeout(() => {
+                 document.dispatchEvent(new Event("searchSamples")),
+                 50
+             });
+         },
+         openDropdown() {
+             this.open = true;
+             this.$refs.detailsElement.open = true;
+         },
+         closeDropdown() {
+             this.open = false;
+             this.$refs.detailsElement.open = false;
+         }
+     }
+}
+</script>
 {% endblock content %}

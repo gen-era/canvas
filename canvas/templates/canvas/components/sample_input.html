@@ -1,0 +1,28 @@
+<div class="container-fluid">
+    <div id="sample-input-rows" class="card">
+        <!-- Table Header -->
+        <div class="grid">
+            <div>Protocol ID</div>
+            <div>Institution</div>
+            <div>Sample Type</div>
+            <div>Arrival Date</div>
+            <div>Study Date</div>
+            <div>Description</div>
+            <div>Concentration</div>
+            <div>Remove row</div>
+        </div>
+        {% include "canvas/partials/sample_input_row.html" %}
+    </div>
+</div>
+
+<script>
+function removeRow(button) {
+    const row = button.closest('.sample-input-row');
+    const rows = document.querySelectorAll('.sample-input-row');
+    if (rows.length > 1) {
+        row.remove();
+    } else {
+        alert("You cannot remove the last remaining row.");
+    }
+}
+</script>

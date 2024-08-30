@@ -1,5 +1,11 @@
+{% if samples.number == 1 %}
+<header>
+    found {{ num_samples }} samples
+</header>
+{% endif %}
+
 {% for sample in samples %}
-<div class="bg-white shadow-lg rounded-lg p-6 mb-6 border border-gray-200"
+<article
      {% if forloop.last and samples.has_next %}
         hx-get="{% url 'sample_search'  %}"
         hx-trigger="intersect once"
@@ -7,72 +13,79 @@
         hx-target="this"
         hx-vals='js:{"page": "{{ samples.next_page_number }}", "search": "{{ query }}", "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
      {% endif %}>
-    <h3 class="text-lg font-semibold mb-2">Protocol ID: {{ sample.protocol_id }}</h3>
-    <p class="text-gray-800">
-        Arrival Date:
+    <header>
+        <strong>Protocol ID: {{ sample.protocol_id }}</strong>
+    </header>
+    <p>
+        <strong>Arrival Date:</strong>
         {{ sample.arrival_date }}
     </p>
-    <p class="text-gray-600 mb-4">
-        Entry Date:
+    <p>
+        <strong>Entry Date:</strong>
         {{ sample.entry_date }}
     </p>
 
-    <p class="text-gray-800">
-        Institute:
-                <span class="inline-block bg-amber-500 text-white text-sm font-semibold px-1 py-1 rounded-full">
-        {{ sample.institution }}
-                </span>
+    <p>
+        <strong>Institute:</strong>
+        <span>
+            {{ sample.institution }}
+        </span>
     </p>
-    <p class="text-gray-800">
-        Sample Type:
+    <p>
+        <strong>Sample Type:</strong>
         {{ sample.sample_type }}
     </p>
 
-        {% for chipsample in sample.chipsample.all %}
+    {% for chipsample in sample.chipsample.all %}
+    <article>
+        <header>
+            <strong>Chip ID:</strong>
+            <span>
+                {{ chipsample.chip.chip_id }}
+            </span>
+        </header>
+        <p>
 
-        <div class="bg-white shadow-lg rounded-lg  border border-gray-200 pt-2"
-            <p class="text-gray-800">
-                Chip ID:
-                <span
-                    class="inline-block bg-green-500 text-white text-sm font-semibold  px-1 py-1 rounded-full">
-                    {{ chipsample.chip.chip_id }}
-                </span>
-            </p>
-            <p class="text-gray-800">
-                Position:
-                <span
-                    class="inline-block bg-pink-500 text-white text-sm font-semibold  px-1 py-1 rounded-full">
+        <div hx-get="{% url 'chipsample_tab_button' %}" hx-target="#tab-buttons" hx-trigger="click"
+            hx-swap="beforeend" hx-on::before-request="
+            const existingTabIds = Array.from(
+                document.getElementsByClassName('tab-button')
+            ).map(e => e.id)
+            const tabId = 'tab-button-{{  chipsample.pk }}';
+            if (existingTabIds.includes(tabId)) {
+                event.preventDefault();  // Stop the request
+                document.getElementById(tabId).click()
+            }
+            " hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'>
+            <div hx-get="{% url 'chipsample_tab_content' %}" hx-target="#tab-contents" hx-trigger="click"
+                hx-swap="beforeend" hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'>
+
+                <strong>Position:</strong>
+                <a>
+                    Browse
                     {{ chipsample.position }}
-                </span>
-            </p>
-            <p class="text-gray-800">
-                Scan Date:
-                <span>
-                    {{ chipsample.chip.scan_date }}
-                </span>
-            </p>
-
-
-            <div hx-get="{% url 'chipsample_tab_button' %}" hx-target="#tab-buttons" hx-trigger="click"
-                hx-swap="beforeend" hx-on::before-request="
-                const existingTabIds = Array.from(
-                    document.getElementsByClassName('tab-button')
-                ).map(e => e.id)
-                const tabId = 'tab-button-{{  chipsample.pk }}';
-                if (existingTabIds.includes(tabId)) {
-                    event.preventDefault();  // Stop the request
-                    document.getElementById(tabId).click()
-                }
-                " hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'>
-                <div hx-get="{% url 'chipsample_tab_content' %}" hx-target="#tab-contents" hx-trigger="click"
-                    hx-swap="beforeend" hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'>
-                    <button class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-150">
-                        Browse
-                    </button>
-                </div>
+                </a>
             </div>
-            </div>
-        {% endfor %}
+        </div>
+
+        <a>
+            View Report
+        </a>
+
+        <footer>
+            <strong>Scan Date:</strong>
+            <span>
+                {{ chipsample.chip.scan_date }}
+            </span>
+        </footer>
+    </article>
+    {% endfor %}
     <!-- Other sample details -->
-</div>
+</article>
 {% endfor %}
+
+{% if not samples.has_next %}
+<footer>
+    No more samples
+</footer>
+{% endif %}

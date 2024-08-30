@@ -3,36 +3,50 @@ from django.shortcuts import render
 from django.views import View
 from django.core.paginator import Paginator
 
-from django.views.generic.base import TemplateView
+from django.http import JsonResponse
 
-from canvas.models import Sample, Chip, ChipSample, Institution, IDAT, BedGraph
+from canvas.models import (
+    Sample,
+    Chip,
+    ChipSample,
+    Institution,
+    IDAT,
+    BedGraph,
+    SampleType,
+    ChipType,
+)
 from django.contrib.auth.decorators import login_required
 
 from datetime import timedelta
 import json
 
+import secrets
 import minio
 
 
 def index(request):
 
     samples = Sample.objects.order_by("-entry_date")
+    num_samples = len(samples)
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(1)
 
+    label = secrets.token_urlsafe(6)
     return render(
         request,
         "canvas/index.html",
         {
             "title": "Index",
             "samples": samples,
+            "label": label,
+            "num_samples": num_samples,
         },
     )
 
 
 @login_required
 def institution_search(request):
-    query = request.POST.get("search", "")
+    query = request.POST.get("search", "").strip()
     if query:
         institutions = Institution.objects.filter(name__icontains=query)
     else:
@@ -47,7 +61,7 @@ def institution_search(request):
 
 @login_required
 def chip_search(request):
-    query = request.POST.get("search", "")
+    query = request.POST.get("search", "").strip()
     if query:
         chips = Chip.objects.filter(chip_id__icontains=query)
     else:
@@ -80,13 +94,16 @@ def sample_search(request):
 
     # Order by entry date
     samples = samples.order_by("-entry_date")
+    num_samples = len(samples)
 
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)
+    print(dir(samples))
+    print(samples.number)
     return render(
         request,
         "canvas/partials/sample_results.html",
-        {"samples": samples, "query": query},
+        {"samples": samples, "query": query, "num_samples": num_samples},
     )
 
 
@@ -106,11 +123,22 @@ def chipsample_tab_content(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
     bedgraphs = chipsample.bedgraph.all()
+    lrr_bedgraph = None
+    baf_bedgraph = None
+    for bedgraph in bedgraphs:
+        if bedgraph.bedgraph_type == "LRR":
+            lrr_bedgraph = bedgraph
+        elif bedgraph.bedgraph_type == "BAF":
+            baf_bedgraph = bedgraph
 
     return render(
         request,
         "canvas/partials/chipsample_tab_content.html",
-        {"chipsample": chipsample, "bedgraphs": bedgraphs},
+        {
+            "chipsample": chipsample,
+            "lrr_bedgraph": lrr_bedgraph,
+            "baf_bedgraph": baf_bedgraph,
+        },
     )
 
 
@@ -164,3 +192,67 @@ class ChipUpload(View):
         }
 
         return render(request, self.template_name, context)
+
+
+def get_sample_input_row(request):
+    label = secrets.token_urlsafe(6)
+    return render(request, "canvas/partials/sample_input_row.html", {"label": label})
+
+
+def save_form(request):
+    if request.method == "POST":
+        protocol_id = request.POST.getlist("protocol_id")
+        name = request.POST.getlist("name")
+        institution = request.POST.getlist("institution")
+        sample_type = request.POST.getlist("sample_type")
+        arrival_date = request.POST.getlist("arrival_date")
+        chip_type = request.POST.getlist("chip_type")
+        study_date = request.POST.getlist("study_date")
+        description = request.POST.getlist("description")
+        concentration = request.POST.getlist("concentration")
+
+        for i in range(len(protocol_id)):
+            Sample.objects.create(
+                protocol_id=protocol_id[i],
+                institution=Institution.objects.get(name=institution[i]),
+                sample_type=SampleType.objects.get(name=sample_type[i]),
+                chip_type=ChipType.objects.get(name=chip_type[i]),
+                arrival_date=arrival_date[i],
+                study_date=study_date[i],
+                description=description[i],
+                concentration=concentration[i],
+            )
+
+        return JsonResponse({"status": "success"})
+
+    return JsonResponse({"status": "failed"})
+
+
+@login_required
+def sample_type_search(request):
+    query = request.POST.get("sample-type-search", "")
+    if query:
+        types = SampleType.objects.filter(name__icontains=query)
+    else:
+        types = SampleType.objects.none()
+
+    return render(
+        request,
+        "canvas/partials/search_results.html",
+        {"items": types},
+    )
+
+
+@login_required
+def chip_type_search(request):
+    query = request.POST.get("chip-type-search", "")
+    if query:
+        chips = ChipType.objects.filter(name__icontains=query)
+    else:
+        chips = ChipType.objects.none()
+
+    return render(
+        request,
+        "canvas/partials/search_results.html",
+        {"items": chips},
+    )
