@@ -46,8 +46,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "django_htmx",
     "minio_storage",
-    "home",
-    "users",
 ]
 
 SITE_ID = 1

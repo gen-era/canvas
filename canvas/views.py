@@ -27,6 +27,7 @@ import minio
 def index(request):
 
     samples = Sample.objects.order_by("-entry_date")
+    num_samples = len(samples)
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(1)
 
@@ -38,13 +39,14 @@ def index(request):
             "title": "Index",
             "samples": samples,
             "label": label,
+            "num_samples": num_samples,
         },
     )
 
 
 @login_required
 def institution_search(request):
-    query = request.POST.get("search", "")
+    query = request.POST.get("search", "").strip()
     if query:
         institutions = Institution.objects.filter(name__icontains=query)
     else:
@@ -59,7 +61,7 @@ def institution_search(request):
 
 @login_required
 def chip_search(request):
-    query = request.POST.get("search", "")
+    query = request.POST.get("search", "").strip()
     if query:
         chips = Chip.objects.filter(chip_id__icontains=query)
     else:
@@ -92,13 +94,16 @@ def sample_search(request):
 
     # Order by entry date
     samples = samples.order_by("-entry_date")
+    num_samples = len(samples)
 
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)
+    print(dir(samples))
+    print(samples.number)
     return render(
         request,
         "canvas/partials/sample_results.html",
-        {"samples": samples, "query": query},
+        {"samples": samples, "query": query, "num_samples": num_samples},
     )
 
 
@@ -118,15 +123,13 @@ def chipsample_tab_content(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
     bedgraphs = chipsample.bedgraph.all()
-    print(f"{bedgraphs=}")
+    lrr_bedgraph = None
+    baf_bedgraph = None
     for bedgraph in bedgraphs:
         if bedgraph.bedgraph_type == "LRR":
             lrr_bedgraph = bedgraph
         elif bedgraph.bedgraph_type == "BAF":
             baf_bedgraph = bedgraph
-
-    print(lrr_bedgraph)
-    print(baf_bedgraph)
 
     return render(
         request,

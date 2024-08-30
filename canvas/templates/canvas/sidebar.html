@@ -1,48 +1,143 @@
 {% load static %}
 
-    <div :class="sidebar.isExpanded ? 'w-1/5' : 'w-16'" class="bg-gray-100 border-r border-gray-300 flex flex-col">
-        <div class="flex justify-between p-4">
-            <div x-show="sidebar.isExpanded" class="font-bold text-lg">
-                <img class="inline-block h-12" src="{% static 'canvas/img/canvas_logo.png' %}" alt="canvas_logo">
-                CaNVas
-            </div>
-            <button @click="sidebar.isExpanded = !sidebar.isExpanded" class="text-gray-600 focus:outline-none">
-                <svg x-show="sidebar.isExpanded" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                <svg x-show="!sidebar.isExpanded" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
-        </div>
+<article
+style="display:flex; flex-direction:column"
+>
+    <header>
+    <img src="{% static 'canvas/img/canvas_logo.png' %}" alt="canvas_logo">
+    <h2>CaNVas</h2>
+    </header>
 
-        <ul class="flex-grow">
+    <aside style="flex:1;">
+    <nav>
+        <ul>
             <li>
-                <button
+                <a href="#"
                     @click="showSampleSearch()"
-                    class="w-full py-2 px-4 flex items-center justify-start text-left"
-                    :class="{'bg-blue-500 text-white': views.currentView === 'sampleSearch'}"
+                    :class="{'primary': views.currentView === 'sampleSearch'}"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+                    style="height: 2em;"
+                    >
                         <path d="M342.6 9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L28.1 342.6C10.1 360.6 0 385 0 410.5L0 416c0 53 43 96 96 96l5.5 0c25.5 0 49.9-10.1 67.9-28.1L448 205.3l9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-32-32-96-96-32-32zM205.3 256L352 109.3 402.7 160l-96 96-101.5 0z"/>
                     </svg>
-                    <span x-show="sidebar.isExpanded" class="ml-2">Samples</span>
-                </button>
+                    <span x-show="sidebar.isExpanded">Samples</span>
+                </a>
             </li>
             <li>
-                <button
+                <a href="#"
                     @click="showSampleInput()"
-                    class="w-full py-2 px-4 flex items-center justify-start text-left"
-                    :class="{'bg-blue-500 text-white': views.currentView === 'sampleInput'}"
+                    :class="{'primary': views.currentView === 'sampleInput'}"
                 >
-                    <span x-show="sidebar.isExpanded" class="ml-2">Sample Input</span>
-                </button>
-            </li>
-            <!-- ... other sidebar items ... -->
-        </ul>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="height: 2em;">
+                    <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                    <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zM200 344l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
 
-        <!-- Include Logout Form -->
-        <div class="mt-auto p-4">
-            {% include "canvas/logout.html" %}
-        </div>
-    </div>
+                    <span x-show="sidebar.isExpanded">New Samples</span>
+                </a>
+            </li>
+
+            <li>
+                <details class="dropdown">
+                    <summary role="button" class="secondary">Theme</summary>
+                    <ul>
+                    <li><a href="#" data-theme-switcher="auto">Auto</a></li>
+                    <li><a href="#" data-theme-switcher="light">Light</a></li>
+                    <li><a href="#" data-theme-switcher="dark">Dark</a></li>
+                    </ul>
+                </details>
+            </li>
+        </ul>
+    </nav>
+    </aside>
+
+
+    <!-- Include Logout Form -->
+    <footer>
+        {% include "canvas/logout.html" %}
+    </footer>
+</article>
+
+
+<script>
+/*!
+ * Minimal theme switcher
+ *
+ * Pico.css - https://picocss.com
+ * Copyright 2019-2024 - Licensed under MIT
+ */
+
+const themeSwitcher = {
+  // Config
+  _scheme: "auto",
+  menuTarget: "details.dropdown",
+  buttonsTarget: "a[data-theme-switcher]",
+  buttonAttribute: "data-theme-switcher",
+  rootAttribute: "data-theme",
+  localStorageKey: "picoPreferredColorScheme",
+
+  // Init
+  init() {
+    this.scheme = this.schemeFromLocalStorage;
+    this.initSwitchers();
+  },
+
+  // Get color scheme from local storage
+  get schemeFromLocalStorage() {
+    return window.localStorage?.getItem(this.localStorageKey) ?? this._scheme;
+  },
+
+  // Preferred color scheme
+  get preferredColorScheme() {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  },
+
+  // Init switchers
+  initSwitchers() {
+    const buttons = document.querySelectorAll(this.buttonsTarget);
+    buttons.forEach((button) => {
+      button.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          // Set scheme
+          this.scheme = button.getAttribute(this.buttonAttribute);
+          // Close dropdown
+          document.querySelector(this.menuTarget)?.removeAttribute("open");
+        },
+        false
+      );
+    });
+  },
+
+  // Set scheme
+  set scheme(scheme) {
+    if (scheme == "auto") {
+      this._scheme = this.preferredColorScheme;
+    } else if (scheme == "dark" || scheme == "light") {
+      this._scheme = scheme;
+    }
+    this.applyScheme();
+    this.schemeToLocalStorage();
+  },
+
+  // Get scheme
+  get scheme() {
+    return this._scheme;
+  },
+
+  // Apply scheme
+  applyScheme() {
+    document.querySelector("html")?.setAttribute(this.rootAttribute, this.scheme);
+  },
+
+  // Store scheme to local storage
+  schemeToLocalStorage() {
+    window.localStorage?.setItem(this.localStorageKey, this.scheme);
+  },
+};
+
+// Init
+themeSwitcher.init();
+
+</script>

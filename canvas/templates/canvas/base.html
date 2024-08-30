@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 <!doctype html>
-<html class="no-js" lang="">
+<html class="no-js" lang="" data-theme="light">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -13,13 +13,21 @@
 
         <script defer src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+        <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+        >
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
         <script defer src="https://cdn.jsdelivr.net/npm/igv@3.0.2/dist/igv.min.js"></script>
         {% block head %}
         {% endblock %}
     </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          style="font-family: Inter Tight">
         {% block content %}
         {% endblock %}
 

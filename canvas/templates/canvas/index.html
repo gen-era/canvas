@@ -19,31 +19,54 @@
             this.collapseSampleSearch = false; // Ensure sample search is visible for other views
         }
     }"
-    class="flex h-screen">
+     id="authenticated-content"
+     class="container-fluid main"
+     style="padding-top:1em;"
+>
     <!-- Sidebar -->
     {% include "canvas/sidebar.html" %}
 
     <!-- Main content area -->
-    <div class="flex-1 overflow-hidden">
         <!-- Sample Search View -->
-        <div x-show="views.currentView === 'sampleSearch'" class="h-full flex">
-            <div :class="collapseSampleSearch ? 'hidden' : 'w-1/2 border-r border-gray-300 p-4 overflow-auto'">
+        <div
+            x-show="views.currentView === 'sampleSearch'"
+            class="container-fluid sample-container"
+        >
+            <div>
                 {% include "canvas/components/sample_search.html" %}
             </div>
-            <div class="flex-1 p-4 overflow-auto">
+            <div>
                 {% include "canvas/components/chipsample_tabs.html" %}
             </div>
         </div>
-
-        <!-- Full-sized Sample Input View -->
-        <div x-show="views.currentView === 'sampleInput'" class="h-full p-4 overflow-auto">
+        <div x-show="views.currentView === 'sampleInput'">
             {% include "canvas/components/sample_input.html" %}
         </div>
-    </div>
+        <!-- Full-sized Sample Input View -->
 </div>
+
 {% else %}
     {% include "canvas/login.html" %}
 {% endif %}
+
+<style>
+ .main {
+    display: grid;
+    grid-template-columns: 1fr 11fr;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+    justify-items: stretch;
+    align-items: stretch;
+ }
+ .sample-container {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+    justify-items: stretch;
+    align-items: stretch;
+ }
+</style>
 
 <script>
 function getSelectedInstitutions() {
@@ -54,43 +77,50 @@ function getSelectedChips() {
      return Array.from(document.getElementsByClassName("selected-chips-sample-search")).map(e => e.innerText)
 }
 function createSearchComponent(type, isSingleSelect = false) {
-    return {
-        open: false,
-        searchQuery: '',
-        selectedItems: [],
-        selectedItem: null,
-        isSingleSelect: isSingleSelect,
-        selectItem(item) {
-            if (this.isSingleSelect) {
-                this.selectedItem = item;
-            } else {
-                if (!this.selectedItems.includes(item)) {
-                    this.selectedItems.push(item);
-                }
-            }
-            setTimeout(() => {
-                document.dispatchEvent(new Event("searchSamples")),
-                50
-            });
-            this.clearSearch();
-        },
-        clearSearch() {
-            this.searchQuery = '';
-            this.open = false;
-        },
-        removeItem(item = null) {
-            if (this.isSingleSelect) {
-                this.selectedItem = null;
-            } else {
-                this.selectedItems = this.selectedItems.filter(i => i !== item);
-            }
-            setTimeout(() => {
-                document.dispatchEvent(new Event("searchSamples")),
-                50
-            });
-        }
-    }
+     return {
+         searchQuery: '',
+         selectedItems: [],
+         selectedItem: null,
+         isSingleSelect: isSingleSelect,
+         selectItem(item) {
+             if (this.isSingleSelect) {
+                 this.selectedItem = item;
+             } else {
+                 if (!this.selectedItems.includes(item)) {
+                     this.selectedItems.push(item);
+                 }
+             }
+             setTimeout(() => {
+                 document.dispatchEvent(new Event("searchSamples")),
+                 50
+             });
+             this.closeDropdown();
+             this.clearSearch();
+         },
+         clearSearch() {
+             this.searchQuery = '';
+             this.open = false;
+         },
+         removeItem(item = null) {
+             if (this.isSingleSelect) {
+                 this.selectedItem = null;
+             } else {
+                 this.selectedItems = this.selectedItems.filter(i => i !== item);
+             }
+             setTimeout(() => {
+                 document.dispatchEvent(new Event("searchSamples")),
+                 50
+             });
+         },
+         openDropdown() {
+             this.open = true;
+             this.$refs.detailsElement.open = true;
+         },
+         closeDropdown() {
+             this.open = false;
+             this.$refs.detailsElement.open = false;
+         }
+     }
 }
-
 </script>
 {% endblock content %}

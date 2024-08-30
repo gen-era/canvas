@@ -1,5 +1,4 @@
 <button
-    :class="activeTab === {{ chipsample.pk }} ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'"
     @click="
         activeTab = {{ chipsample.pk }};
         igv_browsers['{{ chipsample.pk }}'].then(browser => {
@@ -9,7 +8,7 @@
         });
     "
     x-init="activeTab = {{ chipsample.pk }}"
-    class="tab-button px-4 py-2 focus:outline-none"
+    class="tab-button"
     id="tab-button-{{ chipsample.pk }}"
 >
     {{ chipsample.sample.protocol_id }}

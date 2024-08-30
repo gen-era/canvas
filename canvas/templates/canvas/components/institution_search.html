@@ -1,51 +1,44 @@
-{% if label == "sample-search" %}
-<div x-data="createSearchComponent('institution')" class="flex-1 relative">
-  {% else %}
-<div x-data="createSearchComponent('institution', true)" class="flex-1 relative">
-{% endif %}
+<details class="dropdown"
+         x-ref="detailsElement"
+         x-data="createSearchComponent('institution-{{ label }}', {% if label == 'sample-search' %}false{% else %}true{% endif %})"
+>
 
-    <div class="flex flex-wrap items-center border border-gray-300 rounded-lg">
-        <!-- Chips Display -->
-        <template x-if="!isSingleSelect">
-            <template x-for="item in selectedItems" :key="item">
-                <span class="inline-block bg-orange-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
-                    <span class="selected-institutions-{{ label }}" x-text="item"></span>
-                    <button type="button" @click="removeItem(item)" class="ml-2 text-white">x</button>
-                </span>
-            </template>
+  <summary>
+
+    <div class="selected-items" x-show="selectedItems.length > 0 || selectedItem">
+      <template x-if="!isSingleSelect">
+        <template x-for="item in selectedItems" :key="item">
+          <span class="badge">
+            <span class="selected-institutions-{{ label }}" x-text="item"></span>
+            <a href="#" class="secondary outline" @click.prevent.stop="removeItem(item)">×</a>
+          </span>
         </template>
-
-        <!-- Single Selected Item Display -->
-        <template x-if="isSingleSelect && selectedItem">
-            <span class="inline-block bg-orange-500 text-white text-sm font-semibold mr-2 px-3 py-1 rounded-full mt-1">
-                <span class="selected-institution-{{ label }}" x-text="selectedItem"></span>
-                <button type="button" @click="removeItem()" class="ml-2 text-white">x</button>
-            </span>
-        </template>
-
-
-        <!-- Input Field -->
-        <input
-          id="institution-search-{{ label }}"
-          class="flex-1 border-0 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-150 ease-in-out"
-          type="search"
-          name="search"
-          x-model="searchQuery"
-          x-show="!isSingleSelect || !selectedItem"
-          placeholder="Search Institutions..."
-          hx-post="{% url 'institution_search' %}"
-          hx-trigger="input changed delay:500ms"
-          hx-target="#institution-results-{{ label }}"
-          hx-swap="innerHTML"
-          @focus="open = true"
-          @input="open = true"
-        />
+      </template>
+      <template x-if="isSingleSelect && selectedItem">
+        <span class="badge">
+          <span class="selected-institution-{{ label }}" x-text="selectedItem"></span>
+          <a href="#" class="secondary outline" @click.prevent.stop="removeItem()">×</a>
+        </span>
+      </template>
     </div>
-    <ul
-      class="absolute mt-1 w-full bg-white shadow-lg rounded max-h-60 overflow-y-auto z-10"
-      id="institution-results-{{ label }}"
-      x-show="open"
-      @click.outside="open = false">
-      <!-- Search results will be inserted here -->
-    </ul>
-</div>
+
+    <input
+      x-ref="searchInput"
+      type="search"
+      name="search"
+      x-model="searchQuery"
+      placeholder="Search Institutions..."
+      hx-post="{% url 'institution_search' %}"
+      hx-trigger="input changed delay:500ms, focus"
+      hx-target="next ul"
+      hx-swap="innerHTML"
+      @input="openDropdown()"
+    />
+  </summary>
+
+
+  <!-- Dropdown Results -->
+  <ul>
+    <!-- Search results will be inserted here -->
+  </ul>
+</details>
