@@ -98,8 +98,6 @@ def sample_search(request):
 
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)
-    print(dir(samples))
-    print(samples.number)
     return render(
         request,
         "canvas/partials/sample_results.html",
@@ -122,6 +120,8 @@ def chipsample_tab_button(request):
 def chipsample_tab_content(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
+    cnvs = json.dumps([cnv.cnv_json for cnv in chipsample.cnv.all()])
+
     bedgraphs = chipsample.bedgraph.all()
     lrr_bedgraph = None
     baf_bedgraph = None
@@ -138,6 +138,7 @@ def chipsample_tab_content(request):
             "chipsample": chipsample,
             "lrr_bedgraph": lrr_bedgraph,
             "baf_bedgraph": baf_bedgraph,
+            "cnvs": cnvs,
         },
     )
 

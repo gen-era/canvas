@@ -12,7 +12,8 @@ from .models import (
     IDAT,
     GTC,
     VCF,
-    BedGraph
+    BedGraph,
+    CNV,
 )
 
 
@@ -58,7 +59,11 @@ class ChipSampleAdmin(admin.ModelAdmin):
         "position",
         "call_rate",
     )
-    search_fields = ("sample__protocol_id", "chip__chip_id", "sample__institution__name")
+    search_fields = (
+        "sample__protocol_id",
+        "chip__chip_id",
+        "sample__institution__name",
+    )
 
     def protocol_id(self, obj):
         return obj.sample.protocol_id
@@ -82,13 +87,15 @@ class GTCAdmin(admin.ModelAdmin):
     def protocol_id(self, obj):
         return obj.chipsample.sample.protocol_id
 
+
 class VCFAdmin(admin.ModelAdmin):
     list_display = ["vcf", "protocol_id"]
     search_fields = ["vcf", "protocol_id"]
 
     def protocol_id(self, obj):
         return obj.chipsample.sample.protocol_id
-    
+
+
 class BedGraphAdmin(admin.ModelAdmin):
     list_display = ["chipsample", "bedgraph", "bedgraph_type", "protocol_id"]
     search_fields = ["bedgraph", "protocol_id"]
@@ -101,6 +108,20 @@ class BedGraphAdmin(admin.ModelAdmin):
         except:
             return "abc"
 
+
+class CNVAdmin(admin.ModelAdmin):
+    list_display = ["variant_id", "entry_date"]
+    search_fields = ["variant_id", "cnv_json"]
+
+    autocomplete_fields = ["chipsample"]
+
+    def protocol_id(self, obj):
+        try:
+            return obj.chipsample.sample.protocol_id
+        except:
+            return "abc"
+
+
 admin.site.register(Lot)
 admin.site.register(Chip, ChipAdmin)
 admin.site.register(ChipType, ChipTypeAdmin)
@@ -111,4 +132,5 @@ admin.site.register(ChipSample, ChipSampleAdmin)
 admin.site.register(IDAT, IDATAdmin)
 admin.site.register(GTC, GTCAdmin)
 admin.site.register(VCF, VCFAdmin)
-admin.site.register(BedGraph,BedGraphAdmin)
+admin.site.register(BedGraph, BedGraphAdmin)
+admin.site.register(CNV, CNVAdmin)

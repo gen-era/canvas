@@ -9,11 +9,17 @@
     "
     x-init="activeTab = {{ chipsample.pk }}"
     class="tab-button"
+    style="padding:0.2em"
+    :class="activeTab === {{ chipsample.pk }} ? 'primary outline' : 'secondary outline'"
     id="tab-button-{{ chipsample.pk }}"
 >
+    <span
+    style="font-size:small;">
     {{ chipsample.sample.protocol_id }}
+
     <br>
     {{  chipsample.chip.chip_id }} - {{  chipsample.position }}
+    </span>
 
     <span
         @click="
@@ -25,4 +31,5 @@
         }
         "
     >  &times;</span>
+
 </button>

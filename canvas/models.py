@@ -183,3 +183,21 @@ class SampleSheet(models.Model):
         upload_to="samplesheets/",
         validators=[FileExtensionValidator(allowed_extensions=["tsv"])],
     )
+
+
+class CNV(models.Model):
+    chipsample = models.ForeignKey(
+        ChipSample,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="cnv",
+    )
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    variant_id = models.CharField(max_length=255)
+    cnv_json = models.JSONField()
+
+    def __str__(self):
+        return f"{self.variant_id}"

@@ -1,0 +1,514 @@
+<div class="container-fluid" style="height:75vh;" x-data="{ selectedSection1: '',
+evidences: {
+    e1A: 0,
+    e1B: 0,
+    e2A: 0,
+    e2B: 0,
+    e2C: 0,
+    e2C1: 0,
+    e2C2: 0,
+    e2D: 0,
+    e2D1: 0,
+    e2D2: 0,
+    e2D3: 0,
+    e2D4: 0,
+    e2E: 0,
+    e2F: 0,
+    e2G: 0,
+    e2H: 0,
+    e2I: 0,
+    e2J: 0,
+    e2K: 0,
+    e2L: 0,
+    e3: 0,
+    e4A: 0,
+    e4B: 0,
+    e4C: 0,
+    e4D: 0,
+    e4E: 0,
+    e4F: 0,
+    e4G: 0,
+    e4H: 0,
+    e4I: 0,
+    e4J: 0,
+    e4K: 0,
+    e4L: 0,
+    e4M: 0,
+    e4N: 0,
+    e4O: 0,
+    e5A: 0,
+    e5B: 0,
+    e5C: 0,
+    e5D: 0,
+    e5E: 0,
+    e5F: 0,
+    e5G: 0,
+    e5H: 0
+}
+           }">
+    <!-- Section 1 -->
+    <article>
+        <header>
+            <h3>Section 1: Initial Assessment of Genomic Content</h3>
+        </header>
+
+
+        <div class="grid evidence-container">
+            <div class="evidence-group">
+                    Copy number loss content (For intragenic variants, use section 2E)
+            </div>
+            <div>
+                <article>
+                    <header>
+                        <label>
+                            <input type="radio" name="section1" value="1A" @change="selectedSection1 = '1A'" />
+                            1A Contains protein-coding or other known functionally important elements
+                        </label>
+                    </header>
+                    <p>Suggested points: 0</p>
+                    <p>Max Score: 0</p>
+                </article>
+                <article>
+                    <header>
+                        <label>
+                            <input type="radio" name="section1" value="1B" @change="selectedSection1 = '1B'" />
+                            1B Does <strong> NOT </strong> contain protein-coding or any known functionally important
+                            elements
+                        </label>
+                    </header>
+                    <p>Suggested points: -0.60</p>
+                    <p>Max Score: -0.60</p>
+                </article>
+            </div>
+        </div>
+
+    </article>
+
+    <!-- Section 2 (conditionally shown based on Section 1 selection) -->
+    <article x-data="{ selectedOption: '' }">
+        <header>
+            <h3>Section 2: Overlap with Established/Predicted HI or Established Benign Genes/Genomic Regions</h3>
+            <br />
+            (Skip to Section 3 if your copy number loss DOES NOT overlap these types of genes/regions)
+        </header>
+
+        <div x-show="selectedSection1 === '1A'" class="">
+
+            <div class="grid evidence-container">
+                <div class="evidence-group">
+                    Overlap with ESTABLISHED HI genes or genomic regions and consideration of reason for referral
+                </div>
+                <div>
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2A" @change="selectedOption = '2A';
+                                            evidences.e2A = 1;
+                                            evidences.e2B = 0;
+                                            evidences.e2C1 = 0;
+                                            evidences.e2C2 = 0;
+                                            evidences.e2D1 = 0;
+                                            evidences.e2D2 = 0;
+                                            evidences.e2D3 = 0;
+                                            evidences.e2D4 = 0;
+                                            evidences.e2E = 0;
+                                            evidences.e2F = 0;
+                                            evidences.e2G = 0;
+                                            evidences.e2H = 0;
+                                             " />
+                                2A Complete overlap of an established HI gene/genomic region
+                            </label>
+
+                            <span class="badge assigned-points">
+                                Assigned points:
+                                <span x-text="evidences.e2A"></span>
+                            </span>
+                        </header>
+
+                        <div x-show="selectedOption === '2A'">
+
+                            <label>
+                                <input type="range" min="0.0" max="1.0" step=".05" x-model="evidences.e2A" />
+                            </label>
+                            <p>Suggested points: 1</p>
+                            <p>Max Score: 1</p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2B" @change="selectedOption = '2B';
+                                            evidences.e2A = 0;
+                                            evidences.e2B = 0;
+                                            evidences.e2C1 = 0;
+                                            evidences.e2C2 = 0;
+                                            evidences.e2D1 = 0;
+                                            evidences.e2D2 = 0;
+                                            evidences.e2D3 = 0;
+                                            evidences.e2D4 = 0;
+                                            evidences.e2E = 0;
+                                            evidences.e2F = 0;
+                                            evidences.e2G = 0;
+                                            evidences.e2H = 0;
+                                        " />
+                                2B Partial overlap of an established HI genomic region
+                            </label>
+                        </header>
+                        <div x-show="selectedOption === '2B'">
+                            <ul>
+                                <li>
+                                    The observed CNV does NOT contain the known causative gene or critical region for
+                                    this established HI genomic region OR
+                                </li>
+                                <li>
+                                    Unclear if known causative gene or critical region is affected OR
+                                </li>
+                                <li>
+                                    No specific causative gene or critical region has been established for this HI
+                                    genomic region (e.g. 1p36 deletion)
+                                </li>
+                            </ul>
+
+                            <p>Suggested points: 0</p>
+                            <p>Max Score: 0</p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2C" @change="selectedOption = '2C'
+                                        evidences.e2A = 0;
+                                        evidences.e2B = 0;
+                                        evidences.e2D1 = 0;
+                                        evidences.e2D2 = 0;
+                                        evidences.e2D3 = 0;
+                                        evidences.e2D4 = 0;
+                                        evidences.e2E = 0;
+                                        evidences.e2F = 0;
+                                        evidences.e2G = 0;
+                                        evidences.e2H = 0;
+                                    " />
+                                2C Partial overlap with the 5’ end of an established HI gene (3’ end of the gene not
+                                involved)…
+                            </label>
+                        </header>
+
+                        <div x-show="selectedOption === '2C'" x-data="{ selectedOption2C: '' }" class="grid">
+                            <article>
+                                <header>
+                                    <label>
+                                        <input type="radio" name="2C" @change="selectedOption2C = '2C1'
+                                        evidences.e2C1 = 0.90;
+                                        evidences.e2C2 = 0;
+                                    " />
+                                        2C-1 …and coding sequence is involved
+                                    </label>
+                                    <span class="badge assigned-points">
+                                        Assigned points:
+                                        <span x-text="evidences.e2C1"></span>
+                                    </span>
+                                </header>
+
+                                <div x-show="selectedOption2C === '2C1'">
+                                    <label>
+                                        <input type="range" min=".45" max="1" step=".05" x-model="evidences.e2C1" />
+                                    </label>
+                                </div>
+
+                            </article>
+                            <article>
+                                <header>
+                                    <label>
+                                        <input type="radio" name="2C" @change="selectedOption2C = '2C2'
+                                            evidences.e2C1 = 0;
+                                            evidences.e2C2 = 0;
+                                    " />
+                                        2C-2 …and only the 5’ UTR is involved
+                                    </label>
+                                    <span class="badge assigned-points">
+                                        Assigned points:
+                                        <span x-text="evidences.e2C2"></span>
+                                    </span>
+                                </header>
+
+                                <div x-show="selectedOption2C === '2C2'">
+                                    <label>
+                                        <input type="range" min=".0" max="0.45" step=".05" x-model="evidences.e2C2" />
+                                    </label>
+                                </div>
+
+                            </article>
+                        </div>
+                    </article>
+
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2D"
+                                       @change="selectedOption = '2D'
+                                        evidences.e2A = 0;
+                                        evidences.e2B = 0;
+                                        evidences.e2D1 = 0;
+                                        evidences.e2D2 = 0;
+                                        evidences.e2D3 = 0;
+                                        evidences.e2D4 = 0;
+                                        evidences.e2E = 0;
+                                        evidences.e2F = 0;
+                                        evidences.e2G = 0;
+                                        evidences.e2H = 0;
+                                             " />
+                                2D Partial overlap with the 3’ end of an established HI gene (5’ end of the gene not
+                                involved)…
+                            </label>
+                        </header>
+
+                        <div x-show="selectedOption === '2D'" class="grid">
+                            <article>
+                                <header>
+                                    <label>
+                                        <input type="radio" name="2D"
+                                            @change="evidences.e2D1 = 0; evidences.e2D2 = 0.0; evidences.e2D3 = 0.0; evidences.e2D4 = 0;" />
+                                        2D-1 …and only the 3’ untranslated region is involved.
+                                    </label>
+
+                                    <span class="badge assigned-points">
+                                        Assigned points:
+                                        <span x-text="evidences.e2D1"></span>
+                                    </span>
+                                </header>
+
+                            </article>
+                            <article>
+                                <header>
+                                    <label>
+                                        <input type="radio" name="2D"
+                                            @change="evidences.e2D1 = 0; evidences.e2D2 = 0.9; evidences.e2D3 = 0.0; evidences.e2D4 = 0;" />
+                                        2D-2 …and only the last exon is involved. Other established pathogenic variants
+                                        have been reported in this exon.
+                                    </label>
+                                    <span class="badge assigned-points">
+                                        Assigned points:
+                                        <span x-text="evidences.e2D2"></span>
+                                    </span>
+                                </header>
+
+                                <label>
+                                    <input type="range" min=".45" max="0.9" step=".05" x-model="evidences.e2D2" />
+                                </label>
+
+                            </article>
+                            <article>
+                                <header>
+                                    <label>
+                                        <input type="radio" name="2D"
+                                            @change="evidences.e2D1 = 0; evidences.e2D2 = 0; evidences.e2D3 = 0.3; evidences.e2D4 = 0;" />
+                                        2D-3 …and only the last exon is involved. No other established pathogenic
+                                        variants have been reported in this exon.
+                                    </label>
+                                    <span class="badge assigned-points">
+                                        Assigned points:
+                                        <span x-text="evidences.e2D3"></span>
+                                    </span>
+                                </header>
+
+
+                                <label>
+                                    <input type="range" min=".0" max="0.45" step=".05" x-model="evidences.e2D3" />
+                                </label>
+
+                            </article>
+
+                            <article>
+                                <header>
+                                    <label>
+                                        <input type="radio" name="2D"
+                                            @change="evidences.e2D1 = 0; evidences.e2D2 = 0; evidences.e2D3 = 0; evidences.e2D4 = 0.9;" />
+                                        2D-4 …and it includes other exons in addition to the last exon.
+                                        Nonsense-mediated decay is expected to occur.
+                                    </label>
+                                    <span class="badge assigned-points">
+                                        Assigned points:
+                                        <span x-text="evidences.e2D4"></span>
+                                    </span>
+                                </header>
+
+                                <label>
+                                    <input type="range" min=".45" max="1" step=".05" x-model="evidences.e2D4" />
+                                </label>
+                            </article>
+                        </div>
+                    </article>
+
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2E"
+                                       @change="selectedOption = '2E'
+                                        evidences.e2A = 0;
+                                        evidences.e2B = 0;
+                                        evidences.e2D1 = 0;
+                                        evidences.e2D2 = 0;
+                                        evidences.e2D3 = 0;
+                                        evidences.e2D4 = 0;
+                                        evidences.e2E = 0;
+                                        evidences.e2F = 0;
+                                        evidences.e2G = 0;
+                                        evidences.e2H = 0;
+                                             " />
+                                2E Both breakpoints are within the same gene (gene-level sequence variant)
+                            </label>
+                            <span class="badge assigned-points">
+                                Assigned points:
+                                <span x-text="evidences.e2E"></span>
+                            </span>
+
+                        </header>
+                        <div x-show="selectedOption === '2E'">
+
+                            See ClinGen SVI working group PVS1 specifications
+
+                            <ul>
+                                <li> PVS1= 0.90 (Range: 0.45 to 0.90) </li>
+                                <li> PVS1_Strong= 0.45 (Range: 0.30 to 0.90) </li>
+                                <li> PVS1_Moderate or PM4 (in-frame indels) = 0.30 (Range: 0.15 to 0.45) </li>
+                                <li> PVS1_Supporting = 0.15 (Range: 0 to 0.30) </li>
+                                <li> N/A = No points, but continue evaluation </li>
+                            </ul>
+
+                            <label>
+                                <input type="range" min=".0" max=".9" step=".05" x-model="evidences.e2E" />
+                            </label>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div class="grid evidence-container">
+                <div class="evidence-group">
+                    Overlap with ESTABLISHED benign genes or genomic regions
+                </div>
+
+                <div>
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2F"
+                                       @change="selectedOption = '2F'
+                                        evidences.e2A = 0;
+                                        evidences.e2B = 0;
+                                        evidences.e2D1 = 0;
+                                        evidences.e2D2 = 0;
+                                        evidences.e2D3 = 0;
+                                        evidences.e2D4 = 0;
+                                        evidences.e2E = 0;
+                                        evidences.e2F = -1;
+                                        evidences.e2G = 0;
+                                        evidences.e2H = 0;
+                                             " />
+                                2F Both breakpoints are within the same gene (gene-level sequence variant)
+                            </label>
+
+                            <span class="badge assigned-points">
+                                Assigned points:
+                                <span x-text="evidences.e2F"></span>
+                            </span>
+
+                        </header>
+                        <div x-show="selectedOption === '2F'">
+
+                            <label>
+                                <input type="range" min="-1.0" max=".0" step=".05" x-model="evidences.e2F" />
+                            </label>
+                        </div>
+                    </article>
+
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2G"
+                                       @change="selectedOption = '2G'
+                                        evidences.e2A = 0;
+                                        evidences.e2B = 0;
+                                        evidences.e2D1 = 0;
+                                        evidences.e2D2 = 0;
+                                        evidences.e2D3 = 0;
+                                        evidences.e2D4 = 0;
+                                        evidences.e2E = 0;
+                                        evidences.e2F = 0;
+                                        evidences.e2G = 0;
+                                        evidences.e2H = 0;
+                                             " />
+                                2G Both breakpoints are within the same gene (gene-level sequence variant)
+                            </label>
+                            <span class="badge assigned-points">
+                                Assigned points:
+                                <span x-text="evidences.e2G"></span>
+                            </span>
+
+                        </header>
+                        <div x-show="selectedOption === '2G'">
+
+                            <label>
+                                <input type="range" min=".0" max=".9" step=".05" x-model="evidences.e2G" />
+                            </label>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+
+            <div class="grid evidence-container">
+                <div class="evidence-group">
+                    HI Predictors
+                </div>
+
+                <div>
+                    <article>
+                        <header>
+                            <label>
+                                <input type="radio" name="section2" value="2H"
+                                       @change="selectedOption = '2H'
+                                        evidences.e2A = 0;
+                                        evidences.e2B = 0;
+                                        evidences.e2D1 = 0;
+                                        evidences.e2D2 = 0;
+                                        evidences.e2D3 = 0;
+                                        evidences.e2D4 = 0;
+                                        evidences.e2E = 0;
+                                        evidences.e2F = 0;
+                                        evidences.e2G = 0;
+                                        evidences.e2H = 0.15;
+                                             " />
+                                2H Both breakpoints are within the same gene (gene-level sequence variant)
+                            </label>
+                            <span class="badge assigned-points">
+                                Assigned points:
+                                <span x-text="evidences.e2H"></span>
+                            </span>
+                        </header>
+                        <div x-show="selectedOption === '2H'">
+
+                            <label>
+                                <input type="range" min=".0" max=".9" step=".05" x-model="evidences.e2H" />
+                            </label>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </div>
+    </article>
+    <article>
+        <header>
+            <h3> Section 3: Evaluation of Gene Number </h3>
+        </header>
+
+    </article>
+</div>
+
+<style>
+ .assigned-points {
+     float: right;
+ }
+</style>

@@ -16,111 +16,181 @@
         },
         showSampleInput() {
             this.views.currentView = 'sampleInput';
-            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        },
+        showAcmgLoss() {
+            this.views.currentView = 'acmgLoss';
         }
-    }"
-     id="authenticated-content"
-     class="container-fluid main"
-     style="padding-top:1em;"
->
+    }" id="authenticated-content" class="container-fluid main" style="padding-top:1em;">
     <!-- Sidebar -->
     {% include "canvas/sidebar.html" %}
 
     <!-- Main content area -->
-        <!-- Sample Search View -->
-        <div
-            x-show="views.currentView === 'sampleSearch'"
-            class="container-fluid sample-container"
-        >
-            <div>
-                {% include "canvas/components/sample_search.html" %}
-            </div>
-            <div>
-                {% include "canvas/components/chipsample_tabs.html" %}
-            </div>
+    <!-- Sample Search View -->
+    <div x-show="views.currentView === 'sampleSearch'" class="container-fluid sample-container">
+        <div x-show="collapseSampleSearch === false">
+            {% include "canvas/components/sample_search.html" %}
         </div>
-        <div x-show="views.currentView === 'sampleInput'">
-            {% include "canvas/components/sample_input.html" %}
+        <div>
+            {% include "canvas/components/chipsample_tabs.html" %}
         </div>
-        <!-- Full-sized Sample Input View -->
+    </div>
+    <div x-show="views.currentView === 'sampleInput'">
+        {% include "canvas/components/sample_input.html" %}
+    </div>
+    <div x-show="views.currentView === 'acmgLoss'">
+        {% include "canvas/components/acmg_loss.html" %}
+    </div>
+    <!-- Full-sized Sample Input View -->
 </div>
 
 {% else %}
-    {% include "canvas/login.html" %}
+{% include "canvas/login.html" %}
 {% endif %}
 
 <style>
- .main {
-    display: grid;
-    grid-template-columns: 1fr 11fr;
-    grid-column-gap: 1em;
-    grid-row-gap: 1em;
-    justify-items: stretch;
-    align-items: stretch;
- }
- .sample-container {
-    display: grid;
-    grid-template-columns: 4fr 8fr;
-    grid-column-gap: 1em;
-    grid-row-gap: 1em;
-    justify-items: stretch;
-    align-items: stretch;
- }
+    .main {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        grid-column-gap: 1em;
+        grid-row-gap: 1em;
+        justify-items: stretch;
+        align-items: stretch;
+    }
+
+    .sample-container {
+        display: grid;
+        grid-template-columns: 4fr 8fr;
+        grid-column-gap: 1em;
+        grid-row-gap: 1em;
+        justify-items: stretch;
+        align-items: stretch;
+    }
+    .evidence-container {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        grid-column-gap: 1em;
+        grid-row-gap: 1em;
+        justify-items: stretch;
+        align-items: stretch;
+        border-top-width: thin;
+        border-top-style: solid;
+    }
+    .evidence-group {
+        margin:auto;
+    }
+
+
+    .dropdown>summary {
+        border-radius: 2em !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown>summary::after {
+        margin-left: auto;
+    }
+
+    .dropdown>summary input {
+        flex-grow: 1;
+    }
+
+    .dropdown>summary input {
+        width: 100%;
+        margin: 0;
+        background: transparent;
+        border: none;
+    }
+
+    .dropdown>summary input:focus {
+        box-shadow: none;
+    }
+
+    .dropdown>summary .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .badge {
+        background-color: #3a3a3a;
+        color: #ffffff;
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge a {
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 16px;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .badge button:hover {
+        color: #ff4444;
+    }
 </style>
 
 <script>
-function getSelectedInstitutions() {
-     return Array.from(document.getElementsByClassName("selected-institutions-sample-search")).map(e => e.innerText)
-}
+    function getSelectedInstitutions() {
+        return Array.from(document.getElementsByClassName("selected-institutions-sample-search")).map(e => e.innerText)
+    }
 
-function getSelectedChips() {
-     return Array.from(document.getElementsByClassName("selected-chips-sample-search")).map(e => e.innerText)
-}
-function createSearchComponent(type, isSingleSelect = false) {
-     return {
-         searchQuery: '',
-         selectedItems: [],
-         selectedItem: null,
-         isSingleSelect: isSingleSelect,
-         selectItem(item) {
-             if (this.isSingleSelect) {
-                 this.selectedItem = item;
-             } else {
-                 if (!this.selectedItems.includes(item)) {
-                     this.selectedItems.push(item);
-                 }
-             }
-             setTimeout(() => {
-                 document.dispatchEvent(new Event("searchSamples")),
-                 50
-             });
-             this.closeDropdown();
-             this.clearSearch();
-         },
-         clearSearch() {
-             this.searchQuery = '';
-             this.open = false;
-         },
-         removeItem(item = null) {
-             if (this.isSingleSelect) {
-                 this.selectedItem = null;
-             } else {
-                 this.selectedItems = this.selectedItems.filter(i => i !== item);
-             }
-             setTimeout(() => {
-                 document.dispatchEvent(new Event("searchSamples")),
-                 50
-             });
-         },
-         openDropdown() {
-             this.open = true;
-             this.$refs.detailsElement.open = true;
-         },
-         closeDropdown() {
-             this.open = false;
-             this.$refs.detailsElement.open = false;
-         }
-     }
-}
+    function getSelectedChips() {
+        return Array.from(document.getElementsByClassName("selected-chips-sample-search")).map(e => e.innerText)
+    }
+    function createSearchComponent(type, isSingleSelect = false) {
+        return {
+            searchQuery: '',
+            selectedItems: [],
+            selectedItem: null,
+            isSingleSelect: isSingleSelect,
+            selectItem(item) {
+                if (this.isSingleSelect) {
+                    this.selectedItem = item;
+                } else {
+                    if (!this.selectedItems.includes(item)) {
+                        this.selectedItems.push(item);
+                    }
+                }
+                setTimeout(() => {
+                    document.dispatchEvent(new Event("searchSamples")),
+                        50
+                });
+                this.closeDropdown();
+                this.clearSearch();
+            },
+            clearSearch() {
+                this.searchQuery = '';
+                this.open = false;
+            },
+            removeItem(item = null) {
+                if (this.isSingleSelect) {
+                    this.selectedItem = null;
+                } else {
+                    this.selectedItems = this.selectedItems.filter(i => i !== item);
+                }
+                setTimeout(() => {
+                    document.dispatchEvent(new Event("searchSamples")),
+                        50
+                });
+            },
+            openDropdown() {
+                this.open = true;
+                this.$refs.detailsElement.open = true;
+            },
+            closeDropdown() {
+                this.open = false;
+                this.$refs.detailsElement.open = false;
+            }
+        }
+    }
 </script>
 {% endblock content %}
