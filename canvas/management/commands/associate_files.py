@@ -47,6 +47,21 @@ class Command(BaseCommand):
                     iscns.append(i)
             return {i.stem.split("_")[1]: i for i in iscns}
 
+
+        def gather_bedgraphs():
+            """
+            returns:
+            {
+            "R03C02": "path to the cnvs",
+            }
+
+            """
+
+            bedgraphs = []
+            for i in results.joinpath("bedgraphs").iterdir():
+                bedgraphs.append(i)
+            return {i.stem.split("_")[1].split(".")[0]: i for i in bedgraphs}
+
         # Function to process CNV file
         def process_cnv_file(file_path):
             cnv_data = {}
@@ -97,8 +112,6 @@ class Command(BaseCommand):
         scoresheet_files = gather_scoresheets()
         cnv_files = gather_cnvs()
 
-        print(cnv_files)
-        print(scoresheet_files)
         for position, scoresheet_file in scoresheet_files.items():
 
             cnv_data = process_cnv_file(cnv_files[position])
@@ -116,7 +129,7 @@ class Command(BaseCommand):
                 )
             except ChipSample.DoesNotExist:
                 self.stdout.write(
-                    self.style.ERROR(f"ChipSample not found for position {position}")
+                    self.style.ERROR(f"ChipSample not found for {chip_id} position {position}")
                 )
                 continue
 
@@ -126,15 +139,26 @@ class Command(BaseCommand):
                 )
 
 
-# # Save BedGraph files
-# for filename in files['bedgraphs']:
-#     bedgraph_type = filename.split(".")[1].upper()
-#     BedGraph.objects.create(
-#         chipsample=chipsample,
-#         bedgraph_type=bedgraph_type,
-#         bedgraph=os.path.join("bedGraphs", filename),
-#     )
-#     self.stdout.write(self.style.SUCCESS(f"Saved BedGraph {filename} to {chipsample}"))
+        bedgraphs = gather_bedgraphs()
+        for position, bedgraph in bedgraphs.items():
+
+            try:
+                chipsample = ChipSample.objects.get(
+                    chip__chip_id=chip_id, position=position
+                )
+            except ChipSample.DoesNotExist:
+                self.stdout.write(
+                    self.style.ERROR(f"ChipSample not found for position {position}")
+                )
+                continue
+
+            bedgraph_type = bedgraph.stem.split(".")[1].upper()
+            BedGraph.objects.create(
+                chipsample=chipsample,
+                bedgraph_type=bedgraph_type,
+                bedgraph=bedgraph.relative_to("media").as_posix(),
+            )
+            self.stdout.write(self.style.SUCCESS(f"Saved BedGraph {bedgraph.stem} to {chipsample}"))
 
 # Save IDAT files
 # for filename in files['idats']:
