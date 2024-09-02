@@ -3,16 +3,31 @@ style="height:97vh;">
     <div id="sample-input-rows" class="card">
         <!-- Table Header -->
         <div class="grid">
+
             <div>Protocol ID</div>
             <div>Institution</div>
             <div>Sample Type</div>
             <div>Arrival Date</div>
             <div>Study Date</div>
             <div>Description</div>
+            <div>Repeat</div>
             <div>Concentration</div>
             <div>Remove row</div>
         </div>
         {% include "canvas/partials/sample_input_row.html" %}
+    </div>
+
+    <div class="mt-4">
+        <button
+        x-data="{samples: []}"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        x-on:click="samples = updateSamples()"
+        hx-post="{% url 'save_samples' %}"
+        hx-trigger="click"
+        hx-vals="js:JSON.stringify({samples: updateSamples()})"
+    >
+            Save Samples
+        </button>
     </div>
 </div>
 
@@ -25,5 +40,30 @@ function removeRow(button) {
     } else {
         alert("You cannot remove the last remaining row.");
     }
+}
+
+function updateSamples() {
+    const rows = document.querySelectorAll('#sample-input-rows > .sample-input-row');
+    const samples = [];
+    rows.forEach(row => {
+        if (!row.querySelector('div:nth-child(2) > div > div > span > span') || !row.querySelector('div:nth-child(3) > div > div > span > span')) {
+            console.log('ins or sample_type are required')
+        } else if(row.querySelector('div:nth-child(7) > div > div > span > span')){
+            console.log('will handle later')
+        } else {
+            samples.push({
+            protocol_id: row.querySelector('[name="protocol_id"]').value,
+            institution: row.querySelector('div:nth-child(2) > div > div > span > span').textContent,
+            sample_type: row.querySelector('div:nth-child(3) > div > div > span > span').textContent,
+            arrival_date: row.querySelector('[name="arrival_date"]').value,
+            study_date: row.querySelector('[name="study_date"]').value,
+            description: row.querySelector('[name="description"]').value,
+            //repeat: row.querySelector('div:nth-child(7) > div > div > span > span').textContent,
+            concentration: row.querySelector('[name="concentration"]').value,
+        });
+        }
+    });
+    console.log(samples)
+    return samples
 }
 </script>

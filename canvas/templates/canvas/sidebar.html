@@ -35,6 +35,14 @@ style="display:flex; flex-direction:column"
                     <span x-show="sidebar.isExpanded">New Samples</span>
                 </a>
             </li>
+            <li>
+              <a href="#"
+                  @click="showChipInput()"
+                  :class="{'primary': views.currentView === 'chipInput'}"
+              >
+                  <span x-show="sidebar.isExpanded">New Chip</span>
+              </a>
+          </li>
 
             <li>
                 <a href="#"
