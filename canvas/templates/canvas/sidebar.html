@@ -38,6 +38,15 @@
                     <span x-show="sidebar.isExpanded" class="ml-2">Sample Input</span>
                 </button>
             </li>
+            <li>
+                <button
+                    @click="showChipInput()"
+                    class="w-full py-2 px-4 flex items-center justify-start text-left"
+                    :class="{'bg-blue-500 text-white': views.currentView === 'chipInput'}"
+                >
+                    <span x-show="sidebar.isExpanded" class="ml-2">Chip Input</span>
+                </button>
+            </li>
             <!-- ... other sidebar items ... -->
         </ul>
 

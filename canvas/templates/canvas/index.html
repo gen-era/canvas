@@ -17,6 +17,10 @@
         showSampleInput() {
             this.views.currentView = 'sampleInput';
             this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        },
+        showChipInput() {
+            this.views.currentView = 'chipInput';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
         }
     }"
     class="flex h-screen">
@@ -38,6 +42,9 @@
         <!-- Full-sized Sample Input View -->
         <div x-show="views.currentView === 'sampleInput'" class="h-full p-4 overflow-auto">
             {% include "canvas/components/sample_input.html" %}
+        </div>
+        <div x-show="views.currentView === 'chipInput'" class="h-full p-4 overflow-auto">
+            {% include "canvas/components/chip_input.html" %}
         </div>
     </div>
 </div>
