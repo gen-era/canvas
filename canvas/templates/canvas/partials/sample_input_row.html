@@ -7,22 +7,10 @@
         hx-swap="beforeend">
     <input type="text" name="protocol_id" required>
 
-    {% with label=label %}
-        {% include "canvas/components/institution_search.html" %}
-    {% endwith %}
+    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" %}
 
-    <div x-data="{ openSampleType: false, selectedSampleType: '' }" @click.away="open = false">
-        <input
-            type="search" name="sample-type-search" placeholder="Search sample types..."
-            hx-post="{% url 'sample_type_search' %}"
-            hx-trigger="input changed delay:500ms"
-            hx-target="#sample-results"
-            @input="openSampleType = true"
-            x-model="selectedSampleType"/>
-        <ul x-show="openSampleType"
-            id="sample-results" @click.away="openSampleType = false" @click="selectedSampleType = $event.target.textContent.trim(), openSampleType = false">
-        </ul>
-    </div>
+    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" %}
+
     <input type="date" name="arrival_date" required>
     <input type="date" name="study_date">
     <input type="text" name="description">

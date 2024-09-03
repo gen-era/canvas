@@ -49,6 +49,7 @@ class SampleAdmin(admin.ModelAdmin):
         "sample_type",
         "description",
     )
+    autocomplete_fields = ["repeat"]
     search_fields = ("protocol_id", "institution__name")
 
 

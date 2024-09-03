@@ -1,7 +1,9 @@
 {% if samples.number == 1 %}
-<header>
-    found {{ num_samples }} samples
-</header>
+    <div class="badge"
+         :class="{'pico-background-green-400': {{ len_samples }} > 0,
+                'pico-background-red-500': {{ len_samples }} == 0}">
+    Found {{ len_samples }} samples.
+    </div>
 {% endif %}
 
 {% for sample in samples %}
@@ -19,6 +21,10 @@
     <p>
         <strong>Arrival Date:</strong>
         {{ sample.arrival_date }}
+    </p>
+    <p>
+        <strong>Sex:</strong>
+        {{ sample.sex }}
     </p>
     <p>
         <strong>Entry Date:</strong>
@@ -43,8 +49,6 @@
             <span>
                 {{ chipsample.chip.chip_id }}
             </span>
-        </header>
-        <p>
 
         <div hx-get="{% url 'chipsample_tab_button' %}" hx-target="#tab-buttons" hx-trigger="click"
             hx-swap="beforeend" hx-on::before-request="
@@ -68,24 +72,55 @@
             </div>
         </div>
 
-        <a>
-            View Report
-        </a>
+        </header>
 
-        <footer>
             <strong>Scan Date:</strong>
             <span>
                 {{ chipsample.chip.scan_date }}
             </span>
+
+
+
+
+        <footer>
+        <div class="badge"
+            :class="{'pico-background-green-400': {{ chipsample.autosomal_call_rate }} > 0.99,
+                    'pico-background-red-500': {{ chipsample.autosomal_call_rate }} <= 0.99}">
+            <strong>Autosomal Call Rate:</strong>
+            {{ chipsample.autosomal_call_rate }}
+        </div>
+
+        <div class="badge"
+            :class="{'pico-background-green-400': {{ chipsample.call_rate }} > 0.99,
+                    'pico-background-red-500': {{ chipsample.call_rate }} <= 0.99}">
+            <strong>Call Rate:</strong>
+            {{ chipsample.call_rate }}
+        </div>
+
+
+        <div class="badge"
+            :class="{'pico-background-green-400': {{ chipsample.lrr_std_dev }} <= 0.15,
+                    'pico-background-red-500': {{ chipsample.lrr_std_dev }} > 0.15}">
+            <strong>LRR Std. Dev.:</strong>
+            {{ chipsample.lrr_std_dev }}
+        </div>
+
+        <div class="badge"
+            :class="{'pico-background-green-400': '{{ chipsample.sex_estimate }}' === '{{ sample.sex }}',
+                    'pico-background-red-500': '{{ chipsample.sex_estimate }}' !== '{{ sample.sex }}'}">
+            <strong>Sex Estimate:</strong>
+            {{ chipsample.sex_estimate }}
+        </div>
         </footer>
     </article>
     {% endfor %}
-    <!-- Other sample details -->
 </article>
 {% endfor %}
 
 {% if not samples.has_next %}
-<footer>
-    No more samples
-</footer>
+    {% if len_samples != 0 %}
+        <div class="badge pico-background-orange-300">
+        No more items
+        </div>
+    {% endif %}
 {% endif %}

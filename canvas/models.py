@@ -2,11 +2,12 @@ from django.core.validators import RegexValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
 
 from django.db import models
-from taggit.managers import TaggableManager
 from django.contrib.auth.models import User, Group
 
 
 # Create your models here.
+
+sex_types = [("F", "Female"), ("M", "Male"), ("U", "Unknown")]
 
 
 class Lot(models.Model):
@@ -75,7 +76,7 @@ class Sample(models.Model):
     institution = models.ForeignKey(
         Institution, on_delete=models.PROTECT, related_name="sample"
     )
-    data_info = TaggableManager()
+    sex = models.CharField(max_length=100, choices=sex_types, null=True)
     description = models.CharField(max_length=255, null=True)
     sample_type = models.ForeignKey(SampleType, on_delete=models.PROTECT)
     repeat = models.ManyToManyField("self", blank=True)
@@ -93,7 +94,13 @@ class ChipSample(models.Model):
         Sample, on_delete=models.PROTECT, related_name="chipsample"
     )
 
-    call_rate = models.DecimalField(max_digits=10, decimal_places=7)
+    call_rate = models.DecimalField(max_digits=10, decimal_places=8, default=0)
+    autosomal_call_rate = models.DecimalField(
+        max_digits=10, decimal_places=8, default=0
+    )
+    lrr_std_dev = models.DecimalField(max_digits=10, decimal_places=8, default=0)
+    sex_estimate = models.CharField(max_length=100, choices=sex_types, null=True)
+
     chip = models.ForeignKey(
         Chip, on_delete=models.PROTECT, null=True, blank=True, related_name="chipsample"
     )

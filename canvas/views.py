@@ -2,7 +2,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.views import View
 from django.core.paginator import Paginator
-
+from django.apps import apps
 from django.http import JsonResponse
 
 from canvas.models import (
@@ -27,7 +27,7 @@ import minio
 def index(request):
 
     samples = Sample.objects.order_by("-entry_date")
-    num_samples = len(samples)
+    len_samples = len(samples)
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(1)
 
@@ -39,38 +39,42 @@ def index(request):
             "title": "Index",
             "samples": samples,
             "label": label,
-            "num_samples": num_samples,
+            "len_samples": len_samples,
         },
     )
 
 
 @login_required
-def institution_search(request):
-    query = request.POST.get("search", "").strip()
+def generic_search(request, model_name, field_name):
+    query = request.GET.get("search", "").strip()
+    page = request.GET.get("page")
+
+    # Dynamically get the model class
+    model = apps.get_model(app_label="canvas", model_name=model_name)
+
     if query:
-        institutions = Institution.objects.filter(name__icontains=query)
+        # Use the field_name dynamically
+        filter_kwargs = {f"{field_name}__icontains": query}
+        items = model.objects.filter(**filter_kwargs)
     else:
-        institutions = Institution.objects.none()
+        items = model.objects.none()
+
+    items = items.order_by(field_name)
+    len_items = len(items)
+
+    paginator = Paginator(items, 12)
+    items = paginator.get_page(page)
 
     return render(
         request,
         "canvas/partials/search_results.html",
-        {"items": institutions},
-    )
-
-
-@login_required
-def chip_search(request):
-    query = request.POST.get("search", "").strip()
-    if query:
-        chips = Chip.objects.filter(chip_id__icontains=query)
-    else:
-        chips = Chip.objects.none()
-
-    return render(
-        request,
-        "canvas/partials/search_results.html",
-        {"items": chips},
+        {
+            "items": items,
+            "len_items": len_items,
+            "query": query,
+            "model_name": model_name,
+            "field_name": field_name,
+        },
     )
 
 
@@ -94,14 +98,14 @@ def sample_search(request):
 
     # Order by entry date
     samples = samples.order_by("-entry_date")
-    num_samples = len(samples)
+    len_samples = len(samples)
 
     paginator = Paginator(samples, 12)
     samples = paginator.get_page(page)
     return render(
         request,
         "canvas/partials/sample_results.html",
-        {"samples": samples, "query": query, "num_samples": num_samples},
+        {"samples": samples, "query": query, "len_samples": len_samples},
     )
 
 
@@ -227,33 +231,3 @@ def save_form(request):
         return JsonResponse({"status": "success"})
 
     return JsonResponse({"status": "failed"})
-
-
-@login_required
-def sample_type_search(request):
-    query = request.POST.get("sample-type-search", "")
-    if query:
-        types = SampleType.objects.filter(name__icontains=query)
-    else:
-        types = SampleType.objects.none()
-
-    return render(
-        request,
-        "canvas/partials/search_results.html",
-        {"items": types},
-    )
-
-
-@login_required
-def chip_type_search(request):
-    query = request.POST.get("chip-type-search", "")
-    if query:
-        chips = ChipType.objects.filter(name__icontains=query)
-    else:
-        chips = ChipType.objects.none()
-
-    return render(
-        request,
-        "canvas/partials/search_results.html",
-        {"items": chips},
-    )

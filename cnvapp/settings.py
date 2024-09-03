@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.sites",
     "canvas",
-    "taggit",
     "allauth",
     "allauth.account",
     "django_htmx",

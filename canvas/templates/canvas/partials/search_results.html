@@ -1,10 +1,30 @@
+{% if items.number == 1 %}
+    <div class="badge"
+         :class="{'pico-background-green-400': {{ len_items }} > 0,
+                'pico-background-red-500': {{ len_items }} == 0}">
+    found {{ len_items }} items.
+    </div>
+{% endif %}
+
 {% for item in items %}
-
-<li
-
-    @click="selectItem('{{ item }}')"
->
-    {{ item }}
-</li>
+    <li
+     {% if forloop.last and items.has_next %}
+        hx-get="{% url 'generic_search' model_name=model_name field_name=field_name %}"
+        hx-trigger="intersect once"
+        hx-swap="afterend"
+        hx-target="this"
+        hx-vals='{"page": "{{ items.next_page_number }}", "search": "{{ query }}"}'
+     {% endif %}
+     @click="selectItem('{{ item }}')"
+    >
+        {{ item }}
+    </li>
 {% endfor %}
 
+{% if not items.has_next %}
+    {% if len_items != 0 %}
+        <div class="badge pico-background-orange-300">
+        No more items
+        </div>
+    {% endif %}
+{% endif %}
