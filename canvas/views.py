@@ -251,16 +251,17 @@ def sample_type_search(request):
 
 @login_required
 def chip_type_search(request):
-    query = request.POST.get("chip-type-search", "")
+    query = request.POST.get("search", "")
+    print(query)
     if query:
-        chips = ChipType.objects.filter(name__icontains=query)
+        chip_types = ChipType.objects.filter(name__icontains=query)
     else:
-        chips = ChipType.objects.none()
-
+        chip_types = ChipType.objects.none()
+    print(chip_types)
     return render(
         request,
         "canvas/partials/search_results.html",
-        {"items": chips},
+        {"items": chip_types},
     )
 
 @login_required
@@ -276,3 +277,4 @@ def sample_input_sample_search(request):
         "canvas/partials/search_results.html",
         {"items": samples},
     )
+
