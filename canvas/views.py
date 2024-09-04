@@ -207,7 +207,7 @@ def get_sample_input_row(request):
 @login_required
 def save_samples(request):
     print(request.POST)
-    samples_data = json.loads(request.POST.get("samples", "[]"))
+    samples_data = json.loads(request.POST.get("sample_inputs", "[]"))
     print(samples_data)
 
     return JsonResponse({"status": "success", "data": samples_data})

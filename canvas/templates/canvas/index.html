@@ -13,6 +13,7 @@
         showSampleSearch() {
             this.views.currentView = 'sampleSearch';
             this.collapseSampleSearch = !this.collapseSampleSearch; // Toggle visibility of sample search
+            $nextTick(() => { window.dispatchEvent(new Event('resize')); });
         },
         showSampleInput() {
             this.views.currentView = 'sampleInput';
@@ -31,7 +32,8 @@
 
     <!-- Main content area -->
     <!-- Sample Search View -->
-    <div x-show="views.currentView === 'sampleSearch'" class="container-fluid sample-container">
+    <div x-show="views.currentView === 'sampleSearch'" class="container-fluid"
+         :class="collapseSampleSearch === false ? 'sample-container' : ''">
         <div x-show="collapseSampleSearch === false">
             {% include "canvas/components/sample_search.html" %}
         </div>

@@ -15,13 +15,9 @@
             concentration: ''
         }
     }"
-    x-init="$nextTick(() => { 
-        if ($root.dataset.rows) {
-            $root.dataset.rows.push(sample_row); 
-        } else {
-            console.error('The rows array is not defined on $root');
-        }
-    })"
+    x-init="
+            sample_inputs.push(sample_row);
+    "
 >
     <input type="text" name="protocol_id" x-model="sample_row.protocol_id" required>
 

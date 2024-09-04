@@ -1,6 +1,6 @@
-<div class="container-fluid" 
+<form class="container-fluid"
     style="max-height:97vh;"
-    x-data data-rows="[]"
+    x-data="{sample_inputs:[]}"
 >
     <div id="sample-input-rows">
         <!-- Table Header -->
@@ -18,12 +18,16 @@
         </div>
         {% include "canvas/partials/sample_input_row.html" %}
     </div>
-    <button hx-post="{% url 'save_samples' %}"
+    <button
+        type="submit"
+        hx-post="{% url 'save_samples' %}"
         hx-trigger="click"
-        :hx-vals="`{ rows_data: getRowsAsJson() }`">
+        hx-target="#sample-input-result"
+        :hx-vals="{ 'sample_inputs': sample_inputs }">
         Save Samples
     </button>
-</div>
+    <div id="sample-input-result">
+</form>
 <script>
     function removeRow(button) {
         const row = button.closest('.sample-input-row');
@@ -33,30 +37,5 @@
         } else {
             alert("You cannot remove the last remaining row.");
         }
-    }
-
-    function updateSamples() {
-        const rows = document.querySelectorAll('#sample-input-rows > .sample-input-row');
-        const samples = [];
-        rows.forEach(row => {
-            if (!row.querySelector('div:nth-child(2) > div > div > span > span') || !row.querySelector('div:nth-child(3) > div > div > span > span')) {
-                console.log('ins or sample_type are required')
-            } else if (row.querySelector('div:nth-child(7) > div > div > span > span')) {
-                console.log('will handle later')
-            } else {
-                samples.push({
-                    protocol_id: row.querySelector('[name="protocol_id"]').value,
-                    institution: row.querySelector('div:nth-child(2) > div > div > span > span').textContent,
-                    sample_type: row.querySelector('div:nth-child(3) > div > div > span > span').textContent,
-                    arrival_date: row.querySelector('[name="arrival_date"]').value,
-                    study_date: row.querySelector('[name="study_date"]').value,
-                    description: row.querySelector('[name="description"]').value,
-                    //repeat: row.querySelector('div:nth-child(7) > div > div > span > span').textContent,
-                    concentration: row.querySelector('[name="concentration"]').value,
-                });
-            }
-        });
-        console.log(samples)
-        return samples
     }
 </script>
