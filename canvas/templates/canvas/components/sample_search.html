@@ -1,61 +1,22 @@
-<article>
-    <header>
-    <input
-        id="sample-search"
-        type="search"
-        name="search"
-        placeholder="Search Samples..."
-        hx-get="{% url 'sample_search' %}"
-        hx-trigger="input changed delay:500ms, searchSamples from:document"
-        hx-target="next article"
-        hx-vals='js:{"page": 1, "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
-    />
+<div>
+      <input
+          id="sample-search"
+          type="search"
+          name="search"
+          placeholder="Search Samples..."
+          hx-get="{% url 'sample_search' %}"
+          hx-trigger="input changed delay:500ms, searchSamples from:document"
+          hx-target="next div.container"
+          hx-vals='js:{"page": 1, "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
+      />
 
-    <div class="grid">
-        {% with label="sample-search" %}
-            {% include "canvas/components/institution_search.html" %}
-        {% endwith %}
+      <div class="grid">
+          {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" label="sample-search" %}
 
-        {% with label="sample-search" %}
-            {% include "canvas/components/chip_search.html" %}
-        {% endwith %}
-    </div>
-    </header>
+          {% include 'canvas/components/generic_search.html' with model_name="Chip" field_name="chip_id" label="sample-search" %}
+      </div>
 
-    <article style="overflow:auto; height:75vh;">
+    <div class="container" style="overflow:auto; height:75vh;">
         {% include "canvas/partials/sample_results.html" %}
-    </article>
-</article>
-
-
-<style>
-.dropdown > summary {
-  border-radius: 2em !important;
-  display: flex;
-  align-items: center;
-}
-
-.dropdown > summary::after {
-  margin-left: auto;
-}
-.dropdown > summary input {
-  flex-grow: 1;
-}
-
-.dropdown > summary input {
-  width: 100%;
-  margin: 0;
-  background: transparent;
-  border: none;
-}
-
-.dropdown > summary input:focus {
-  box-shadow: none;
-}
-
-.dropdown > summary .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-</style>
+    </div>
+</div>

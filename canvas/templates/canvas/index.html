@@ -87,23 +87,16 @@
         margin:auto;
     }
 
-
     .dropdown>summary {
+        height: unset !important;
+        padding: 0 !important;
         border-radius: 2em !important;
-        display: flex;
-        align-items: center;
     }
-
-    .dropdown>summary::after {
-        margin-left: auto;
+    details.dropdown summary::after {
+        display:none;
     }
 
     .dropdown>summary input {
-        flex-grow: 1;
-    }
-
-    .dropdown>summary input {
-        width: 100%;
         margin: 0;
         background: transparent;
         border: none;
@@ -113,15 +106,7 @@
         box-shadow: none;
     }
 
-    .dropdown>summary .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
-
     .badge {
-        background-color: #3a3a3a;
-        color: #ffffff;
         border-radius: 16px;
         padding: 4px 10px;
         font-size: 12px;
@@ -140,19 +125,15 @@
         cursor: pointer;
         transition: color 0.3s ease;
     }
-
-    .badge button:hover {
-        color: #ff4444;
-    }
 </style>
 
 <script>
     function getSelectedInstitutions() {
-        return Array.from(document.getElementsByClassName("selected-institutions-sample-search")).map(e => e.innerText)
+        return Array.from(document.getElementsByClassName("selected-Institution-sample-search")).map(e => e.innerText)
     }
 
     function getSelectedChips() {
-        return Array.from(document.getElementsByClassName("selected-chips-sample-search")).map(e => e.innerText)
+        return Array.from(document.getElementsByClassName("selected-Chip-sample-search")).map(e => e.innerText)
     }
     function createSearchComponent(type, isSingleSelect = false) {
         return {

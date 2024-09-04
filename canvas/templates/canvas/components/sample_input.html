@@ -1,9 +1,6 @@
-<div class="container-fluid"
-style="height:97vh;">
-    <article id="sample-input-rows"
-    x-data="{
-        samples: {}
-    }">
+<div class="container"
+style="max-height:97vh;">
+    <div id="sample-input-rows">
         <!-- Table Header -->
         <div class="grid">
 
@@ -15,6 +12,7 @@ style="height:97vh;">
             <div>Description</div>
             <div>Repeat</div>
             <div>Concentration</div>
+            <div>Repeat</div>
             <div>Remove row</div>
         </div>
         {% include "canvas/partials/sample_input_row.html" %}

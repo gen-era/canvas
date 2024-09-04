@@ -6,11 +6,10 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("sample_search", views.sample_search, name="sample_search"),
     path(
-        "institution_search/",
-        views.institution_search,
-        name="institution_search",
+        "search/<str:model_name>/<str:field_name>/",
+        views.generic_search,
+        name="generic_search",
     ),
-    path("chip_search", views.chip_search, name="chip_search"),
     path(
         "chipsample_tab_content",
         views.chipsample_tab_content,
@@ -25,22 +24,5 @@ urlpatterns = [
     path(
         "get_sample_input_row/", views.get_sample_input_row, name="get_sample_input_row"
     ),
-    path('save-samples/', 
-         views.save_samples, 
-         name='save_samples'),
-    path(
-        "sample_type_search/",
-        views.sample_type_search,
-        name="sample_type_search",
-    ),
-    path(
-        "chip_type_search/",
-        views.chip_type_search,
-        name="chip_type_search",
-    ),
-    path(
-        "sample_input_sample_search/",
-        views.sample_input_sample_search,
-        name="sample_input_sample_search",
-    ),
+    path("save_form/", views.save_form, name="save_form"),
 ]

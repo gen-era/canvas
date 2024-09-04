@@ -4,18 +4,12 @@
     hx-target="#sample-input-rows" hx-swap="beforeend"
     x-init="samples.label = {}">
     <input type="text" name="protocol_id" required>
-    <div name="institution">
-        {% with label=label search_type='institution' %}
-        {% include "canvas/components/sample_input_search.html" %}
-        {% endwith %}
-    </div>
-    <div name="sample_type">
-        {% with label=label search_type='sample_type' %}
-        {% include "canvas/components/sample_input_search.html" %}
-        {% endwith %}
-    </div>
-    <input type="date" name="arrival_date" required
-    @change="samples.{{ label }}.arrival_date = 0">
+
+    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" %}
+
+    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" %}
+
+    <input type="date" name="arrival_date" required>
     <input type="date" name="study_date">
     <input type="text" name="description">
     <div name="repeat">
@@ -24,6 +18,8 @@
         {% endwith %}
     </div>
     <input type="number" name="concentration" min="0" step="0.1" required>
+
+    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
 
     <a href="#" onclick="removeRow(this)">
         <svg fill="none" stroke="currentColor" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">

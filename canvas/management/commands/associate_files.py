@@ -47,7 +47,6 @@ class Command(BaseCommand):
                     iscns.append(i)
             return {i.stem.split("_")[1]: i for i in iscns}
 
-
         def gather_bedgraphs():
             """
             returns:
@@ -129,15 +128,26 @@ class Command(BaseCommand):
                 )
             except ChipSample.DoesNotExist:
                 self.stdout.write(
-                    self.style.ERROR(f"ChipSample not found for {chip_id} position {position}")
+                    self.style.ERROR(
+                        f"ChipSample not found for {chip_id} position {position}"
+                    )
                 )
                 continue
 
             for variant_id, cnv in cnvs.items():
-                CNV.objects.create(
+                cnv, created = CNV.objects.get_or_create(
                     variant_id=variant_id, cnv_json=cnv, chipsample=chipsample
                 )
-
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(f"Saved CNV {variant_id} to {chipsample}")
+                )
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"CNV {variant_id} for {chipsample} already exists."
+                    )
+                )
 
         bedgraphs = gather_bedgraphs()
         for position, bedgraph in bedgraphs.items():
@@ -153,12 +163,52 @@ class Command(BaseCommand):
                 continue
 
             bedgraph_type = bedgraph.stem.split(".")[1].upper()
-            BedGraph.objects.create(
+            bg, created = BedGraph.objects.get_or_create(
                 chipsample=chipsample,
                 bedgraph_type=bedgraph_type,
                 bedgraph=bedgraph.relative_to("media").as_posix(),
             )
-            self.stdout.write(self.style.SUCCESS(f"Saved BedGraph {bedgraph.stem} to {chipsample}"))
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Saved BedGraph {bedgraph.stem} to {chipsample}"
+                    )
+                )
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"BedGraph {bedgraph.stem} for {chipsample} already exists."
+                    )
+                )
+
+        # Gather quality metrics for chip sample
+        gt_sample_summary = results.joinpath("gtcs/gt_sample_summary.csv")
+        with open(gt_sample_summary, "r") as f:
+            samples = [i.split(",") for i in f.read().splitlines()[1:]]
+            for sample in samples:
+                print(sample)
+                position = sample[0].split("_")[1]
+                try:
+                    chipsample = ChipSample.objects.get(
+                        chip__chip_id=chip_id, position=position
+                    )
+                    chipsample.autosomal_call_rate = sample[3]
+                    chipsample.call_rate = sample[4]
+                    chipsample.lrr_std_dev = sample[5]
+                    chipsample.sex_estimate = sample[6]
+                    chipsample.save()
+
+                except ChipSample.DoesNotExist:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"ChipSample not found for position {position}"
+                        )
+                    )
+                    continue
+                self.stdout.write(
+                    self.style.SUCCESS(f"Updated quality metrics for {chipsample}")
+                )
+
 
 # Save IDAT files
 # for filename in files['idats']:
