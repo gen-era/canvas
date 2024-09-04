@@ -19,6 +19,11 @@
         },
         showAcmgLoss() {
             this.views.currentView = 'acmgLoss';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        },
+        showChipInput() {
+            this.views.currentView = 'chipInput';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
         }
     }" id="authenticated-content" class="container-fluid main" style="padding-top:1em;">
     <!-- Sidebar -->
@@ -37,6 +42,9 @@
     <div x-show="views.currentView === 'sampleInput'">
         {% include "canvas/components/sample_input.html" %}
     </div>
+    <div x-show="views.currentView === 'chipInput'">
+        {% include "canvas/components/chip_input.html" %}
+    </div>
     <div x-show="views.currentView === 'acmgLoss'">
         {% include "canvas/components/acmg_loss.html" %}
     </div>
@@ -48,6 +56,13 @@
 {% endif %}
 
 <style>
+    :root {
+    --pico-border-radius: 1rem;
+    --pico-typography-spacing-vertical: .5rem;
+    --pico-form-element-spacing-vertical: .1rem;
+    --pico-form-element-spacing-horizontal: .25rem;
+    --pico-font-size: .8rem;
+  }
     .main {
         display: grid;
         grid-template-columns: 1fr 11fr;

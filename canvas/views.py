@@ -204,30 +204,34 @@ def get_sample_input_row(request):
     return render(request, "canvas/partials/sample_input_row.html", {"label": label})
 
 
-def save_form(request):
-    if request.method == "POST":
-        protocol_id = request.POST.getlist("protocol_id")
-        name = request.POST.getlist("name")
-        institution = request.POST.getlist("institution")
-        sample_type = request.POST.getlist("sample_type")
-        arrival_date = request.POST.getlist("arrival_date")
-        chip_type = request.POST.getlist("chip_type")
-        study_date = request.POST.getlist("study_date")
-        description = request.POST.getlist("description")
-        concentration = request.POST.getlist("concentration")
+@login_required
+def save_samples(request):
+    print(request.POST)
+    samples_data = json.loads(request.POST.get("samples", "[]"))
+    print(samples_data)
 
-        for i in range(len(protocol_id)):
-            Sample.objects.create(
-                protocol_id=protocol_id[i],
-                institution=Institution.objects.get(name=institution[i]),
-                sample_type=SampleType.objects.get(name=sample_type[i]),
-                chip_type=ChipType.objects.get(name=chip_type[i]),
-                arrival_date=arrival_date[i],
-                study_date=study_date[i],
-                description=description[i],
-                concentration=concentration[i],
-            )
+    return JsonResponse({"status": "success", "data": samples_data})
 
-        return JsonResponse({"status": "success"})
+    # saved_samples = []
+    # for sample_data in samples_data:
+    #     institution, _ = Institution.objects.get_or_create(name=sample_data['institution'])
+    #     sample_type, _ = SampleType.objects.get_or_create(name=sample_data['sample_type'])
 
-    return JsonResponse({"status": "failed"})
+    #     sample = Sample.objects.create(
+    #         protocol_id=sample_data['protocol_id'],
+    #         institution=institution,
+    #         sample_type=sample_type,
+    #         arrival_date=sample_data['arrival_date'],
+    #         study_date=sample_data['study_date'] or None,
+    #         description=sample_data['description'],
+    #         concentration=sample_data['concentration']
+    #     )
+
+    #     if sample_data['repeat']:
+    #         repeat_sample = Sample.objects.filter(protocol_id=sample_data['repeat']).first()
+    #         if repeat_sample:
+    #             sample.repeat.add(repeat_sample)
+
+    #     saved_samples.append(sample)
+
+    # return HttpResponse(f"Successfully saved {len(saved_samples)} samples.")

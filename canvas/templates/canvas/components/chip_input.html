@@ -1,0 +1,16 @@
+<div class="card-grid">
+    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
+</div>
+
+<style>
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    .card {
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
