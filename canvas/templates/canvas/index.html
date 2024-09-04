@@ -6,7 +6,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<div x-data="{
+<main x-data="{
         sidebar: { isExpanded: true },
         views: { currentView: 'sampleSearch' },
         collapseSampleSearch: false,
@@ -26,32 +26,34 @@
             this.views.currentView = 'chipInput';
             this.collapseSampleSearch = false; // Ensure sample search is visible for other views
         }
-    }" id="authenticated-content" class="container-fluid main" style="padding-top:1em;">
+    }" id="authenticated-content" class="container-fluid main">
     <!-- Sidebar -->
     {% include "canvas/sidebar.html" %}
 
     <!-- Main content area -->
-    <!-- Sample Search View -->
-    <div x-show="views.currentView === 'sampleSearch'" class="container-fluid"
-         :class="collapseSampleSearch === false ? 'sample-container' : ''">
-        <div x-show="collapseSampleSearch === false">
-            {% include "canvas/components/sample_search.html" %}
+    <div>
+        <!-- Sample Search View -->
+        <div x-show="views.currentView === 'sampleSearch'" class="container-fluid"
+            :class="collapseSampleSearch === false ? 'sample-container' : 'container'">
+            <div x-show="collapseSampleSearch === false">
+                {% include "canvas/components/sample_search.html" %}
+            </div>
+            <div>
+                {% include "canvas/components/chipsample_tabs.html" %}
+            </div>
         </div>
-        <div>
-            {% include "canvas/components/chipsample_tabs.html" %}
+        <div x-show="views.currentView === 'sampleInput'">
+            {% include "canvas/components/sample_input.html" %}
         </div>
-    </div>
-    <div x-show="views.currentView === 'sampleInput'">
-        {% include "canvas/components/sample_input.html" %}
-    </div>
-    <div x-show="views.currentView === 'chipInput'">
-        {% include "canvas/components/chip_input.html" %}
-    </div>
-    <div x-show="views.currentView === 'acmgLoss'">
-        {% include "canvas/components/acmg_loss.html" %}
+        <div x-show="views.currentView === 'chipInput'">
+            {% include "canvas/components/chip_input.html" %}
+        </div>
+        <div x-show="views.currentView === 'acmgLoss'">
+            {% include "canvas/components/acmg_loss.html" %}
+        </div>
     </div>
     <!-- Full-sized Sample Input View -->
-</div>
+</main>
 
 {% else %}
 {% include "canvas/login.html" %}
@@ -59,7 +61,6 @@
 
 <style>
     :root {
-    --pico-border-radius: 1rem;
     --pico-typography-spacing-vertical: .5rem;
     --pico-form-element-spacing-vertical: .1rem;
     --pico-form-element-spacing-horizontal: .25rem;
@@ -71,25 +72,25 @@
     .main {
         display: grid;
         grid-template-columns: 1fr 11fr;
-        grid-column-gap: 1em;
-        grid-row-gap: 1em;
+        grid-column-gap: .6em;
+        grid-row-gap: .6em;
         justify-items: stretch;
         align-items: stretch;
     }
 
     .sample-container {
         display: grid;
-        grid-template-columns: 4fr 8fr;
-        grid-column-gap: 1em;
-        grid-row-gap: 1em;
+        grid-template-columns: 3fr 9fr;
+        grid-column-gap: .6em;
+        grid-row-gap: .6em;
         justify-items: stretch;
         align-items: stretch;
     }
     .evidence-container {
         display: grid;
         grid-template-columns: 1fr 11fr;
-        grid-column-gap: 1em;
-        grid-row-gap: 1em;
+        grid-column-gap: .6em;
+        grid-row-gap: .6em;
         justify-items: stretch;
         align-items: stretch;
         border-top-width: thin;
@@ -119,19 +120,17 @@
     }
 
     .badge {
-        border-radius: 16px;
-        padding: 4px 10px;
-        font-size: 12px;
+        border-radius: 2em;
+        padding: .2em .6em;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: .3em;
     }
 
     .badge a {
         background: none;
         border: none;
         color: #888;
-        font-size: 16px;
         line-height: 1;
         padding: 0;
         cursor: pointer;

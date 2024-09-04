@@ -201,6 +201,7 @@ class ChipUpload(View):
         return render(request, self.template_name, context)
 
 
+@login_required
 def get_sample_input_row(request):
     label = secrets.token_urlsafe(6)
     return render(request, "canvas/partials/sample_input_row.html", {"label": label})
@@ -283,3 +284,12 @@ def save_samples(request):
             "canvas/partials/sample_input_form_errors.html",
             {"errors": errors},
         )
+
+
+def create_report(request):
+    form_data = dict(request.POST)
+    print(form_data)
+    return render(
+        request,
+        "canvas/partials/sample_input_form_errors.html",
+    )

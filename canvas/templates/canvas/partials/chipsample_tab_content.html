@@ -1,16 +1,23 @@
 <div
     id="tab-content-{{ chipsample.pk }}"
     x-show="activeTab === {{ chipsample.pk }}"
-    class="container"
 >
+
     <div
         id="igv-div-{{ chipsample.pk }}"
         style="width:100%;"
     ></div>
 
+    <form
+        hx-post="{% url 'create_report' %}"
+    >
     <div style="overflow:auto; height: 25vh;">
-    {% include 'canvas/partials/cnv_table.html' %}
+        {% include 'canvas/partials/cnv_table.html' %}
     </div>
+    <button type="submit">
+        create report
+    </button>
+    </form>
 </div>
 
 <script>

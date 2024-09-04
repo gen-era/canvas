@@ -25,4 +25,5 @@ urlpatterns = [
         "get_sample_input_row/", views.get_sample_input_row, name="get_sample_input_row"
     ),
     path("save_samples/", views.save_samples, name="save_samples"),
+    path("create_report/", views.create_report, name="create_report"),
 ]
