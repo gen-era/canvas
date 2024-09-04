@@ -3,7 +3,9 @@ from django.shortcuts import render
 from django.views import View
 from django.core.paginator import Paginator
 from django.apps import apps
-from django.http import JsonResponse
+from django_htmx.http import retarget
+from django.db import transaction
+
 
 from canvas.models import (
     Sample,
@@ -206,32 +208,78 @@ def get_sample_input_row(request):
 
 @login_required
 def save_samples(request):
-    print(request.POST)
-    samples_data = json.loads(request.POST.get("sample_inputs", "[]"))
-    print(samples_data)
+    form_data = dict(request.POST)
+    print(form_data)  # For debugging
 
-    return JsonResponse({"status": "success", "data": samples_data})
+    form_invalid = False
+    errors = []
 
-    # saved_samples = []
-    # for sample_data in samples_data:
-    #     institution, _ = Institution.objects.get_or_create(name=sample_data['institution'])
-    #     sample_type, _ = SampleType.objects.get_or_create(name=sample_data['sample_type'])
+    len_samples = len(form_data["protocol_id"])
+    # Process each row of form data
+    try:
+        with transaction.atomic():
+            for i in range(len(form_data["protocol_id"])):
+                try:
+                    institution = Institution.objects.get(
+                        id=form_data["Institution"][i]
+                    )
+                    sample_type = SampleType.objects.get(id=form_data["SampleType"][i])
 
-    #     sample = Sample.objects.create(
-    #         protocol_id=sample_data['protocol_id'],
-    #         institution=institution,
-    #         sample_type=sample_type,
-    #         arrival_date=sample_data['arrival_date'],
-    #         study_date=sample_data['study_date'] or None,
-    #         description=sample_data['description'],
-    #         concentration=sample_data['concentration']
-    #     )
+                    # Create new Sample object
+                    sample = Sample.objects.create(
+                        arrival_date=form_data["arrival_date"][i],
+                        study_date=form_data["study_date"][i] or None,
+                        protocol_id=form_data["protocol_id"][i],
+                        concentration=form_data["concentration"][i],
+                        institution=institution,
+                        sex=form_data["sex"][i],
+                        description=form_data["description"][i],
+                        sample_type=sample_type,
+                    )
 
-    #     if sample_data['repeat']:
-    #         repeat_sample = Sample.objects.filter(protocol_id=sample_data['repeat']).first()
-    #         if repeat_sample:
-    #             sample.repeat.add(repeat_sample)
+                    # Handle ManyToManyField 'repeat'
+                    repeat_sample_id = form_data["Sample"][i]
+                    if repeat_sample_id:
+                        try:
+                            repeat_sample = Sample.objects.get(id=repeat_sample_id)
+                            sample.repeat.add(repeat_sample)
+                        except Sample.DoesNotExist:
+                            errors.append(
+                                f"Sample with ID {repeat_sample_id} not found."
+                            )
+                            form_invalid = True
 
-    #     saved_samples.append(sample)
+                except Institution.DoesNotExist:
+                    errors.append(
+                        f"Institution with ID {form_data['Institution'][i]} not found."
+                    )
+                    form_invalid = True
+                except SampleType.DoesNotExist:
+                    errors.append(
+                        f"SampleType with ID {form_data['SampleType'][i]} not found."
+                    )
+                    form_invalid = True
 
-    # return HttpResponse(f"Successfully saved {len(saved_samples)} samples.")
+        # Check if the form is invalid after the loop
+        if form_invalid:
+            return render(
+                request,
+                "canvas/partials/sample_input_form_errors.html",
+                {"errors": errors},
+            )
+        else:
+            # If everything is successful, return success response
+            response = render(
+                request,
+                "canvas/partials/sample_input_success.html",
+                {"len_samples": len_samples},
+            )
+            return retarget(response, "#sample-input-form")
+
+    except Exception as e:
+        errors.append(str(e))
+        return render(
+            request,
+            "canvas/partials/sample_input_form_errors.html",
+            {"errors": errors},
+        )

@@ -63,8 +63,11 @@
     --pico-typography-spacing-vertical: .5rem;
     --pico-form-element-spacing-vertical: .1rem;
     --pico-form-element-spacing-horizontal: .25rem;
-    --pico-font-size: .8rem;
+    --pico-font-size: .6rem;
   }
+    select {
+        height:2em;
+    }
     .main {
         display: grid;
         grid-template-columns: 1fr 11fr;
@@ -149,10 +152,12 @@
             searchQuery: '',
             selectedItems: [],
             selectedItem: null,
+            selectedItemPk: null,
             isSingleSelect: isSingleSelect,
-            selectItem(item) {
+            selectItem(item, item_pk) {
                 if (this.isSingleSelect) {
                     this.selectedItem = item;
+                    this.selectedItemPk = item_pk;
                 } else {
                     if (!this.selectedItems.includes(item)) {
                         this.selectedItems.push(item);

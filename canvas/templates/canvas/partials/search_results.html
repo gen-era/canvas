@@ -15,7 +15,7 @@
         hx-target="this"
         hx-vals='{"page": "{{ items.next_page_number }}", "search": "{{ query }}"}'
      {% endif %}
-     @click="selectItem('{{ item }}')"
+     @click="selectItem('{{ item }}', {{ item.pk }})"
     >
         {{ item }}
     </li>

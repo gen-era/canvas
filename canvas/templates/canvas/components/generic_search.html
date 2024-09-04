@@ -7,7 +7,7 @@
     <div class="selected-items" x-show="selectedItems.length > 0 || selectedItem">
       <template x-if="isSingleSelect && selectedItem">
         <span>
-        <input type="hidden" name="{{ model_name }}" :value="selectedItem">
+        <input type="hidden" name="{{ model_name }}" :value="selectedItemPk">
           <span class="selected-{{ model_name }}-{{ label }}" x-text="selectedItem"></span>
           <a href="#" @click.prevent.stop="removeItem()">×</a>
         </span>
@@ -24,6 +24,7 @@
 
 
     <template x-if="!selectedItem">
+      <span>
     <input
       x-ref="searchInput"
       type="search"
@@ -37,7 +38,21 @@
       hx-vals='{"page": 1}'
       @input="openDropdown()"
     />
+    <input  style="
+          opacity: 0;
+          height: 1px !important;
+          float:right;
+        " name="{{ model_name }}" value=""
+            {% if model_name == "Institution" %}
+            required
+            {% endif %}
+            {% if model_name == "SampleType" %}
+            required
+            {% endif %}
+    />
+      </span>
     </template>
+
   </summary>
 
 

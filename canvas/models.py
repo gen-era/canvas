@@ -82,7 +82,7 @@ class Sample(models.Model):
     repeat = models.ManyToManyField("self", blank=True)
 
     def __str__(self):
-        return f"{self.protocol_id} - {self.arrival_date}"
+        return f"{self.protocol_id}"
 
     @property
     def chipsample(self):

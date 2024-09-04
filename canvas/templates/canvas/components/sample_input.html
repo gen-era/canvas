@@ -1,7 +1,12 @@
-<form class="container-fluid"
+<form
+    id="sample-input-form"
+    class="container-fluid"
     style="max-height:97vh;"
-    x-data="{sample_inputs:[]}"
+    hx-post="{% url 'save_samples' %}"
+    hx-target="#sample-input-form-errors"
 >
+    <div id="sample-input-form-errors"> </div>
+
     <div id="sample-input-rows">
         <!-- Table Header -->
         <div class="grid">
@@ -12,6 +17,7 @@
             <div>Arrival Date</div>
             <div>Study Date</div>
             <div>Description</div>
+            <div>Sex</div>
             <div>Concentration</div>
             <div>Repeat</div>
             <div>Remove row</div>
@@ -20,22 +26,19 @@
     </div>
     <button
         type="submit"
-        hx-post="{% url 'save_samples' %}"
-        hx-trigger="click"
-        hx-target="#sample-input-result"
-        :hx-vals="{ 'sample_inputs': sample_inputs }">
+        >
         Save Samples
     </button>
-    <div id="sample-input-result">
 </form>
+
 <script>
-    function removeRow(button) {
-        const row = button.closest('.sample-input-row');
-        const rows = document.querySelectorAll('.sample-input-row');
-        if (rows.length > 1) {
-            row.remove();
-        } else {
-            alert("You cannot remove the last remaining row.");
-        }
+function removeRow(button) {
+    const row = button.closest('.sample-input-row');
+    const rows = document.querySelectorAll('.sample-input-row');
+    if (rows.length > 1) {
+        row.remove();
+    } else {
+        alert("You cannot remove the last remaining row.");
     }
+}
 </script>
