@@ -1,13 +1,7 @@
 <div class="card-grid">
-    {% with label='chip_search' search_type='chip_type' %}
-    {% include "canvas/components/sample_input_search.html" %}
-    {% endwith %}
+    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
 </div>
-<script>
-    function selectChip() {
 
-    }
-</script>
 <style>
     .card-grid {
         display: grid;

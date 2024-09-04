@@ -1,9 +1,29 @@
-<div id="sample-input-row-{{ label }}" style="height: 4em;" class="sample-input-row grid"
+<div id="sample-input-row-{{ label }}" 
+    style="height: 4em;" 
+    class="sample-input-row grid"
     hx-get="{% url 'get_sample_input_row' %}"
     hx-trigger="input[this === document.querySelector('#sample-input-rows > .sample-input-row:last-child')]"
     hx-target="#sample-input-rows" hx-swap="beforeend"
-    x-init="samples.label = {}">
-    <input type="text" name="protocol_id" required>
+    x-data="{
+        sample_row: {
+            protocol_id: '',
+            institution: '',
+            sample_type: '',
+            arrival_date: '',
+            study_date: '',
+            description: '',
+            concentration: ''
+        }
+    }"
+    x-init="$nextTick(() => { 
+        if ($root.dataset.rows) {
+            $root.dataset.rows.push(sample_row); 
+        } else {
+            console.error('The rows array is not defined on $root');
+        }
+    })"
+>
+    <input type="text" name="protocol_id" x-model="sample_row.protocol_id" required>
 
     {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" %}
 
@@ -12,11 +32,7 @@
     <input type="date" name="arrival_date" required>
     <input type="date" name="study_date">
     <input type="text" name="description">
-    <div name="repeat">
-        {% with label=label search_type='sample_input_sample' %}
-        {% include "canvas/components/sample_input_search.html" %}
-        {% endwith %}
-    </div>
+    
     <input type="number" name="concentration" min="0" step="0.1" required>
 
     {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
