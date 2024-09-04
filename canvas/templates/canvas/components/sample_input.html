@@ -1,6 +1,9 @@
 <div class="container-fluid"
 style="height:97vh;">
-    <div id="sample-input-rows" class="card">
+    <article id="sample-input-rows"
+    x-data="{
+        samples: {}
+    }">
         <!-- Table Header -->
         <div class="grid">
 
@@ -15,12 +18,10 @@ style="height:97vh;">
             <div>Remove row</div>
         </div>
         {% include "canvas/partials/sample_input_row.html" %}
-    </div>
+    </article>
 
-    <div class="mt-4">
         <button
         x-data="{samples: []}"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         x-on:click="samples = updateSamples()"
         hx-post="{% url 'save_samples' %}"
         hx-trigger="click"
@@ -28,7 +29,6 @@ style="height:97vh;">
     >
             Save Samples
         </button>
-    </div>
 </div>
 
 <script>

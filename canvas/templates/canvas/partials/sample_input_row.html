@@ -1,7 +1,8 @@
 <div id="sample-input-row-{{ label }}" style="height: 4em;" class="sample-input-row grid"
     hx-get="{% url 'get_sample_input_row' %}"
     hx-trigger="input[this === document.querySelector('#sample-input-rows > .sample-input-row:last-child')]"
-    hx-target="#sample-input-rows" hx-swap="beforeend">
+    hx-target="#sample-input-rows" hx-swap="beforeend"
+    x-init="samples.label = {}">
     <input type="text" name="protocol_id" required>
     <div name="institution">
         {% with label=label search_type='institution' %}
@@ -13,7 +14,8 @@
         {% include "canvas/components/sample_input_search.html" %}
         {% endwith %}
     </div>
-    <input type="date" name="arrival_date" required>
+    <input type="date" name="arrival_date" required
+    @change="samples.{{ label }}.arrival_date = 0">
     <input type="date" name="study_date">
     <input type="text" name="description">
     <div name="repeat">

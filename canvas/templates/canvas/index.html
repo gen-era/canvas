@@ -38,12 +38,12 @@
         <div>
             {% include "canvas/components/chipsample_tabs.html" %}
         </div>
-        <div x-show="views.currentView === 'chipInput'" class="h-full p-4 overflow-auto">
-            {% include "canvas/components/chip_input.html" %}
-        </div>
     </div>
     <div x-show="views.currentView === 'sampleInput'">
         {% include "canvas/components/sample_input.html" %}
+    </div>
+    <div x-show="views.currentView === 'chipInput'">
+        {% include "canvas/components/chip_input.html" %}
     </div>
     <div x-show="views.currentView === 'acmgLoss'">
         {% include "canvas/components/acmg_loss.html" %}
