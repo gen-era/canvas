@@ -26,4 +26,5 @@ urlpatterns = [
     ),
     path("save_samples/", views.save_samples, name="save_samples"),
     path("create_report/", views.create_report, name="create_report"),
+    path("get_reports/", views.get_reports, name="get_reports"),
 ]

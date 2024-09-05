@@ -298,3 +298,16 @@ def create_report(request):
         request,
         "canvas/partials/sample_input_form_errors.html",
     )
+
+
+def get_reports(request):
+    chipsample_pk = request.POST.get("chipsample_pk")
+    button = request.POST.get("button")
+    chipsample = ChipSample.objects.get(id=chipsample_pk)
+
+    context = {
+        "reports": [f"{chipsample}a", f"{chipsample}b", f"{chipsample}c"],
+        "button": button,
+    }
+    print(context)
+    return render(request, "canvas/partials/report_list.html", context=context)

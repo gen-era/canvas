@@ -208,3 +208,25 @@ class CNV(models.Model):
 
     def __str__(self):
         return f"{self.variant_id}"
+
+
+class Classification(models.Model):
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    cnv = models.ForeignKey(
+        CNV, on_delete=models.PROTECT, related_name="classification"
+    )
+    classification_json = models.JSONField()
+
+
+class Report(models.Model):
+    classifications = models.ManyToManyField(Classification)
+    entry_date = models.DateTimeField(
+        auto_now_add=True
+    )  # Change to DateTimeField with auto_now_add=True
+    report = models.FileField(
+        upload_to="reports/",
+        validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
+    )
