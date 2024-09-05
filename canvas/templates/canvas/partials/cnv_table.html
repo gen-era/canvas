@@ -59,12 +59,18 @@ var table = new Tabulator("#cnv-table-{{ chipsample.pk }}", {
         {
             title: "Add to Report",
             field: "addToReport",
-            formatter: function(cell, formatterParams) {
-                return `<input type="checkbox"/>`;
-            },
             hozAlign: "center",
-            headerSort: false,
-            width: 100
+            formatter: function(cell, formatterParams) {
+                // Get the cell value
+                let checked = cell.getValue() ? 'checked' : '';
+                // Return checkbox with correct checked status
+                return `<input type="checkbox" ${checked} />`;
+            },
+            cellClick: function(e, cell) {
+                // Toggle the checkbox when the cell is clicked
+                let value = cell.getValue();
+                cell.setValue(!value); // Set the opposite value
+            },
         },
 
         {title: "ISCN", field: "iscn", responsive:0},
@@ -116,16 +122,12 @@ var table = new Tabulator("#cnv-table-{{ chipsample.pk }}", {
         {title: "State Info", field: "state_info", responsive: 2},
         {title: "Start SNP Info", field: "startsnp_info", responsive: 2},
         {title: "End SNP Info", field: "endsnp_info", responsive: 2},
-        {
-            title: "Comment",
-            field: "comment",
-            responsive: 2,
-            formatter: function(cell, formatterParams) {
-                return `<input type="text" placeholder="Add a comment" />`;
+        {title:"Comment", field:"comment", editor:"textarea", editorParams:{
+            elementAttributes:{
+                maxlength:"255", //set the maximum character length of the textarea element to 10 characters
             },
-            editor: "input",  // Allows in-cell editing
-            width: 200
-        },
+            verticalNavigation:"editor", //navigate cursor around text area without leaving the cell
+        }}
         // Add more columns as needed
     ],
     initialSort:[

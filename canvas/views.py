@@ -126,7 +126,12 @@ def chipsample_tab_button(request):
 def chipsample_tab_content(request):
     chipsample_pk = request.GET.get("chipsample_pk")
     chipsample = ChipSample.objects.get(id=chipsample_pk)
-    cnvs = json.dumps([cnv.cnv_json for cnv in chipsample.cnv.all()])
+
+    cnvs = []
+    for cnv in chipsample.cnv.all():
+        cnv_json = cnv.cnv_json
+        cnv_json["addToReport"] = False
+        cnvs.append(cnv_json)
 
     bedgraphs = chipsample.bedgraph.all()
     lrr_bedgraph = None
@@ -144,7 +149,7 @@ def chipsample_tab_content(request):
             "chipsample": chipsample,
             "lrr_bedgraph": lrr_bedgraph,
             "baf_bedgraph": baf_bedgraph,
-            "cnvs": cnvs,
+            "cnvs": json.dumps(cnvs),
         },
     )
 
