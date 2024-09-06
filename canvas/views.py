@@ -333,5 +333,75 @@ def get_chip_type_size(request):
             {'card_positions': card_positions},
         )
 
-def save_chip_input(request):
-    return
+# def save_chip_input(request):
+#     form_data = dict(request.POST)
+#     print(form_data)
+    
+#     try:
+#         with transaction.atomic():
+#             for i in range(len(form_data["Sample"])):
+#                 try:
+#                     sample = Sample.objects.get(
+#                         id=form_data["Sample"][i]
+#                     )
+
+#                     position = 
+
+#                     # Create new Sample object
+#                     sample = Sample.objects.create(
+#                         arrival_date=form_data["arrival_date"][i],
+#                         study_date=form_data["study_date"][i] or None,
+#                         protocol_id=form_data["protocol_id"][i],
+#                         concentration=form_data["concentration"][i],
+#                         institution=institution,
+#                         sex=form_data["sex"][i],
+#                         description=form_data["description"][i],
+#                         sample_type=sample_type,
+#                     )
+
+#                     # Handle ManyToManyField 'repeat'
+#                     repeat_sample_id = form_data["Sample"][i]
+#                     if repeat_sample_id:
+#                         try:
+#                             repeat_sample = Sample.objects.get(id=repeat_sample_id)
+#                             sample.repeat.add(repeat_sample)
+#                         except Sample.DoesNotExist:
+#                             errors.append(
+#                                 f"Sample with ID {repeat_sample_id} not found."
+#                             )
+#                             form_invalid = True
+
+#                 except Institution.DoesNotExist:
+#                     errors.append(
+#                         f"Institution with ID {form_data['Institution'][i]} not found."
+#                     )
+#                     form_invalid = True
+#                 except SampleType.DoesNotExist:
+#                     errors.append(
+#                         f"SampleType with ID {form_data['SampleType'][i]} not found."
+#                     )
+#                     form_invalid = True
+
+#         # Check if the form is invalid after the loop
+#         if form_invalid:
+#             return render(
+#                 request,
+#                 "canvas/partials/sample_input_form_errors.html",
+#                 {"errors": errors},
+#             )
+#         else:
+#             # If everything is successful, return success response
+#             response = render(
+#                 request,
+#                 "canvas/partials/sample_input_success.html",
+#                 {"len_samples": len_samples},
+#             )
+#             return retarget(response, "#sample-input-form")
+
+#     except Exception as e:
+#         errors.append(str(e))
+#         return render(
+#             request,
+#             "canvas/partials/sample_input_form_errors.html",
+#             {"errors": errors},
+#         )
