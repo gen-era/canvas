@@ -8,20 +8,13 @@
 </div>
 {% endif %} {% for sample in samples %}
 <article
-  {%
-  if
-  forloop.last
-  and
-  samples.has_next
-  %}
+  {% if forloop.last and samples.has_next %}
   hx-get="{% url 'sample_search'  %}"
   hx-trigger="intersect once"
   hx-swap="afterend"
   hx-target="this"
   hx-vals='js:{"page": "{{ samples.next_page_number }}", "search": "{{ query }}", "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
-  {%
-  endif
-  %}
+  {% endif %}
 >
   <header>
     <strong>Protocol ID: {{ sample.protocol_id }}</strong>
@@ -129,6 +122,9 @@
   </article>
   {% endfor %}
 </article>
-{% endfor %} {% if not samples.has_next %} {% if len_samples != 0 %}
-<div class="badge pico-background-orange-300">No more items</div>
-{% endif %} {% endif %}
+{% endfor %}
+{% if not samples.has_next %}
+    {% if len_samples != 0 %}
+        <div class="badge pico-background-orange-300">No more items</div>
+    {% endif %}
+{% endif %}

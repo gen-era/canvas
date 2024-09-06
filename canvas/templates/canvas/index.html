@@ -146,7 +146,7 @@
     function getSelectedChips() {
         return Array.from(document.getElementsByClassName("selected-Chip-sample-search")).map(e => e.innerText)
     }
-    function createSearchComponent(type, isSingleSelect = false) {
+    function createSearchComponent(type, isSingleSelect = false, isSampleSearch = false) {
         return {
             searchQuery: '',
             selectedItems: [],
@@ -162,10 +162,12 @@
                         this.selectedItems.push(item);
                     }
                 }
-                setTimeout(() => {
-                    document.dispatchEvent(new Event("searchSamples")),
-                        50
-                });
+                if (this.isSampleSearch) {
+                    setTimeout(() => {
+                        document.dispatchEvent(new Event("searchSamples")),
+                            50
+                    });
+                }
                 this.closeDropdown();
                 this.clearSearch();
             },
