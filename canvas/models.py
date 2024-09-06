@@ -21,6 +21,7 @@ class Lot(models.Model):
 
 class ChipType(models.Model):
     name = models.CharField(max_length=100)
+    size = models.IntegerField(default=24)
 
     def __str__(self):
         return self.name

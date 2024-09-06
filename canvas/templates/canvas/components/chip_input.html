@@ -1,16 +1,38 @@
-<div class="card-grid">
-    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
+<div x-data="{ displaySubmitButton: 'none' }">
+    <div class="grid header_container">
+        <div>
+            <div id="chip_type_search_{{ label }}">
+                {% include 'canvas/components/generic_search.html' with model_name="ChipType" field_name="name" %}
+            </div>
+            <button hx-get="{% url 'get_chip_type_size' %}"
+                hx-vals='js:{"chipType": getSelectedChipType("{{ label }}")}' hx-target=".chip_input_form_container"
+                hx-swap="innerHTML" @click="displaySubmitButton = 'inline'">Generate upload Form</button>
+        </div>
+        <div class="chip_upload">
+            {% include 'canvas/components/uploader.html' %}
+        </div>
+    </div>
+    <form class="chip_input_form_container" hx-post="{% url 'save_chip_input' %}"></form>
+    <button type="submit" style="height: 4rem; margin-top: 2rem;" :style="{ display: displaySubmitButton }">Save Samples</button>
 </div>
 
+<script>
+    function getSelectedChipType(label) {
+        return Array.from(document.getElementsByClassName(`selected-ChipType-${label}`)).map(e => e.innerText)
+    }
+</script>
 <style>
-    .card-grid {
+    .chip_input_form_container {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: 10px;    
     }
+
     .card {
-        padding: 1rem;
         border: 1px solid #ccc;
-        border-radius: 4px;
+        border-radius: 10px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        text-align: center;
     }
 </style>

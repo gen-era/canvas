@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 from django.core.paginator import Paginator
@@ -312,3 +313,25 @@ def get_reports(request):
     }
     print(context)
     return render(request, "canvas/partials/report_list.html", context=context)
+
+def get_chip_type_size(request):
+    query = request.GET.get("chipType", "").strip()
+    chip_type = ChipType.objects.get(name=query)
+
+    # Generate the card positions based on the chip size
+    num_cards = chip_type.size
+    card_positions = []
+    for i in range(1, num_cards + 1):
+        row = (i - 1) // 2 + 1  # Calculate the row based on card number
+        col = (i - 1) % 2 + 1   # Calculate the column (1 or 2)
+        position = f'R{row:02}C{col:02}'
+        card_positions.append(position)
+        
+    return render(
+            request,
+            "canvas/partials/chip_cards_template.html",
+            {'card_positions': card_positions},
+        )
+
+def save_chip_input(request):
+    return

@@ -1,0 +1,6 @@
+{% for position in card_positions %}
+<div class="card">
+    <div class="card-header">{{ position }}</div>
+    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
+</div>
+{% endfor %}
