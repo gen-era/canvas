@@ -12,9 +12,9 @@
       />
 
       <div class="grid">
-          {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" label="sample-search" %}
+          {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" label="sample-search" isSingleSelect="false" eventName="searchSamples"%}
 
-          {% include 'canvas/components/generic_search.html' with model_name="Chip" field_name="chip_id" label="sample-search" %}
+          {% include 'canvas/components/generic_search.html' with model_name="Chip" field_name="chip_id" label="sample-search" isSingleSelect="false" eventName="searchSamples" %}
       </div>
 
     <div class="container" style="overflow:auto; height:90vh;">

@@ -10,9 +10,9 @@
         type="text"
         name="protocol_id" required>
 
-    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" %}
+    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" %}
 
-    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" %}
+    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" %}
 
     <input
         autocomplete="off"
@@ -38,7 +38,7 @@
         autocomplete="off"
         type="number" name="concentration" min="0" step="0.1" required>
 
-    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" %}
+    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="None" %}
 
     <a href="#" onclick="removeRow(this)">
         <svg fill="none" stroke="currentColor" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">

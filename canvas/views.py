@@ -308,6 +308,7 @@ def get_reports(request):
     context = {
         "reports": [f"{chipsample}a", f"{chipsample}b", f"{chipsample}c"],
         "button": button,
+        "chipsample": chipsample,
     }
     print(context)
     return render(request, "canvas/partials/report_list.html", context=context)

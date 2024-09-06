@@ -1,29 +1,42 @@
-<details class="dropdown"
-         x-ref="detailsElement"
-         x-data="createSearchComponent('{{ model_name }}-{{ label }}', {% if label == 'sample-search' %}false, true{% else %}true, false{% endif %})"
+<details
+  class="dropdown"
+  x-ref="detailsElement"
+  x-data="createSearchComponent('{{ model_name }}-{{ label }}', '{{ isSingleSelect }}', '{{ eventName }}' )"
 >
   <summary>
-
-    <div class="selected-items" x-show="selectedItems.length > 0 || selectedItem">
-      <template x-if="isSingleSelect && selectedItem">
+    <div
+      class="selected-items"
+      x-show="selectedItems.length > 0 || selectedItem"
+    >
+      <template x-if="isSingleSelect === 'true' && selectedItem">
         <span>
-        <input type="hidden" name="{{ model_name }}" :value="selectedItemPk" autocomplete="off">
-          <span class="selected-{{ model_name }}-{{ label }}" x-text="selectedItem"></span>
+          <input
+            type="hidden"
+            name="{{ model_name }}"
+            :value="selectedItemPk"
+            autocomplete="off"
+          />
+          <span
+            class="selected-{{ model_name }}-{{ label }}"
+            x-text="selectedItem"
+          ></span>
           <a href="#" @click.prevent.stop="removeItem()">×</a>
         </span>
       </template>
-      <template x-if="!isSingleSelect">
+      <template x-if="isSingleSelect === 'false'">
         <template x-for="item in selectedItems" :key="item">
           <span class="badge">
-            <span class="selected-{{ model_name }}-{{ label }}" x-text="item"></span>
+            <span
+              class="selected-{{ model_name }}-{{ label }}"
+              x-text="item"
+            ></span>
             <a href="#" @click.prevent.stop="removeItem(item)">×</a>
           </span>
         </template>
       </template>
     </div>
 
-
-    <span x-show="!selectedItem">
+    <div x-show="!selectedItem">
       <input
         autocomplete="off"
         x-ref="searchInput"
@@ -41,30 +54,33 @@
 
       <input
         autocomplete="off"
-        style="
-            opacity: 0;
-            height: 1px !important;
-            float:right;
-          "
-        name="{{ model_name }}" value=""
-        {% if model_name == "Institution" %}
-          required
-        {% endif %}
-        {% if model_name == "SampleType" %}
-          required
-        {% endif %}
+        style="opacity: 0; height: 1px !important; float: right"
+        name="{{ model_name }}"
+        value=""
+        {%
+        if
+        model_name=""
+        ="Institution"
+        %}
+        required
+        {%
+        endif
+        %}
+        {%
+        if
+        model_name=""
+        ="SampleType"
+        %}
+        required
+        {%
+        endif
+        %}
       />
-    </span>
-
+    </div>
   </summary>
 
-
-
   <!-- Dropdown Results -->
-  <ul style="overflow:auto; max-height:24vh;">
+  <ul style="overflow: auto; max-height: 24vh">
     <!-- Search results will be inserted here -->
   </ul>
-
-
-
 </details>

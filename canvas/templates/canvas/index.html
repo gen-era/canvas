@@ -146,15 +146,16 @@
     function getSelectedChips() {
         return Array.from(document.getElementsByClassName("selected-Chip-sample-search")).map(e => e.innerText)
     }
-    function createSearchComponent(type, isSingleSelect = false, isSampleSearch = false) {
+    function createSearchComponent(type, isSingleSelect = false, eventName = "") {
         return {
             searchQuery: '',
             selectedItems: [],
             selectedItem: null,
             selectedItemPk: null,
             isSingleSelect: isSingleSelect,
+            eventName: eventName,
             selectItem(item, item_pk) {
-                if (this.isSingleSelect) {
+                if (this.isSingleSelect === "true") {
                     this.selectedItem = item;
                     this.selectedItemPk = item_pk;
                 } else {
@@ -162,9 +163,9 @@
                         this.selectedItems.push(item);
                     }
                 }
-                if (this.isSampleSearch) {
+                if (this.eventName) {
                     setTimeout(() => {
-                        document.dispatchEvent(new Event("searchSamples")),
+                        document.dispatchEvent(new Event(eventName)),
                             50
                     });
                 }
@@ -176,7 +177,7 @@
                 this.open = false;
             },
             removeItem(item = null) {
-                if (this.isSingleSelect) {
+                if (this.isSingleSelect === "true") {
                     this.selectedItem = null;
                 } else {
                     this.selectedItems = this.selectedItems.filter(i => i !== item);
