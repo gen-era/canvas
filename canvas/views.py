@@ -333,7 +333,8 @@ def get_chip_type_size(request):
             {'card_positions': card_positions},
         )
 
-# def save_chip_input(request):
+def save_chip_input(request):
+    return 
 #     form_data = dict(request.POST)
 #     print(form_data)
     
