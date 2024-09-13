@@ -1,0 +1,10 @@
+<button
+  hx-post="{% url 'create_report' %}"
+  hx-vals="js:{
+          'table-data': JSON.stringify(
+              Tabulator.findTable('#cnv-table-{{ chipsample.pk }}')[0].getData().filter(e => e.addToReport===true)
+          )}"
+  hx-target="closest ul"
+>
+  Create report
+</button>

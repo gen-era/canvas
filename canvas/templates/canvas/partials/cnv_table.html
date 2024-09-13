@@ -1,0 +1,150 @@
+<div id="cnv-table-{{ chipsample.pk }}"> </div>
+
+<script type="text/javascript">
+var classificationOrder = {
+    "pathogenic": 1,
+    "likely pathogenic": 2,
+    "vus": 3,
+    "likely benign": 4,
+    "benign": 5
+};
+
+var rowMenu = [
+    {
+        label:"<i class='fas fa-search'></i> Search",
+        menu:[
+            {
+                label:"<i class='fas fa-dna'></i> Search in Decipher",
+                action:function(e, row){
+                    // Get row data
+                    var data = row.getData();
+                    var chromosome = data["Chromosome"];
+                    var start = data["Start"];
+                    var end = data["End"];
+
+                    // Construct the Decipher URL
+                    var decipherUrl = `https://www.deciphergenomics.org/search?q=grch37:${chromosome}:${start}-${end}`;
+
+                    // Open the Decipher search in a new tab
+                    window.open(decipherUrl, '_blank');
+                }
+            },
+            {
+                label:"<i class='fas fa-vial'></i> Search in ClinGen",
+                action:function(e, row){
+                    // Get row data
+                    var data = row.getData();
+                    var chromosome = data["Chromosome"];
+                    var start = data["Start"];
+                    var end = data["End"];
+
+                    // Construct the ClinGen URL
+                    var clingenUrl = `https://search.clinicalgenome.org/kb/regions?page=1&type=GRCh37&region=chr${chromosome}%3A${start}-${end}&size=25&search=`;
+
+                    // Open the ClinGen search in a new tab
+                    window.open(clingenUrl, '_blank');
+                }
+            }
+        ]
+    }
+];
+var table = new Tabulator("#cnv-table-{{ chipsample.pk }}", {
+    data:{{ cnvs|safe }},
+    layout:"fitData",
+    rowContextMenu: rowMenu,
+    responsiveLayout: "collapse",
+    rowHeader:{formatter:"responsiveCollapse", width:30, minWidth:30, hozAlign:"center", resizable:false, headerSort:false},
+    responsiveLayoutCollapseStartOpen:false,
+    columns: [
+        {
+            title: "Add to Report",
+            field: "addToReport",
+            hozAlign: "center",
+            formatter: function(cell, formatterParams) {
+                // Get the cell value
+                let checked = cell.getValue() ? 'checked' : '';
+                // Return checkbox with correct checked status
+                return `<input type="checkbox" ${checked} />`;
+            },
+            cellClick: function(e, cell) {
+                // Toggle the checkbox when the cell is clicked
+                let value = cell.getValue();
+                cell.setValue(!value); // Set the opposite value
+            },
+        },
+
+        {title: "ISCN", field: "iscn", responsive:0},
+        {title: "Number of SNPs", field: "numsnp_info",
+            mutator: function(value, data, type, params, component) {
+                // Extract the numeric value from the string
+                return parseInt(value.replace(/[^0-9]/g, ''), 10);
+            }
+        },
+        {title: "Length", field: "length_info",
+            mutator: function(value, data, type, params, component) {
+                // Extract the numeric value from the string
+                return parseInt(value.replace(/[^0-9]/g, ''), 10);
+            }
+        },
+        {title: "Confidence", field: "conf",
+            mutator: function(value, data, type, params, component) {
+                // Extract the numeric value from the string
+                return parseFloat(value.replace(/[^0-9.-]+/g, ''));
+            }
+        },
+        {title: "Type", field: "Type"},
+        {title: "Classification", field: "Classification",
+                sorter: function(a, b, aRow, bRow, column, dir, sorterParams) {
+                    var classA = classificationOrder[a.toLowerCase()] || 6; // Defaults to 6 for unrecognized classifications
+                    var classB = classificationOrder[b.toLowerCase()] || 6;
+                    return classA - classB;
+                },
+                headerSortStartingDir: "asc"
+        },
+        {title: "Total Score", field: "Total score"},
+        {title: "Chromosome", field: "Chromosome", responsive:2},
+        {title: "Start", field: "Start", responsive:2},
+        {title: "End", field: "End", responsive:2},
+        {
+            title: "Known or Predicted Dosage-sensitive Genes",
+            field: "Known or predicted dosage-sensitive genes",
+            responsive: 2,
+            formatter: function(cell, formatterParams) {
+                return `<em>${cell.getValue()}</em>`;
+            }
+        },
+        {
+            title: "All Protein Coding Genes", field: "All protein coding genes", responsive: 2,
+            formatter: function(cell, formatterParams) {
+                return `<em style="white-space:normal;">${cell.getValue()}</em>`;
+            },
+        },
+        {title: "State Info", field: "state_info", responsive: 2},
+        {title: "Start SNP Info", field: "startsnp_info", responsive: 2},
+        {title: "End SNP Info", field: "endsnp_info", responsive: 2},
+        {title:"Comment", field:"comment", editor:"textarea", editorParams:{
+            elementAttributes:{
+                maxlength:"255", //set the maximum character length of the textarea element to 10 characters
+            },
+            verticalNavigation:"editor", //navigate cursor around text area without leaving the cell
+        }}
+        // Add more columns as needed
+    ],
+    initialSort:[
+        {column:"Classification", dir:"asc"},
+        {column:"Length", dir:"asc"},
+    ],
+});
+
+table.on("rowClick", async function(e, row){
+    var data = row.getData();
+    var locus = data.Chromosome + ":" + data.Start + "-" + data.End;
+
+    var browser = await igv_browsers["{{ chipsample.pk }}"]
+    if (typeof browser !== 'undefined' && browser.search) {
+        browser.search(locus);
+    } else {
+        console.error('IGV browser instance not found.');
+    }
+});
+</script>

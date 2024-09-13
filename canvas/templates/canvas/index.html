@@ -1,11 +1,201 @@
-{% extends "layouts/blank.html" %}
+{% extends "canvas/base.html" %}
+{% load static %}
+
+{% block head %}
+{% endblock head %}
+
 {% block content %}
-<div class="columns-3 ...">
-  {% component "input_institution_search" %}{% endcomponent %}
-  {% component "input_chip_search" %}{% endcomponent %}
-  {% component "input_sample_search" %}{% endcomponent %}
+{% if user.is_authenticated %}
+<main x-data="{
+        sidebar: { isExpanded: true },
+        views: { currentView: 'sampleSearch' },
+        collapseSampleSearch: false,
+        showSampleSearch() {
+            this.views.currentView = 'sampleSearch';
+            this.collapseSampleSearch = !this.collapseSampleSearch; // Toggle visibility of sample search
+            $nextTick(() => { window.dispatchEvent(new Event('resize')); });
+        },
+        showSampleInput() {
+            this.views.currentView = 'sampleInput';
+        },
+        showAcmgLoss() {
+            this.views.currentView = 'acmgLoss';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        },
+        showChipInput() {
+            this.views.currentView = 'chipInput';
+            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
+        }
+    }" id="authenticated-content" class="container-fluid main">
+    <!-- Sidebar -->
+    {% include "canvas/sidebar.html" %}
 
-  {% component "chip_upload" %}{% endcomponent %}
+    <!-- Main content area -->
+    <div>
+        <!-- Sample Search View -->
+        <div x-show="views.currentView === 'sampleSearch'" class="container-fluid"
+            :class="collapseSampleSearch === false ? 'sample-container' : 'container'">
+            <div x-show="collapseSampleSearch === false">
+                {% include "canvas/components/sample_search.html" %}
+            </div>
+            <div>
+                {% include "canvas/components/chipsample_tabs.html" %}
+            </div>
+        </div>
+        <div x-show="views.currentView === 'sampleInput'">
+            {% include "canvas/components/sample_input.html" %}
+        </div>
+        <div x-show="views.currentView === 'chipInput'">
+            {% include "canvas/components/chip_input.html" %}
+        </div>
+        <div x-show="views.currentView === 'acmgLoss'">
+            {% include "canvas/components/acmg_loss.html" %}
+        </div>
+    </div>
+    <!-- Full-sized Sample Input View -->
+</main>
 
-</div>
+{% else %}
+{% include "canvas/login.html" %}
+{% endif %}
+
+<style>
+    :root {
+    --pico-typography-spacing-vertical: .5rem;
+    --pico-form-element-spacing-vertical: .1rem;
+    --pico-form-element-spacing-horizontal: .25rem;
+    --pico-font-size: .6rem;
+  }
+    select {
+        height:2em;
+    }
+    .main {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        grid-column-gap: .6em;
+        grid-row-gap: .6em;
+        justify-items: stretch;
+        align-items: stretch;
+    }
+
+    .sample-container {
+        display: grid;
+        grid-template-columns: 3fr 9fr;
+        grid-column-gap: .6em;
+        grid-row-gap: .6em;
+        justify-items: stretch;
+        align-items: stretch;
+    }
+    .evidence-container {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        grid-column-gap: .6em;
+        grid-row-gap: .6em;
+        justify-items: stretch;
+        align-items: stretch;
+        border-top-width: thin;
+        border-top-style: solid;
+    }
+    .evidence-group {
+        margin:auto;
+    }
+
+    .dropdown>summary {
+        height: unset !important;
+        padding: 0 !important;
+        border-radius: 2em !important;
+    }
+    details.dropdown summary::after {
+        display:none;
+    }
+
+    .dropdown>summary input {
+        margin: 0;
+        background: transparent;
+        border: none;
+    }
+
+    .dropdown>summary input:focus {
+        box-shadow: none;
+    }
+
+    .badge {
+        border-radius: 2em;
+        padding: .2em .6em;
+        display: inline-flex;
+        align-items: center;
+        gap: .3em;
+    }
+
+    .badge a {
+        background: none;
+        border: none;
+        color: #888;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+</style>
+
+<script>
+    function getSelectedInstitutions() {
+        return Array.from(document.getElementsByClassName("selected-Institution-sample-search")).map(e => e.innerText)
+    }
+
+    function getSelectedChips() {
+        return Array.from(document.getElementsByClassName("selected-Chip-sample-search")).map(e => e.innerText)
+    }
+    function createSearchComponent(type, isSingleSelect = false, eventName = "") {
+        return {
+            searchQuery: '',
+            selectedItems: [],
+            selectedItem: null,
+            selectedItemPk: null,
+            isSingleSelect: isSingleSelect,
+            eventName: eventName,
+            selectItem(item, item_pk) {
+                if (this.isSingleSelect === "true") {
+                    this.selectedItem = item;
+                    this.selectedItemPk = item_pk;
+                } else {
+                    if (!this.selectedItems.includes(item)) {
+                        this.selectedItems.push(item);
+                    }
+                }
+                if (this.eventName) {
+                    setTimeout(() => {
+                        document.dispatchEvent(new Event(eventName)),
+                            50
+                    });
+                }
+                this.closeDropdown();
+                this.clearSearch();
+            },
+            clearSearch() {
+                this.searchQuery = '';
+                this.open = false;
+            },
+            removeItem(item = null) {
+                if (this.isSingleSelect === "true") {
+                    this.selectedItem = null;
+                } else {
+                    this.selectedItems = this.selectedItems.filter(i => i !== item);
+                }
+                setTimeout(() => {
+                    document.dispatchEvent(new Event("searchSamples")),
+                        50
+                });
+            },
+            openDropdown() {
+                this.open = true;
+                this.$refs.detailsElement.open = true;
+            },
+            closeDropdown() {
+                this.open = false;
+                this.$refs.detailsElement.open = false;
+            }
+        }
+    }
+</script>
 {% endblock content %}

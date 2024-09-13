@@ -1,7 +1,5 @@
-Django
-pillow
-django-cleanup
-django-allauth
-django-htmx
-django-taggit
-django_components
+Django==5.0.7
+django-allauth==0.63.3
+django-htmx==1.18.0
+django-minio-storage==0.5.7
+minio==7.2.7

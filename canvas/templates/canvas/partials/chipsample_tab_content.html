@@ -1,0 +1,86 @@
+<div
+  id="tab-content-{{ chipsample.pk }}"
+  x-show="activeTab === {{ chipsample.pk }}"
+>
+  {% include 'canvas/components/reports.html' with button="true" %}
+
+  <div id="igv-div-{{ chipsample.pk }}" style="width: 100%"></div>
+
+  <div style="overflow: auto; height: 25vh">
+    {% include 'canvas/partials/cnv_table.html' %}
+  </div>
+</div>
+
+<script>
+  igv_divs[{{ chipsample.pk }}] = document.getElementById("igv-div-{{ chipsample.pk }}");
+
+  igv_options[{{ chipsample.pk }}] = {
+      genome: 'hg19',
+          tracks: [
+              // {
+              //     name: '{{ chipsample.sample.protocol_id }}',
+              //     type: 'annotation',
+              //     format: 'bed',
+              //     url: '{{ cnv_bed }}',
+              // },
+              // {
+              //     name: 'Other patients',
+              //     type: 'annotation',
+              //     format: 'bed',
+              //     url: '{{ diger_hastalar_bedi }}',
+              // },
+              // {
+              //     name: 'ClinGen',
+              //     type: 'annotation',
+              //     format: 'bed',
+              //     url: '{{ clingen_bedi }}',
+              // },
+              // {
+              //     name: 'DGV',
+              //     type: 'annotation',
+              //     format: 'bed',
+              //     url: '{{ DGV_bedi }}',
+              // },
+              // {
+              //     name: 'Decipher',
+              //     type: 'annotation',
+              //     format: 'bed',
+              //     url: '{{ decipher_bedi }}',
+              // },
+
+              {
+                  name: 'LRR',
+                  type: 'wig',
+                  format: 'bedgraph',
+                  url: '{{ lrr_bedgraph.bedgraph.url }}',
+                  height: 200,
+                  graphType: 'points',
+                  min: -1,
+                  max: 1,
+                  windowFunction: 'mean',
+                  guideLines: [
+                      { color: 'blue', dotted: true, y: 0 },
+                  ],
+              },
+
+              {
+                  name: 'BAF',
+                  type: 'wig',
+                  format: 'bedgraph',
+                  url: '{{ baf_bedgraph.bedgraph.url }}',
+                  height: 200,
+                  graphType: 'points',
+                  min: 0,
+                  max: 1,
+                  windowFunction: 'none',
+                  guideLines: [
+                      { color: 'green', dotted: true, y: 0.5 },
+                  ],
+              }
+          ]
+  }
+  igv_browsers[{{ chipsample.pk }}] = igv.createBrowser(
+      igv_divs[{{ chipsample.pk }}],
+      igv_options[{{ chipsample.pk }}]
+  )
+</script>

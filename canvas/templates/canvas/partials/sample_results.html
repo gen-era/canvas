@@ -1,0 +1,130 @@
+{% if samples.number == 1 %}
+<div
+  class="badge"
+  :class="{'pico-background-green-400': {{ len_samples }} > 0,
+                'pico-background-red-500': {{ len_samples }} == 0}"
+>
+  Found {{ len_samples }} samples.
+</div>
+{% endif %} {% for sample in samples %}
+<article
+  {% if forloop.last and samples.has_next %}
+  hx-get="{% url 'sample_search'  %}"
+  hx-trigger="intersect once"
+  hx-swap="afterend"
+  hx-target="this"
+  hx-vals='js:{"page": "{{ samples.next_page_number }}", "search": "{{ query }}", "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
+  {% endif %}
+>
+  <header>
+    <strong>Protocol ID: {{ sample.protocol_id }}</strong>
+  </header>
+  <p>
+    <strong>Arrival Date:</strong>
+    {{ sample.arrival_date }}
+  </p>
+  <p>
+    <strong>Sex:</strong>
+    {{ sample.sex }}
+  </p>
+  <p>
+    <strong>Entry Date:</strong>
+    {{ sample.entry_date }}
+  </p>
+
+  <p>
+    <strong>Institute:</strong>
+    <span> {{ sample.institution }} </span>
+  </p>
+  <p>
+    <strong>Sample Type:</strong>
+    {{ sample.sample_type }}
+  </p>
+
+  {% for chipsample in sample.chipsample.all %}
+  <article>
+    <header>
+      <strong>Chip ID:</strong>
+      <span> {{ chipsample.chip.chip_id }} </span>
+
+      <div
+        hx-get="{% url 'chipsample_tab_button' %}"
+        hx-target="#tab-buttons"
+        hx-trigger="click"
+        hx-swap="beforeend"
+        hx-on::before-request="
+            const existingTabIds = Array.from(
+                document.getElementsByClassName('tab-button')
+            ).map(e => e.id)
+            const tabId = 'tab-button-{{  chipsample.pk }}';
+            if (existingTabIds.includes(tabId)) {
+                event.preventDefault();  // Stop the request
+                document.getElementById(tabId).click()
+            }
+            "
+        hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'
+      >
+        <div
+          hx-get="{% url 'chipsample_tab_content' %}"
+          hx-target="#tab-contents"
+          hx-trigger="click"
+          hx-swap="beforeend"
+          hx-vals='{"chipsample_pk": {{ chipsample.pk }}}'
+        >
+          <strong>Position:</strong>
+          <a> Browse {{ chipsample.position }} </a>
+        </div>
+      </div>
+    </header>
+
+    {% include 'canvas/components/reports.html' %}
+
+    <strong>Scan Date:</strong>
+    <span> {{ chipsample.chip.scan_date }} </span>
+
+    <footer>
+      <div
+        class="badge"
+        :class="{'pico-background-green-400': {{ chipsample.autosomal_call_rate }} > 0.99,
+                    'pico-background-red-500': {{ chipsample.autosomal_call_rate }} <= 0.99}"
+      >
+        <strong>Autosomal Call Rate:</strong>
+        {{ chipsample.autosomal_call_rate }}
+      </div>
+
+      <div
+        class="badge"
+        :class="{'pico-background-green-400': {{ chipsample.call_rate }} > 0.99,
+                    'pico-background-red-500': {{ chipsample.call_rate }} <= 0.99}"
+      >
+        <strong>Call Rate:</strong>
+        {{ chipsample.call_rate }}
+      </div>
+
+      <div
+        class="badge"
+        :class="{'pico-background-green-400': {{ chipsample.lrr_std_dev }} <= 0.15,
+                    'pico-background-red-500': {{ chipsample.lrr_std_dev }} > 0.15}"
+      >
+        <strong>LRR Std. Dev.:</strong>
+        {{ chipsample.lrr_std_dev }}
+      </div>
+
+      <div
+        class="badge"
+        :class="{'pico-background-green-400': '{{ chipsample.sex_estimate }}' === '{{ sample.sex }}',
+                    'pico-background-red-500': '{{ chipsample.sex_estimate }}' !== '{{ sample.sex }}'}"
+      >
+        <strong>Sex Estimate:</strong>
+        {{ chipsample.sex_estimate }}
+      </div>
+    </footer>
+  </article>
+  {% endfor %}
+</article>
+{% endfor %}
+{% if not samples.has_next %}
+    {% if len_samples != 0 %}
+        <div class="badge pico-background-orange-300">No more items</div>
+    {% endif %}
+{% endif %}

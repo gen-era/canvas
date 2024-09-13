@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,16 +40,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.sites",
-    "django_components",
-    "organizations",
     "canvas",
-    "taggit",
     "allauth",
     "allauth.account",
     "django_htmx",
     "minio_storage",
-    "home",
-    "users",
 ]
 
 SITE_ID = 1
@@ -84,12 +80,8 @@ TEMPLATES = [
                     [
                         "django.template.loaders.filesystem.Loader",
                         "django.template.loaders.app_directories.Loader",
-                        "django_components.template_loader.Loader",
                     ],
                 )
-            ],
-            "builtins": [
-                "django_components.templatetags.component_tags",
             ],
         },
     },
@@ -147,12 +139,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    BASE_DIR / "components",
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -165,21 +152,28 @@ ACCOUNT_SIGNUP_REDIRECT_URL = (
 )
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 
-DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
-STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
-MINIO_STORAGE_USE_HTTPS = False
-MINIO_STORAGE_ENDPOINT = "192.168.1.124:9000"
-MINIO_STORAGE_ACCESS_KEY = "U3g6WGWch6lZh3oZC193"
-MINIO_STORAGE_SECRET_KEY = "04aMpugrcWUyighNY4J6yzdPg7j9XaXCnBY42Q2r"
+if os.getenv("DJANGO_DEVELOPMENT") == "true":
+    STATIC_ROOT = BASE_DIR / "static"
+    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_URL = "media/"
 
-MINIO_STORAGE_MEDIA_BUCKET_NAME = "canvas"
-MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET = True
-MINIO_STORAGE_MEDIA_OBJECT_METADATA = {"Cache-Control": "max-age=1000"}
-MINIO_STORAGE_MEDIA_BACKUP_BUCKET = "Recycle Bin"
-MINIO_STORAGE_MEDIA_BACKUP_FORMAT = "%c/"
+else:
+    DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
+    STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
 
-MINIO_STORAGE_STATIC_BUCKET_NAME = "canvas-static"
-MINIO_STORAGE_AUTO_CREATE_STATIC_BUCKET = True
+    MINIO_STORAGE_USE_HTTPS = False
+    MINIO_STORAGE_ENDPOINT = "192.168.1.81:9000"
+    MINIO_STORAGE_ACCESS_KEY = "U3g6WGWch6lZh3oZC193"
+    MINIO_STORAGE_SECRET_KEY = "04aMpugrcWUyighNY4J6yzdPg7j9XaXCnBY42Q2r"
+
+    MINIO_STORAGE_MEDIA_BUCKET_NAME = "canvas"
+    MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET = True
+    MINIO_STORAGE_MEDIA_OBJECT_METADATA = {"Cache-Control": "max-age=1000"}
+    MINIO_STORAGE_MEDIA_BACKUP_BUCKET = "Recycle Bin"
+    MINIO_STORAGE_MEDIA_BACKUP_FORMAT = "%c/"
+
+    MINIO_STORAGE_STATIC_BUCKET_NAME = "canvas-static"
+    MINIO_STORAGE_AUTO_CREATE_STATIC_BUCKET = True

@@ -1,0 +1,50 @@
+<div id="sample-input-row-{{ label }}" 
+    style="height: 4em;" 
+    class="sample-input-row grid"
+    hx-get="{% url 'get_sample_input_row' %}"
+    hx-trigger="input[this === document.querySelector('#sample-input-rows > .sample-input-row:last-child')]"
+    hx-target="#sample-input-rows" hx-swap="beforeend"
+>
+    <input
+        autocomplete="off"
+        type="text"
+        name="protocol_id" required>
+
+    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" %}
+
+    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" %}
+
+    <input
+        autocomplete="off"
+        type="date" name="arrival_date" required>
+    <input
+        autocomplete="off"
+        type="date" name="study_date" required>
+    <input
+        autocomplete="off"
+        type="text" name="description" required>
+
+    <select name="sex" aria-label="Enter observed sex" required>
+        <option selected disabled value="">
+            Enter observed sex…
+        </option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Unknown</option>
+    </select>
+
+
+    <input
+        autocomplete="off"
+        type="number" name="concentration" min="0" step="0.1" required>
+
+    {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="None" %}
+
+    <a href="#" onclick="removeRow(this)">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+            </path>
+        </svg>
+    </a>
+</div>

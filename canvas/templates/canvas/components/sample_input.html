@@ -1,0 +1,45 @@
+<form
+    id="sample-input-form"
+    class="container-fluid"
+    style="max-height:97vh;"
+    hx-post="{% url 'save_samples' %}"
+    hx-target="#sample-input-form-errors"
+    autocomplete="off"
+>
+    <div id="sample-input-form-errors"> </div>
+
+    <div id="sample-input-rows">
+        <!-- Table Header -->
+        <div class="grid">
+
+            <div>Protocol ID</div>
+            <div>Institution</div>
+            <div>Sample Type</div>
+            <div>Arrival Date</div>
+            <div>Study Date</div>
+            <div>Description</div>
+            <div>Sex</div>
+            <div>Concentration</div>
+            <div>Repeat</div>
+            <div>Remove row</div>
+        </div>
+        {% include "canvas/partials/sample_input_row.html" %}
+    </div>
+    <button
+        type="submit"
+        >
+        Save Samples
+    </button>
+</form>
+
+<script>
+function removeRow(button) {
+    const row = button.closest('.sample-input-row');
+    const rows = document.querySelectorAll('.sample-input-row');
+    if (rows.length > 1) {
+        row.remove();
+    } else {
+        alert("You cannot remove the last remaining row.");
+    }
+}
+</script>
