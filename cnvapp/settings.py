@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-ax7b&dz))k(q0x+p=5f6wh0y@3k9nd=uu=!h6tmh&95xm(me@+"
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = ["*"]
 
@@ -164,10 +167,10 @@ else:
     DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
     STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
 
-    MINIO_STORAGE_USE_HTTPS = False
-    MINIO_STORAGE_ENDPOINT = "192.168.1.81:9000"
-    MINIO_STORAGE_ACCESS_KEY = "U3g6WGWch6lZh3oZC193"
-    MINIO_STORAGE_SECRET_KEY = "04aMpugrcWUyighNY4J6yzdPg7j9XaXCnBY42Q2r"
+    MINIO_STORAGE_USE_HTTPS = os.getenv('MINIO_STORAGE_USE_HTTPS')
+    MINIO_STORAGE_ENDPOINT = os.getenv('MINIO_STORAGE_ENDPOINT')
+    MINIO_STORAGE_ACCESS_KEY = os.getenv('MINIO_STORAGE_ACCESS_KEY')
+    MINIO_STORAGE_SECRET_KEY = os.getenv('MINIO_STORAGE_SECRET_KEY')
 
     MINIO_STORAGE_MEDIA_BUCKET_NAME = "canvas"
     MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET = True
