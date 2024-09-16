@@ -1,7 +1,9 @@
 FROM python:3.12.6-alpine
 
+RUN apk update && apk add --no-cache gcc musl-dev postgresql-dev
+
 # set work directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/canvas
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
