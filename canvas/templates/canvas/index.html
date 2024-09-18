@@ -5,8 +5,9 @@
 {% endblock head %}
 
 {% block content %}
-{% if user.is_authenticated %}
-<main x-data="{
+  {% if user.is_authenticated %}
+    <main
+      x-data="{
         sidebar: { isExpanded: true },
         views: { currentView: 'sampleSearch' },
         collapseSampleSearch: false,
@@ -26,176 +27,185 @@
             this.views.currentView = 'chipInput';
             this.collapseSampleSearch = false; // Ensure sample search is visible for other views
         }
-    }" id="authenticated-content" class="container-fluid main">
-    <!-- Sidebar -->
-    {% include "canvas/sidebar.html" %}
+    }"
+      id="authenticated-content"
+      class="container-fluid main"
+    >
+      <!-- Sidebar -->
+      {% include "canvas/sidebar.html" %}
 
-    <!-- Main content area -->
-    <div>
+      <!-- Main content area -->
+      <div>
         <!-- Sample Search View -->
-        <div x-show="views.currentView === 'sampleSearch'" class="container-fluid"
-            :class="collapseSampleSearch === false ? 'sample-container' : 'container'">
-            <div x-show="collapseSampleSearch === false">
-                {% include "canvas/components/sample_search.html" %}
-            </div>
-            <div>
-                {% include "canvas/components/chipsample_tabs.html" %}
-            </div>
+        <div
+          x-show="views.currentView === 'sampleSearch'"
+          class="container-fluid"
+          :class="collapseSampleSearch === false ? 'sample-container' : 'container'"
+        >
+          <div x-show="collapseSampleSearch === false">
+            {% include "canvas/components/sample_search.html" %}
+          </div>
+          <div>{% include "canvas/components/chipsample_tabs.html" %}</div>
         </div>
         <div x-show="views.currentView === 'sampleInput'">
-            {% include "canvas/components/sample_input.html" %}
+          {% include "canvas/components/sample_input.html" %}
         </div>
         <div x-show="views.currentView === 'chipInput'">
-            {% include "canvas/components/chip_input.html" %}
+          {% include "canvas/components/chip_input.html" %}
         </div>
         <div x-show="views.currentView === 'acmgLoss'">
-            {% include "canvas/components/acmg_loss.html" %}
+          {% include "canvas/components/acmg_loss.html" %}
         </div>
-    </div>
-    <!-- Full-sized Sample Input View -->
-</main>
+      </div>
+      <!-- Full-sized Sample Input View -->
+    </main>
+  {% else %}
+    {% include "canvas/login.html" %}
+  {% endif %}
 
-{% else %}
-{% include "canvas/login.html" %}
-{% endif %}
-
-<style>
+  <style>
     :root {
-    --pico-typography-spacing-vertical: .5rem;
-    --pico-form-element-spacing-vertical: .1rem;
-    --pico-form-element-spacing-horizontal: .25rem;
-    --pico-font-size: .6rem;
-  }
+      --pico-typography-spacing-vertical: 0.5rem;
+      --pico-form-element-spacing-vertical: 0.1rem;
+      --pico-form-element-spacing-horizontal: 0.25rem;
+      --pico-font-size: 0.8rem;
+    }
     select {
-        height:2em;
+      height: 2em;
     }
     .main {
-        display: grid;
-        grid-template-columns: 1fr 11fr;
-        grid-column-gap: .6em;
-        grid-row-gap: .6em;
-        justify-items: stretch;
-        align-items: stretch;
+      display: grid;
+      grid-template-columns: 1fr 11fr;
+      grid-column-gap: 0.6em;
+      grid-row-gap: 0.6em;
+      justify-items: stretch;
+      align-items: stretch;
     }
 
     .sample-container {
-        display: grid;
-        grid-template-columns: 3fr 9fr;
-        grid-column-gap: .6em;
-        grid-row-gap: .6em;
-        justify-items: stretch;
-        align-items: stretch;
+      display: grid;
+      grid-template-columns: 3fr 9fr;
+      grid-column-gap: 0.6em;
+      grid-row-gap: 0.6em;
+      justify-items: stretch;
+      align-items: stretch;
     }
     .evidence-container {
-        display: grid;
-        grid-template-columns: 1fr 11fr;
-        grid-column-gap: .6em;
-        grid-row-gap: .6em;
-        justify-items: stretch;
-        align-items: stretch;
-        border-top-width: thin;
-        border-top-style: solid;
+      display: grid;
+      grid-template-columns: 1fr 11fr;
+      grid-column-gap: 0.6em;
+      grid-row-gap: 0.6em;
+      justify-items: stretch;
+      align-items: stretch;
+      border-top-width: thin;
+      border-top-style: solid;
     }
     .evidence-group {
-        margin:auto;
+      margin: auto;
     }
 
-    .dropdown>summary {
-        height: unset !important;
-        padding: 0 !important;
-        border-radius: 2em !important;
+    .dropdown > summary {
+      height: unset !important;
+      padding: 0 !important;
+      border-radius: 2em !important;
     }
     details.dropdown summary::after {
-        display:none;
+      display: none;
     }
 
-    .dropdown>summary input {
-        margin: 0;
-        background: transparent;
-        border: none;
+    .dropdown > summary input {
+      margin: 0;
+      background: transparent;
+      border: none;
     }
 
-    .dropdown>summary input:focus {
-        box-shadow: none;
+    .dropdown > summary input:focus {
+      box-shadow: none;
     }
 
     .badge {
-        border-radius: 2em;
-        padding: .2em .6em;
-        display: inline-flex;
-        align-items: center;
-        gap: .3em;
+      border-radius: 2em;
+      padding: 0.2em 0.6em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3em;
     }
 
     .badge a {
-        background: none;
-        border: none;
-        color: #888;
-        line-height: 1;
-        padding: 0;
-        cursor: pointer;
-        transition: color 0.3s ease;
+      background: none;
+      border: none;
+      color: #888;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+      transition: color 0.3s ease;
     }
-</style>
+  </style>
 
-<script>
+  <script>
     function getSelectedInstitutions() {
-        return Array.from(document.getElementsByClassName("selected-Institution-sample-search")).map(e => e.innerText)
+      return Array.from(
+        document.getElementsByClassName("selected-Institution-sample-search"),
+      ).map((e) => e.innerText);
     }
 
     function getSelectedChips() {
-        return Array.from(document.getElementsByClassName("selected-Chip-sample-search")).map(e => e.innerText)
+      return Array.from(
+        document.getElementsByClassName("selected-Chip-sample-search"),
+      ).map((e) => e.innerText);
     }
-    function createSearchComponent(type, isSingleSelect = false, eventName = "") {
-        return {
-            searchQuery: '',
-            selectedItems: [],
-            selectedItem: null,
-            selectedItemPk: null,
-            isSingleSelect: isSingleSelect,
-            eventName: eventName,
-            selectItem(item, item_pk) {
-                if (this.isSingleSelect === "true") {
-                    this.selectedItem = item;
-                    this.selectedItemPk = item_pk;
-                } else {
-                    if (!this.selectedItems.includes(item)) {
-                        this.selectedItems.push(item);
-                    }
-                }
-                if (this.eventName) {
-                    setTimeout(() => {
-                        document.dispatchEvent(new Event(eventName)),
-                            50
-                    });
-                }
-                this.closeDropdown();
-                this.clearSearch();
-            },
-            clearSearch() {
-                this.searchQuery = '';
-                this.open = false;
-            },
-            removeItem(item = null) {
-                if (this.isSingleSelect === "true") {
-                    this.selectedItem = null;
-                } else {
-                    this.selectedItems = this.selectedItems.filter(i => i !== item);
-                }
-                setTimeout(() => {
-                    document.dispatchEvent(new Event("searchSamples")),
-                        50
-                });
-            },
-            openDropdown() {
-                this.open = true;
-                this.$refs.detailsElement.open = true;
-            },
-            closeDropdown() {
-                this.open = false;
-                this.$refs.detailsElement.open = false;
+    function createSearchComponent(
+      type,
+      isSingleSelect = false,
+      eventName = "",
+    ) {
+      return {
+        searchQuery: "",
+        selectedItems: [],
+        selectedItem: null,
+        selectedItemPk: null,
+        isSingleSelect: isSingleSelect,
+        eventName: eventName,
+        selectItem(item, item_pk) {
+          if (this.isSingleSelect === "true") {
+            this.selectedItem = item;
+            this.selectedItemPk = item_pk;
+          } else {
+            if (!this.selectedItems.includes(item)) {
+              this.selectedItems.push(item);
             }
-        }
+          }
+          if (this.eventName) {
+            setTimeout(() => {
+              document.dispatchEvent(new Event(eventName)), 50;
+            });
+          }
+          this.closeDropdown();
+          this.clearSearch();
+        },
+        clearSearch() {
+          this.searchQuery = "";
+          this.open = false;
+        },
+        removeItem(item = null) {
+          if (this.isSingleSelect === "true") {
+            this.selectedItem = null;
+          } else {
+            this.selectedItems = this.selectedItems.filter((i) => i !== item);
+          }
+          setTimeout(() => {
+            document.dispatchEvent(new Event("searchSamples")), 50;
+          });
+        },
+        openDropdown() {
+          this.open = true;
+          this.$refs.detailsElement.open = true;
+        },
+        closeDropdown() {
+          this.open = false;
+          this.$refs.detailsElement.open = false;
+        },
+      };
     }
-</script>
+  </script>
 {% endblock content %}

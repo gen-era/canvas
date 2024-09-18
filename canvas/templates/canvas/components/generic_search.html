@@ -26,6 +26,7 @@
         hx-trigger="input changed delay:500ms" hx-target="next ul" hx-swap="innerHTML" hx-vals='{"page": 1}'
         @input="openDropdown()" />
 
+      <template x-if="!selectedItem">
       <input autocomplete="off" style="opacity: 0; height: 1px !important; float: right" name="{{ model_name }}"
         value="" 
         {% if model_name == "Institution" %} 
@@ -34,6 +35,7 @@
         {% if model_name == "SampleType" %} 
         required
         {% endif %} />
+      </template>
     </div>
   </summary>
 
