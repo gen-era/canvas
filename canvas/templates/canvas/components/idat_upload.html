@@ -1,0 +1,7 @@
+<form hx-post="{% url 'idat_upload' %}" hx-encoding="multipart/form-data" hx-target="#upload-progress" enctype="multipart/form-data">
+    <label for="directory-upload">Select a directory with .idat files:</label>
+    <input type="file" id="directory-upload" name="files" webkitdirectory mozdirectory multiple>
+    <button type="submit">Upload</button>
+</form>
+
+<div id="upload-progress"></div>

@@ -20,7 +20,7 @@ urlpatterns = [
         views.chipsample_tab_button,
         name="chipsample_tab_button",
     ),
-    path("chip_upload", views.ChipUpload.as_view(), name="chip_upload"),
+    path("idat_upload", views.idat_upload, name="idat_upload"),
     path(
         "get_sample_input_row/", views.get_sample_input_row, name="get_sample_input_row"
     ),
