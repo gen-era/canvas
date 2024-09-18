@@ -1,39 +1,20 @@
-<div x-data="{ displaySubmitButton: 'none' }">
-    <div class="grid header_container">
-        <div>
-            <div
-                hx-get="{% url 'get_chip_type_size' %}" hx-trigger="updateChipTemplate from:document"
-                hx-vals='js:{"chipType": getSelectedChipType("{{ label }}")}' hx-target="next div" hx-swap="innerHTML"
-            >
-                {% include 'canvas/components/generic_search.html' with model_name="ChipType" field_name="name" isSingleSelect="true" eventName="updateChipTemplate" %}
-                
-            </div>
-            <div></div>
-        </div>
-        <div class="chip_upload">
-            {# include 'canvas/components/uploader.html' #}
-        </div>
+<div class="grid">
+    <div
+        hx-get="{% url 'get_chip_type_size' %}" hx-trigger="updateChipTemplate from:document"
+        hx-vals='js:{"chipType": getSelectedChipType("{{ label }}")}' hx-target="#chip-template" hx-swap="innerHTML"
+    >
+        {% include 'canvas/components/generic_search.html' with model_name="ChipType" field_name="name" isSingleSelect="true" eventName="updateChipTemplate" %}
+
     </div>
-    
+    <div class="chip_upload">
+        {% include 'canvas/components/uploader.html' %}
+    </div>
 </div>
+<div id="chip-template"></div>
+    
 
 <script>
     function getSelectedChipType(label) {
         return Array.from(document.getElementsByClassName(`selected-ChipType-${label}`)).map(e => e.innerText)
     }
 </script>
-<style>
-    .chip_input_form_container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;    
-    }
-
-    .card {
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 10px;
-        background-color: #f9f9f9;
-        text-align: center;
-    }
-</style>

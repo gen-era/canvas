@@ -1,10 +1,19 @@
 <form hx-post="{% url 'save_chip_input' %}" autocomplete="off">
-    <input type="text" placeholder="Please enter Chip">
-    {% for position in card_positions %}
-    <div class="card">
-        <div class="card-header">{{ position }}</div>
-        {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" %}
-    </div>
+    <input type="text" name="chip_barcode" placeholder="Please enter Chip">
+    <div class="grid">
+    {% for col in num_cols %}
+        <div>
+        {% for row in num_rows %}
+        <article>
+            <header>
+                R{{ row }}C{{ col }}
+            </header>
+            <input type="hidden" name="position" value="R{{row}}C{{col}}">
+            {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" %}
+        </article>
+        {% endfor %}
+        </div>
     {% endfor %}
+    </div>
     <button type="submit" style="height: 4rem; margin-top: 2rem;">Save Samples</button>
 </form>

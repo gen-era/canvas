@@ -319,22 +319,24 @@ def get_chip_type_size(request):
     chip_type = ChipType.objects.get(name=query)
 
     # Generate the card positions based on the chip size
-    num_cards = chip_type.size
-    card_positions = []
-    for i in range(1, num_cards + 1):
-        row = (i - 1) // 2 + 1  # Calculate the row based on card number
-        col = (i - 1) % 2 + 1   # Calculate the column (1 or 2)
-        position = f'R{row:02}C{col:02}'
-        card_positions.append(position)
-        
+    num_rows=[f"{i:02d}" for i in range(1, 12 +1)]
+    num_cols=[f"{i:02d}" for i in range(1, 4 + 1)]
+    print(num_rows)
+    print(num_cols)
+
     return render(
             request,
             "canvas/partials/chip_cards_template.html",
-            {'card_positions': card_positions},
+            {'num_rows': num_rows,
+                'num_cols': num_cols,
+             },
         )
 
+from django.shortcuts import HttpResponse
 def save_chip_input(request):
-    return 
+
+    print(request.POST)
+    return HttpResponse("hi")
 #     form_data = dict(request.POST)
 #     print(form_data)
     
