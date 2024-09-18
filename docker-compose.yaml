@@ -1,40 +1,141 @@
-version: '3.8'
-
 services:
-  web:
-    build:
-      context: .
-    command: python manage.py runserver 0.0.0.0:8000
+  watchtower:
+    image: containrrr/watchtower
+    command:
+      - "--label-enable"
+      - "--interval"
+      - "30"
+      - "--rolling-restart"
     volumes:
-      - .:/usr/src/canvas/
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  reverse-proxy:
+    image: traefik:v3.1
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=bioit@gen-era.com.tr"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.cnvcanvas.com`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
     ports:
-      - "8000:8000"
-    env_file:
-      - ./.env
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  canvas:
+    image: canvas  # Update this to the correct image for your Django app
+    command: bash /app/start.sh
+    environment:
+      - HOST_NAME=cnvcanvas.com
+      - SECRET_KEY=django-insecure-ax7b&dz))k(q0x+p=5f6wh0y@3k9nd=uu=!h6tmh&95xm(me@+
+      - DEBUG=False
+      - MINIO_STORAGE_USE_HTTPS=False
+      - MINIO_STORAGE_ENDPOINT=minio:9000
+      - MINIO_STORAGE_ACCESS_KEY=minio
+      - MINIO_STORAGE_SECRET_KEY=minio123
+      - MINIO_STORAGE_STATIC_URL=https://minio.cnvcanvas.com/canvas-static
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=canvasdb
+      - SQL_USER=canvas
+      - SQL_PASSWORD=canvaspass
+      - SQL_HOST=db
+      - SQL_PORT=5432
+    labels:
+      - "traefik.http.routers.canvas.rule=Host(`cnvcanvas.com`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.canvas.entrypoints=websecure"
+      - "traefik.http.routers.canvas.tls.certresolver=myresolver"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      mode: replicated
+      replicas: 3
+    restart: always
+    expose:
+      - 8000
     depends_on:
-      - db
-      - minio
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
 
   db:
-    image: postgres:16-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
+    image: postgres
+    restart: always
+    user: postgres
     environment:
+      - POSTGRES_DB=canvasdb  # Changed from canvas to canvasdb
       - POSTGRES_USER=canvas
-      - POSTGRES_PASSWORD=canvaspass
-      - POSTGRES_DB=canvasdb
+      - POSTGRES_PASSWORD=canvaspass  # Using the password directly instead of a secret
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   minio:
-    image: minio/minio
-    command: server /data
-    ports:
-      - "9000:9000"
+    image: minio/minio:latest
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
+      - MINIO_ACCESS_KEY_FILE=/run/secrets/minio-access-key
+      - MINIO_SECRET_KEY_FILE=/run/secrets/minio-secret-key
+      - MINIO_DOMAIN=minio.cnvcanvas.com
+      - MINIO_SERVER_URL=https://minio.cnvcanvas.com
+      - MINIO_BROWSER_REDIRECT_URL=https://admin.minio.cnvcanvas.com
+    command: server /data --console-address ":9001" --address ":9000"
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.minio.service=minio"
+      - "traefik.http.routers.minio.rule=Host(`minio.cnvcanvas.com`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.tls.certresolver=myresolver"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+
+      - "traefik.http.routers.minio-admin.service=minio-admin"
+      - "traefik.http.routers.minio-admin.rule=Host(`admin.minio.cnvcanvas.com`)"
+      - "traefik.http.routers.minio-admin.entrypoints=websecure"
+      - "traefik.http.routers.minio-admin.tls.certresolver=myresolver"
+      - "traefik.http.services.minio-admin.loadbalancer.server.port=9001"
+    expose:
+      - 9000
+      - 9001
     volumes:
-      - minio_data:/data
+      - minio-data:/data
+    secrets:
+      - minio-access-key
+      - minio-secret-key
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 
 
 volumes:
-  postgres_data:
-  minio_data:
+  db-data:
+  letsencrypt:
+  minio-data:
+
+secrets:
+  db-password:
+    file: db/password.txt
+  minio-access-key:
+    file: minio/access-key.txt
+  minio-secret-key:
+    file: minio/secret-key.txt
+

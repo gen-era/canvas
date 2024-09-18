@@ -1,18 +1,23 @@
-FROM python:3.12.6-alpine
+# Use the official Python image from the Docker Hub
+FROM python:3.12.6-slim-bookworm
 
-RUN apk update && apk add --no-cache gcc musl-dev postgresql-dev
+# Set environment variables to ensure that Python output is sent straight to the terminal (e.g., logs)
+ENV PYTHONUNBUFFERED=1
 
-# set work directory
-WORKDIR /usr/src/canvas
+# Set the working directory in the container
+WORKDIR /app
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Install system dependencies and Python packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# install dependencies
-RUN pip install --upgrade pip
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-# copy project
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code into the container
 COPY . .

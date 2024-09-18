@@ -12,9 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv('DEBUG') in ("True")
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [os.getenv("HOST_NAME")]
+CSRF_TRUSTED_ORIGINS = ["https://" + os.getenv("HOST_NAME")]
 
 
 # Application definition
@@ -101,7 +99,7 @@ WSGI_APPLICATION = "cnvapp.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if os.getenv("DJANGO_DEVELOPMENT") == "true":
+if DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -111,12 +109,12 @@ if os.getenv("DJANGO_DEVELOPMENT") == "true":
 else:
     DATABASES = {
         "default": {
-            "ENGINE": os.getenv("SQL_ENGINE", "django.db.backends.sqlite3"),
-            "NAME": os.getenv("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
-            "USER": os.getenv("SQL_USER", "user"),
-            "PASSWORD": os.getenv("SQL_PASSWORD", "password"),
-            "HOST": os.getenv("SQL_HOST", "localhost"),
-            "PORT": os.getenv("SQL_PORT", "5432"),
+            "ENGINE": os.getenv("SQL_ENGINE"),
+            "NAME": os.getenv("SQL_DATABASE"),
+            "USER": os.getenv("SQL_USER"),
+            "PASSWORD": os.getenv("SQL_PASSWORD"),
+            "HOST": os.getenv("SQL_HOST"),
+            "PORT": os.getenv("SQL_PORT"),
             "ENGINE": "django.db.backends.postgresql",
         }
     }
@@ -152,11 +150,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-STATIC_URL = "static/"
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -171,7 +164,12 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 
-if os.getenv("DJANGO_DEVELOPMENT") == "true":
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = "static/"
+
+if DEBUG:
     STATIC_ROOT = BASE_DIR / "static"
     MEDIA_ROOT = BASE_DIR / "media"
     MEDIA_URL = "media/"
@@ -180,7 +178,7 @@ else:
     DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
     STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
 
-    MINIO_STORAGE_USE_HTTPS = os.getenv('MINIO_STORAGE_USE_HTTPS')
+    MINIO_STORAGE_USE_HTTPS = os.getenv('MINIO_STORAGE_USE_HTTPS') in ("True")
     MINIO_STORAGE_ENDPOINT = os.getenv('MINIO_STORAGE_ENDPOINT')
     MINIO_STORAGE_ACCESS_KEY = os.getenv('MINIO_STORAGE_ACCESS_KEY')
     MINIO_STORAGE_SECRET_KEY = os.getenv('MINIO_STORAGE_SECRET_KEY')
@@ -193,3 +191,4 @@ else:
 
     MINIO_STORAGE_STATIC_BUCKET_NAME = "canvas-static"
     MINIO_STORAGE_AUTO_CREATE_STATIC_BUCKET = True
+    MINIO_STORAGE_STATIC_URL = os.getenv('MINIO_STORAGE_STATIC_URL')
