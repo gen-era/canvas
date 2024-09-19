@@ -1,5 +1,6 @@
 <form hx-post="{% url 'save_chip_input' %}" autocomplete="off">
     <input type="text" name="chip_barcode" placeholder="Please enter Chip">
+    <input type="hidden" name="chip_type", value="{{ chip_type }}">
     <div class="grid">
     {% for col in num_cols %}
         <div>

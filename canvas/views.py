@@ -297,16 +297,15 @@ def get_chip_type_size(request):
     chip_type = ChipType.objects.get(name=query)
 
     # Generate the card positions based on the chip size
-    num_rows=[f"{i:02d}" for i in range(1, 12 +1)]
-    num_cols=[f"{i:02d}" for i in range(1, 4 + 1)]
-    print(num_rows)
-    print(num_cols)
+    num_rows=[f"{i:02d}" for i in range(1, chip_type.rows +1)]
+    num_cols=[f"{i:02d}" for i in range(1, chip_type.cols + 1)]
 
     return render(
             request,
             "canvas/partials/chip_cards_template.html",
             {'num_rows': num_rows,
                 'num_cols': num_cols,
+                'chip_type':chip_type
              },
         )
 
