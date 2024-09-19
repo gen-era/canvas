@@ -1,22 +1,22 @@
 from django.conf import settings
-from django.http import JsonResponse
 from django.shortcuts import render
-from django.views import View
 from django.core.paginator import Paginator
 from django.apps import apps
 from django_htmx.http import retarget
 from django.db import transaction
+from django.shortcuts import HttpResponse
+from django.utils import timezone
 
 
 from canvas.models import (
     Sample,
-    Chip,
     ChipSample,
     Institution,
     IDAT,
-    BedGraph,
     SampleType,
     ChipType,
+    Chip,
+    Lot
 )
 from django.contrib.auth.decorators import login_required
 
@@ -185,28 +185,6 @@ def get_presigned_url(bucket_name, file_path, expiration=600):
     )
 
 
-class ChipUpload(View):
-    template_name = "canvas/components/uploader.html"
-
-    def post(self, request, *args, **kwargs):
-        bucket_name = settings.MINIO_STORAGE_MEDIA_BUCKET_NAME
-
-        idats = request.FILES.getlist("file")
-
-        presigned_urls = {}
-        for idat in idats:
-            presigned_urls[idat.name] = put_presigned_url(bucket_name, idat.name)
-            idat_obj = IDAT(idat=f"{bucket_name}/{idat.name}")
-            idat_obj.save()
-
-        context = {
-            "presigned_urls": json.dumps(presigned_urls),
-            "path": f"to {bucket_name}",
-        }
-
-        return render(request, self.template_name, context)
-
-
 @login_required
 def get_sample_input_row(request):
     label = secrets.token_urlsafe(6)
@@ -311,100 +289,100 @@ def get_reports(request):
         "button": button,
         "chipsample": chipsample,
     }
-    print(context)
     return render(request, "canvas/partials/report_list.html", context=context)
+
 
 def get_chip_type_size(request):
     query = request.GET.get("chipType", "").strip()
     chip_type = ChipType.objects.get(name=query)
 
     # Generate the card positions based on the chip size
-    num_rows=[f"{i:02d}" for i in range(1, 12 +1)]
-    num_cols=[f"{i:02d}" for i in range(1, 4 + 1)]
-    print(num_rows)
-    print(num_cols)
+    num_rows=[f"{i:02d}" for i in range(1, chip_type.rows +1)]
+    num_cols=[f"{i:02d}" for i in range(1, chip_type.cols + 1)]
 
     return render(
             request,
             "canvas/partials/chip_cards_template.html",
             {'num_rows': num_rows,
                 'num_cols': num_cols,
+                'chip_type':chip_type
              },
         )
-
-from django.shortcuts import HttpResponse
+@login_required
 def save_chip_input(request):
+    if request.method == 'POST':
+        lot_number = request.POST.get('lot')
+        chip_barcode = request.POST.get('chip_barcode')
+        chip_type_name = request.POST.get('chip_type')
 
-    print(request.POST)
-    return HttpResponse("hi")
-#     form_data = dict(request.POST)
-#     print(form_data)
-    
-#     try:
-#         with transaction.atomic():
-#             for i in range(len(form_data["Sample"])):
-#                 try:
-#                     sample = Sample.objects.get(
-#                         id=form_data["Sample"][i]
-#                     )
+        lot, created = Lot.objects.get_or_create(
+            lot_number=lot_number,
+            defaults={'arrival_date': timezone.now()}
+        )
+       
+        chip_type = ChipType.objects.get(name=chip_type_name)
+       
 
-#                     position = 
+        # Create the Chip instance
+        chip = Chip.objects.create(
+            chip_id=chip_barcode,
+            chip_type=chip_type,
+            lot=lot,
+            lab_practitioner=request.user,
+            protocol_start_date=timezone.now(), 
+            scan_date=timezone.now()            
+        )
 
-#                     # Create new Sample object
-#                     sample = Sample.objects.create(
-#                         arrival_date=form_data["arrival_date"][i],
-#                         study_date=form_data["study_date"][i] or None,
-#                         protocol_id=form_data["protocol_id"][i],
-#                         concentration=form_data["concentration"][i],
-#                         institution=institution,
-#                         sex=form_data["sex"][i],
-#                         description=form_data["description"][i],
-#                         sample_type=sample_type,
-#                     )
+        # Get positions and samples from the form data
+        positions = request.POST.getlist('position')
+        samples = request.POST.getlist('Sample')
 
-#                     # Handle ManyToManyField 'repeat'
-#                     repeat_sample_id = form_data["Sample"][i]
-#                     if repeat_sample_id:
-#                         try:
-#                             repeat_sample = Sample.objects.get(id=repeat_sample_id)
-#                             sample.repeat.add(repeat_sample)
-#                         except Sample.DoesNotExist:
-#                             errors.append(
-#                                 f"Sample with ID {repeat_sample_id} not found."
-#                             )
-#                             form_invalid = True
+        # Iterate over positions and samples
+        for position, sample_id in zip(positions, samples):
+            if sample_id.strip():  # Ensure the sample_id is not empty  
+                sample_pk = int(sample_id)
+                sample = Sample.objects.get(pk=sample_pk)
+                
+                # Create the ChipSample instance
+                ChipSample.objects.create(
+                    sample=sample,
+                    chip=chip,
+                    position=position
+                )
 
-#                 except Institution.DoesNotExist:
-#                     errors.append(
-#                         f"Institution with ID {form_data['Institution'][i]} not found."
-#                     )
-#                     form_invalid = True
-#                 except SampleType.DoesNotExist:
-#                     errors.append(
-#                         f"SampleType with ID {form_data['SampleType'][i]} not found."
-#                     )
-#                     form_invalid = True
+        # Redirect to a success page or render a success message
+        return HttpResponse("Chip and samples saved successfully.")
 
-#         # Check if the form is invalid after the loop
-#         if form_invalid:
-#             return render(
-#                 request,
-#                 "canvas/partials/sample_input_form_errors.html",
-#                 {"errors": errors},
-#             )
-#         else:
-#             # If everything is successful, return success response
-#             response = render(
-#                 request,
-#                 "canvas/partials/sample_input_success.html",
-#                 {"len_samples": len_samples},
-#             )
-#             return retarget(response, "#sample-input-form")
+def idat_upload(request):
+    if request.method == 'POST':
+        files = request.FILES.getlist('files')
+        uploaded_files = []
+        errors = []
 
-#     except Exception as e:
-#         errors.append(str(e))
-#         return render(
-#             request,
-#             "canvas/partials/sample_input_form_errors.html",
-#             {"errors": errors},
-#         )
+        for file in files:
+            if file.name.endswith('.idat'):
+                # Extract chip_id logic (from file or directory name)
+                chip_id, position = file.name.split("_")[:2]
+
+                # Get or create ChipSample instance using chip_id
+                chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
+
+                try:
+                    # Save the file in the IDAT model and link it to ChipSample
+                    idat_file = IDAT.objects.create(
+                        idat=file,
+                        chipsample=chipsample
+                    )
+                    uploaded_files.append(idat_file)
+                except Exception as e:
+                    errors.append(f"Error uploading {file.name}: {str(e)}")
+            else:
+                errors.append(f"Invalid file type: {file.name}")
+
+        # Render the uploaded files and error messages into HTML
+        context = {
+            'uploaded_files': uploaded_files,
+            'errors': errors
+        }
+        return HttpResponse("hi")
+        # return render(request, 'partials/upload_result.html', context)

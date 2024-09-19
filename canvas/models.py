@@ -21,7 +21,8 @@ class Lot(models.Model):
 
 class ChipType(models.Model):
     name = models.CharField(max_length=100)
-    size = models.IntegerField(default=24)
+    rows = models.IntegerField(default=12)
+    cols = models.IntegerField(default=2)
 
     def __str__(self):
         return self.name
@@ -120,12 +121,18 @@ class ChipSample(models.Model):
         return f"{self.sample.protocol_id} - {self.chip.scan_date}"
 
 
+def idat_directory_path(instance, filename):
+    # Get the chip_id from the related ChipSample model
+    chip_id = instance.chipsample.chip.chip_id
+    return f"{chip_id}/idats/{filename}"
+
+
 class IDAT(models.Model):
     entry_date = models.DateTimeField(
         auto_now_add=True
     )  # Change to DateTimeField with auto_now_add=True
     idat = models.FileField(
-        upload_to="idats/",
+        upload_to=idat_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["idat"])],
     )
     chipsample = models.ForeignKey(

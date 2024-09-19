@@ -65,6 +65,7 @@ class ChipSampleAdmin(admin.ModelAdmin):
         "chip__chip_id",
         "sample__institution__name",
     )
+    autocomplete_fields = ["sample", "chip"]
 
     def protocol_id(self, obj):
         return obj.sample.protocol_id
