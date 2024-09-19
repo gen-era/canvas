@@ -5,11 +5,7 @@
     >
         {% include 'canvas/components/generic_search.html' with model_name="ChipType" field_name="name" isSingleSelect="true" eventName="updateChipTemplate" %}
 
-        <label for="lot">Lot number</label>
-        <input
-        autocomplete="off"
-        type="text" name="lot" placeholder="Lot" required>
-
+        
     </div>
     <div class="chip_upload">
         {% include 'canvas/components/idat_upload.html' %}
