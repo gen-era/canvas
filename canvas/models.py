@@ -124,7 +124,7 @@ class ChipSample(models.Model):
 def idat_directory_path(instance, filename):
     # Get the chip_id from the related ChipSample model
     chip_id = instance.chipsample.chip.chip_id
-    return f"{chip_id}/idats/{filename}"
+    return f"chip_data/{chip_id}/idats/{filename}"
 
 
 class IDAT(models.Model):
