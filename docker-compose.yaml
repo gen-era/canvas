@@ -39,6 +39,7 @@ services:
     image: canvas  # Update this to the correct image for your Django app
     command: bash /app/start.sh
     environment:
+      - HOST_IP=${HOST_IP}
       - HOST_NAME=cnvcanvas.com
       - SECRET_KEY=django-insecure-ax7b&dz))k(q0x+p=5f6wh0y@3k9nd=uu=!h6tmh&95xm(me@+
       - DEBUG=False
@@ -70,6 +71,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+    volumes:
+      - /home/canvas/canvas-keys:/root/.ssh
 
   db:
     image: postgres
@@ -94,8 +97,6 @@ services:
     environment:
       - MINIO_ACCESS_KEY_FILE=/run/secrets/minio-access-key
       - MINIO_SECRET_KEY_FILE=/run/secrets/minio-secret-key
-      - MINIO_DOMAIN=minio.cnvcanvas.com
-      - MINIO_SERVER_URL=https://minio.cnvcanvas.com
       - MINIO_BROWSER_REDIRECT_URL=https://admin.minio.cnvcanvas.com
     command: server /data --console-address ":9001" --address ":9000"
     labels:
@@ -138,4 +139,3 @@ secrets:
     file: minio/access-key.txt
   minio-secret-key:
     file: minio/secret-key.txt
-

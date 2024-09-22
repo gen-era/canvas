@@ -25,6 +25,8 @@ import json
 
 import secrets
 import minio
+import os
+import subprocess
 
 
 def index(request):
@@ -156,36 +158,6 @@ def chipsample_tab_content(request):
 
 
 @login_required
-def put_presigned_url(bucket_name, file_name, expiration=600):
-
-    client = minio.Minio(
-        settings.MINIO_STORAGE_ENDPOINT,
-        settings.MINIO_STORAGE_ACCESS_KEY,
-        settings.MINIO_STORAGE_SECRET_KEY,
-        secure=False,
-    )
-
-    return client.presigned_put_object(
-        bucket_name, file_name, expires=timedelta(hours=2)
-    )
-
-
-@login_required
-def get_presigned_url(bucket_name, file_path, expiration=600):
-
-    client = minio.Minio(
-        settings.MINIO_STORAGE_ENDPOINT,
-        settings.MINIO_STORAGE_ACCESS_KEY,
-        settings.MINIO_STORAGE_SECRET_KEY,
-        secure=False,
-    )
-
-    return client.presigned_get_object(
-        bucket_name, file_path, expires=timedelta(seconds=expiration)
-    )
-
-
-@login_required
 def get_sample_input_row(request):
     label = secrets.token_urlsafe(6)
     return render(request, "canvas/partials/sample_input_row.html", {"label": label})
@@ -308,6 +280,8 @@ def get_chip_type_size(request):
                 'chip_type':chip_type
              },
         )
+
+
 @login_required
 def save_chip_input(request):
     if request.method == 'POST':
@@ -352,6 +326,15 @@ def save_chip_input(request):
 
         # Redirect to a success page or render a success message
         return HttpResponse("Chip and samples saved successfully.")
+
+
+
+#    HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
+#    label = secrets.token_urlsafe(6)
+#    subprocess.run(
+#        f"ssh canvas@{HOST_IP} tsp -L {label} nextflow run hello",
+#        shell=True,
+#    )
 
 def idat_upload(request):
     if request.method == 'POST':
