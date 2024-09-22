@@ -1,7 +1,36 @@
-<form hx-post="{% url 'idat_upload' %}" hx-encoding="multipart/form-data" hx-target="#upload-progress" enctype="multipart/form-data">
-    <label for="directory-upload">Select a directory with .idat files:</label>
-    <input type="file" id="directory-upload" name="files" webkitdirectory mozdirectory multiple autocomplete="off">
-    <button type="submit">Upload</button>
-</form>
+<div
+    id="idat-upload"
+    x-data="{ uploading: false }"
+>
+    <form
+        id="idat-upload-form"
+        hx-post="{% url 'idat_upload' %}"
+        hx-encoding="multipart/form-data"
+        hx-target="#idat-upload-results"
+        hx-swap="outerHTML"
+        enctype="multipart/form-data">
+        <label for="directory-upload">Select a directory with .idat files:</label>
+        <input type="file" id="directory-upload" name="files" webkitdirectory mozdirectory multiple autocomplete="off">
 
-<div id="upload-progress"></div>
+        <button type="submit"
+                x-show="!uploading"
+                @click="uploading = true"
+        >Upload</button>
+    </form>
+
+    <progress id="idat-upload-progress"
+            x-show="uploading"
+            value="0" max="100">
+    </progress>
+
+    <div id="idat-upload-results">
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+     htmx.on('#idat-upload-form', 'htmx:xhr:progress', function(evt) {
+         htmx.find('#idat-upload-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
+     });
+});
+</script>

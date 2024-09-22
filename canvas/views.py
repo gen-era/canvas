@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
@@ -344,13 +343,13 @@ def idat_upload(request):
 
         for file in files:
             if file.name.endswith('.idat'):
-                # Extract chip_id logic (from file or directory name)
-                chip_id, position = file.name.split("_")[:2]
-
-                # Get or create ChipSample instance using chip_id
-                chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
-
                 try:
+                    # Extract chip_id logic (from file or directory name)
+                    chip_id, position = file.name.split("_")[:2]
+
+                    # Get or create ChipSample instance using chip_id
+                    chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
+
                     # Save the file in the IDAT model and link it to ChipSample
                     idat_file = IDAT.objects.create(
                         idat=file,
@@ -367,5 +366,4 @@ def idat_upload(request):
             'uploaded_files': uploaded_files,
             'errors': errors
         }
-        return HttpResponse("hi")
-        # return render(request, 'partials/upload_result.html', context)
+        return render(request, 'canvas/partials/idat_upload_results.html', context)
