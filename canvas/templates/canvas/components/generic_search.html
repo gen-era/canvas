@@ -21,7 +21,7 @@
 
     <div x-show="!selectedItem">
       <input autocomplete="off" x-ref="searchInput" type="search" name="search" x-model="searchQuery"
-        placeholder="Search {{ model_name|capfirst }}..."
+        placeholder="{{ model_name|capfirst }} Search ..."
         hx-get="{% url 'generic_search' model_name=model_name field_name=field_name %}"
         hx-trigger="input changed delay:500ms" hx-target="next ul" hx-swap="innerHTML" hx-vals='{"page": 1}'
         @input="openDropdown()" />
