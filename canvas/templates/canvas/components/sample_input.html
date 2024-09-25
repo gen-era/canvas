@@ -27,6 +27,7 @@
     </div>
     <button
         type="submit"
+        onclick="prepareFormSubmission();"
         >
         Save Samples
     </button>
@@ -34,12 +35,41 @@
 
 <script>
 function removeRow(button) {
-    const row = button.closest('.sample-input-row');
-    const rows = document.querySelectorAll('.sample-input-row');
-    if (rows.length > 1) {
-        row.remove();
-    } else {
-        alert("You cannot remove the last remaining row.");
-    }
+  const row = button.closest('.sample-input-row');
+  const rows = document.querySelectorAll('.sample-input-row');
+  if (rows.length > 1) {
+    row.remove();
+  } else {
+    showError(row.querySelector('input[name="protocol_id"]'), "At least one row is required.");
+    setTimeout(() => {
+      clearError(row.querySelector('input[name="protocol_id"]'));
+    }, 2000);
+  }
 }
+
+function isRowEmpty(row) {
+  const inputs = row.querySelectorAll('input, select');
+  return Array.from(inputs).every(input => !input.value.trim());
+}
+
+function prepareFormSubmission() {
+  const rows = document.querySelectorAll('.sample-input-row');
+  const lastRow = rows[rows.length - 1];
+
+  if (rows.length > 1 && isRowEmpty(lastRow)) {
+    lastRow.remove();
+  }
+}
+function showError(input, message) {
+  clearError(input);
+  input.setCustomValidity(message);
+  input.reportValidity();
+  input.classList.add('error');
+}
+
+function clearError(input) {
+  input.setCustomValidity('');
+  input.classList.remove('error');
+}
+
 </script>

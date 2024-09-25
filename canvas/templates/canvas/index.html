@@ -9,11 +9,10 @@
     <main
       x-data="{
         sidebar: { isExpanded: true },
-        views: { currentView: 'sampleSearch' },
+        views: { currentView: 'samplePage' },
         collapseSampleSearch: false,
-        showSampleSearch() {
-            this.views.currentView = 'sampleSearch';
-            this.collapseSampleSearch = !this.collapseSampleSearch; // Toggle visibility of sample search
+        showSamplePage() {
+            this.views.currentView = 'samplePage';
             $nextTick(() => { window.dispatchEvent(new Event('resize')); });
         },
         showSampleInput() {
@@ -36,15 +35,23 @@
 
       <!-- Main content area -->
       <div>
+
         <!-- Sample Search View -->
         <div
-          x-show="views.currentView === 'sampleSearch'"
+          x-show="views.currentView === 'samplePage'"
           class="container-fluid"
           :class="collapseSampleSearch === false ? 'sample-container' : 'container'"
         >
-          <div x-show="collapseSampleSearch === false">
-            {% include "canvas/components/sample_search.html" %}
+
+          <div>
+            <a
+                @click="collapseSampleSearch = !collapseSampleSearch"
+            > Sample Search </a>
+            <div x-show="collapseSampleSearch === false">
+              {% include "canvas/components/sample_search.html" %}
+            </div>
           </div>
+
           <div>{% include "canvas/components/chipsample_tabs.html" %}</div>
         </div>
         <div x-show="views.currentView === 'sampleInput'">
@@ -207,5 +214,17 @@
         },
       };
     }
+
+
+document.body.addEventListener('htmx:configRequest', (event) => {
+    const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+
+    if (csrfToken) {
+        event.detail.headers['X-CSRFToken'] = csrfToken;
+    }
+});
   </script>
 {% endblock content %}

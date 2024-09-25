@@ -10,7 +10,8 @@
         <ul>
             <li>
                 <a href="#"
-                    @click="showSampleSearch()"
+                    @click="showSamplePage()"
+                    :class="views.currentView === 'samplePage' ? 'primary' : 'secondary'"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
                     style="height: 1em;"
@@ -23,7 +24,7 @@
             <li>
                 <a href="#"
                     @click="showSampleInput()"
-                    :class="{'primary': views.currentView === 'sampleInput'}"
+                    :class="views.currentView === 'sampleInput' ? 'primary' : 'secondary'"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="height: 1em;">
                     <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
@@ -35,7 +36,7 @@
             <li>
               <a href="#"
                   @click="showChipInput()"
-                  :class="{'primary': views.currentView === 'chipInput'}"
+                    :class="views.currentView === 'chipInput' ? 'primary' : 'secondary'"
               >
                   <span x-show="sidebar.isExpanded">New Chip</span>
               </a>
@@ -44,7 +45,7 @@
             <li>
                 <a href="#"
                     @click="showAcmgLoss()"
-                    :class="{'primary': views.currentView === 'acmgLoss'}"
+                    :class="views.currentView === 'acmgLoss' ? 'primary' : 'secondary'"
                 >
                     <span x-show="sidebar.isExpanded">ACMG Loss</span>
                 </a>

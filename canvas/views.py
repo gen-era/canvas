@@ -1,3 +1,4 @@
+from http.client import HTTPResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
@@ -220,14 +221,14 @@ def save_samples(request):
         if form_invalid:
             return render(
                 request,
-                "canvas/partials/sample_input_form_errors.html",
+                "canvas/partials/sample_results.html",
                 {"errors": errors},
             )
         else:
             # If everything is successful, return success response
             response = render(
                 request,
-                "canvas/partials/sample_input_success.html",
+                "canvas/partials/sample_input_results.html",
                 {"len_samples": len_samples},
             )
             return retarget(response, "#sample-input-form")
@@ -236,7 +237,7 @@ def save_samples(request):
         errors.append(str(e))
         return render(
             request,
-            "canvas/partials/sample_input_form_errors.html",
+            "canvas/partials/sample_input_results.html",
             {"errors": errors},
         )
 
@@ -244,10 +245,11 @@ def save_samples(request):
 def create_report(request):
     form_data = dict(request.POST)
     print(form_data)
-    return render(
-        request,
-        "canvas/partials/sample_input_form_errors.html",
-    )
+    return HTTPResponse("hi")
+    # return render(
+    #     request,
+    #     "canvas/partials/sample_input_.html",
+    # )
 
 
 def get_reports(request):
@@ -322,9 +324,10 @@ def save_chip_input(request):
                     chip=chip,
                     position=position
                 )
+        context={
+        }
 
-        # Redirect to a success page or render a success message
-        return HttpResponse("Chip and samples saved successfully.")
+        return render(request, 'canvas/partials/chip_input_results.html', context)
 
 
 

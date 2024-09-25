@@ -1,0 +1,18 @@
+{% if len_samples %}
+    <h3
+    x-init="
+            document.dispatchEvent(new Event('searchSamples'));
+            "
+    >
+        Successfully saved {{ len_samples }} samples</h3>
+    {% include 'canvas/components/sample_input.html' %}
+{% endif %}
+
+{% if errors %}
+    <h3>Errors</h3>
+    <ul class="error-list">
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
