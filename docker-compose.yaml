@@ -36,7 +36,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   canvas:
-    image: canvas  # Update this to the correct image for your Django app
+    image: yserdem/canvas-web:latest
     command: bash /app/start.sh
     environment:
       - HOST_IP=${HOST_IP}
