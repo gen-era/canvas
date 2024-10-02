@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') in ("True")
+DEBUG = os.getenv("DEBUG") in ("True")
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
@@ -31,7 +31,7 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = [os.getenv("HOST_NAME")]
     CSRF_TRUSTED_ORIGINS = ["https://" + os.getenv("HOST_NAME")]
-    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 # Application definition
@@ -168,11 +168,11 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 
-DATA_UPLOAD_MAX_NUMBER_FILES = 10240 # higher than the count of fields
-DATA_UPLOAD_MAX_MEMORY_SIZE= 2000000000
-DATA_UPLOAD_MAX_NUMBER_FIELDS= None
+DATA_UPLOAD_MAX_NUMBER_FILES = 10240  # higher than the count of fields
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2000000000
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
-FILE_UPLOAD_MAX_MEMORY_SIZE=2000000000
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2000000000
 
 
 # Static files (CSS, JavaScript, Images)
@@ -188,10 +188,10 @@ else:
     DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
     STATICFILES_STORAGE = "minio_storage.storage.MinioStaticStorage"
 
-    MINIO_STORAGE_USE_HTTPS = os.getenv('MINIO_STORAGE_USE_HTTPS') in ("True")
-    MINIO_STORAGE_ENDPOINT = os.getenv('MINIO_STORAGE_ENDPOINT')
-    MINIO_STORAGE_ACCESS_KEY = os.getenv('MINIO_STORAGE_ACCESS_KEY')
-    MINIO_STORAGE_SECRET_KEY = os.getenv('MINIO_STORAGE_SECRET_KEY')
+    MINIO_STORAGE_USE_HTTPS = os.getenv("MINIO_STORAGE_USE_HTTPS") in ("True")
+    MINIO_STORAGE_ENDPOINT = os.getenv("MINIO_STORAGE_ENDPOINT")
+    MINIO_STORAGE_ACCESS_KEY = os.getenv("MINIO_STORAGE_ACCESS_KEY")
+    MINIO_STORAGE_SECRET_KEY = os.getenv("MINIO_STORAGE_SECRET_KEY")
 
     MINIO_STORAGE_MEDIA_BUCKET_NAME = "canvas"
     MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET = True
@@ -201,4 +201,4 @@ else:
 
     MINIO_STORAGE_STATIC_BUCKET_NAME = "canvas-static"
     MINIO_STORAGE_AUTO_CREATE_STATIC_BUCKET = True
-    MINIO_STORAGE_STATIC_URL = os.getenv('MINIO_STORAGE_STATIC_URL')
+    MINIO_STORAGE_STATIC_URL = os.getenv("MINIO_STORAGE_STATIC_URL")
