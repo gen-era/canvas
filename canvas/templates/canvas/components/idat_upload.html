@@ -1,5 +1,6 @@
 <form
       x-data="{
+              uploading: false,
               init() {
               uploading = false;
               }
@@ -12,17 +13,12 @@
 
     <label for="id_file_field">Select a directory with .idat files:</label>
     <input type="file" name="file" id="id_file_field"
-           hx-post="{% url 'idat_upload' %}"
-           hx-target="#idat-upload-form"
-           hx-select="#idat-upload-form"
-           hx-indicator="#idat-upload-spinner"
-           hx-swap="outerHTML"
-           hx-trigger="change"
            hx-preserve="true"
            multiple
            webkitdirectory
            mozdirectory
-    >
+           onchange="triggerUpload()"
+           >
 
     <div id="idat-upload-spinner" class="htmx-indicator">
         <svg width="16" height="16" viewBox="0 0 135 140" xmlns="http://www.w3.org/2000/svg" fill="#494949">
@@ -81,6 +77,9 @@
     </div>
 
     {% if presigned_urls|length > 0 %}
+        <!-- TODO: dosya isimleri ile loopla, dictin keyleri
+             Her biri için ayrı bir progress bar
+             Bu da 16vh lik bir containerda overflowda dursun. -->
         <div
             x-show="uploading"
             id="progress-display" >
@@ -93,8 +92,8 @@
 
         <button
             x-show="!uploading"
-            @click="uploading = true"
-            onclick="upload()" type="submit" id="upload-btn"
+            @click="uploading = true; upload()"
+            type="submit" id="upload-btn"
         >
             <span id="start-upload">Upload</span>
             <span id="loader">Uploading...</span>
@@ -108,31 +107,30 @@
 
 
 <script type="text/javascript">
-htmx.on('htmx:xhr:progress', function (evt) {
-    if (evt.detail.elt.id === 'form') {
-        console.log("evt.detail = ", evt.detail)
-        const progressValue = evt.detail.loaded / evt.detail.total * 100;
-        htmx.find('#progress').setAttribute('value', progressValue);
-        htmx.find('#percent').setAttribute('value', Math.round(progressValue));
-    }
-});
+function triggerUpload() {
+   const fileInput = document.querySelector("#id_file_field");
+   const files = fileInput.files;
 
-htmx.on('htmx:beforeRequest', (evt) => {
-    if (evt.detail.elt.id === 'form') {
-        htmx.find('#start-upload').style.display = 'none';
-        htmx.find('#loader').style.display = 'block';
-        htmx.find('#upload-path').style.visibility = 'hidden';
-        htmx.find('#percent-wrapper').style.visibility = 'visible';
-    }
-});
+   // Collect only the file names to send in the request
+   const fileNames = [];
+   for (let i = 0; i < files.length; i++) {
+       if (files[i].name.endsWith(".idat")){
+        fileNames.push(files[i].name);
+       }
+   }
 
-htmx.on('htmx:afterOnLoad', (evt) => {
-    if (evt.detail.elt.id === 'form') {
-        htmx.find('#loader').style.display = 'none';
-        htmx.find('#upload-path').style.visibility = 'visible';
-        htmx.find('#start-upload').style.display = 'block';
-    }
-});
+   // Manually trigger an HTMX request with file names as parameters
+   htmx.ajax('POST', "{% url 'idat_upload' %}", {
+       target: "#idat-upload-form",
+       select: "#idat-upload-form",
+       swap: "outerHTML",
+       indicator: "#idat-upload-spinner",
+       values: {
+           file_names: JSON.stringify(fileNames)
+       }
+   });
+}
+
 function upload() {
       // Get selected files from the input element.
      presigned_urls_div = document.querySelector("#presigned-urls");
@@ -146,7 +144,11 @@ function upload() {
          console.log(file)
          uploadFile(file, presigned_urls[file.name]);
      }
+     alert("upload finished")
+     // TODO: tell the django upload finished
+     // pass the files
  }
+
 function uploadFile(file, url) {
      console.log(url)
      if (typeof url !== "undefined") {
@@ -173,55 +175,4 @@ function uploadFile(file, url) {
         display: block;
         opacity:1;
     }
-
-    #progress-display {
-        display: flex;
-        gap: 2px;
-    }
-
-    #percent-wrapper{
-        width: 90px;
-        visibility: hidden;
-    }
-
-    #percent {
-        border: none;
-        text-align: right;
-        width: 2em;
-        background: transparent;
-    }
-
-    #upload-path {
-        visibility: hidden;
-    }
-
-    /* Progress bar */
-    #progress {
-        width: 100%;
-        height: 2rem;
-        border: none;
-        border-radius: 10px;
-        background: #f3f3f3;
-    }
-
-    #progress[value]::-webkit-progress-bar {
-        border-radius: 10px;
-        background: #f3f3f3;
-    }
-
-    #progress[value]::-webkit-progress-value {
-        border-radius: 10px;
-        background: #007bff;
-    }
-
-    #progress[value]::-moz-progress-bar {
-        border-radius: 10px;
-        background: #007bff;
-    }
-
-    /* Loader and Success messages */
-    #loader{
-        display: none;
-    }
-
 </style>
