@@ -1,36 +1,227 @@
-<div
-    id="idat-upload"
-    x-data="{ uploading: false }"
+<form
+      x-data="{
+              init() {
+              uploading = false;
+              }
+             }"
+      hx-encoding="multipart/form-data"
+      hx-trigger="submit"
+    id="idat-upload-form"
 >
-    <form
-        id="idat-upload-form"
-        hx-post="{% url 'idat_upload' %}"
-        hx-encoding="multipart/form-data"
-        hx-target="#idat-upload-results"
-        hx-swap="outerHTML"
-        enctype="multipart/form-data">
-        <label for="directory-upload">Select a directory with .idat files:</label>
-        <input type="file" id="directory-upload" name="files" webkitdirectory mozdirectory multiple autocomplete="off">
+    <div id="presigned-urls" style="display:none;">{{ presigned_urls }}</div>
 
-        <button type="submit"
-                x-show="!uploading"
-                @click="uploading = true"
-        >Upload</button>
-    </form>
+    <label for="id_file_field">Select a directory with .idat files:</label>
+    <input type="file" name="file" id="id_file_field"
+           hx-post="{% url 'idat_upload' %}"
+           hx-target="#idat-upload-form"
+           hx-select="#idat-upload-form"
+           hx-indicator="#idat-upload-spinner"
+           hx-swap="outerHTML"
+           hx-trigger="change"
+           hx-preserve="true"
+           multiple
+           webkitdirectory
+           mozdirectory
+    >
 
-    <progress id="idat-upload-progress"
-            x-show="uploading"
-            value="0" max="100">
-    </progress>
-
-    <div id="idat-upload-results">
+    <div id="idat-upload-spinner" class="htmx-indicator">
+        <svg width="16" height="16" viewBox="0 0 135 140" xmlns="http://www.w3.org/2000/svg" fill="#494949">
+            <rect y="10" width="15" height="120" rx="6">
+                <animate attributeName="height"
+                    begin="0.5s" dur="1s"
+                    values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                    repeatCount="indefinite" />
+                <animate attributeName="y"
+                    begin="0.5s" dur="1s"
+                    values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                    repeatCount="indefinite" />
+            </rect>
+            <rect x="30" y="10" width="15" height="120" rx="6">
+                <animate attributeName="height"
+                    begin="0.25s" dur="1s"
+                    values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                    repeatCount="indefinite" />
+                <animate attributeName="y"
+                    begin="0.25s" dur="1s"
+                    values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                    repeatCount="indefinite" />
+            </rect>
+            <rect x="60" width="15" height="140" rx="6">
+                <animate attributeName="height"
+                    begin="0s" dur="1s"
+                    values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                    repeatCount="indefinite" />
+                <animate attributeName="y"
+                    begin="0s" dur="1s"
+                    values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                    repeatCount="indefinite" />
+            </rect>
+            <rect x="90" y="10" width="15" height="120" rx="6">
+                <animate attributeName="height"
+                    begin="0.25s" dur="1s"
+                    values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                    repeatCount="indefinite" />
+                <animate attributeName="y"
+                    begin="0.25s" dur="1s"
+                    values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                    repeatCount="indefinite" />
+            </rect>
+            <rect x="120" y="10" width="15" height="120" rx="6">
+                <animate attributeName="height"
+                    begin="0.5s" dur="1s"
+                    values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                    repeatCount="indefinite" />
+                <animate attributeName="y"
+                    begin="0.5s" dur="1s"
+                    values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                    repeatCount="indefinite" />
+            </rect>
+        </svg>
+        Processing your files.
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-     htmx.on('#idat-upload-form', 'htmx:xhr:progress', function(evt) {
-         htmx.find('#idat-upload-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
-     });
+    {% if presigned_urls|length > 0 %}
+        <div
+            x-show="uploading"
+            id="progress-display" >
+            <progress id='progress' value='0' max='100'></progress>
+            <div id="percent-wrapper">
+                <input id='percent' value="0" type="number" contenteditable="false" disabled/>
+                <span>%</span>
+            </div>
+        </div>
+
+        <button
+            x-show="!uploading"
+            @click="uploading = true"
+            onclick="upload()" type="submit" id="upload-btn"
+        >
+            <span id="start-upload">Upload</span>
+            <span id="loader">Uploading...</span>
+        </button>
+    {% endif %}
+
+    <div id="upload-path">
+        Uploaded {{ path }}
+    </div>
+</form>
+
+
+<script type="text/javascript">
+htmx.on('htmx:xhr:progress', function (evt) {
+    if (evt.detail.elt.id === 'form') {
+        console.log("evt.detail = ", evt.detail)
+        const progressValue = evt.detail.loaded / evt.detail.total * 100;
+        htmx.find('#progress').setAttribute('value', progressValue);
+        htmx.find('#percent').setAttribute('value', Math.round(progressValue));
+    }
 });
+
+htmx.on('htmx:beforeRequest', (evt) => {
+    if (evt.detail.elt.id === 'form') {
+        htmx.find('#start-upload').style.display = 'none';
+        htmx.find('#loader').style.display = 'block';
+        htmx.find('#upload-path').style.visibility = 'hidden';
+        htmx.find('#percent-wrapper').style.visibility = 'visible';
+    }
+});
+
+htmx.on('htmx:afterOnLoad', (evt) => {
+    if (evt.detail.elt.id === 'form') {
+        htmx.find('#loader').style.display = 'none';
+        htmx.find('#upload-path').style.visibility = 'visible';
+        htmx.find('#start-upload').style.display = 'block';
+    }
+});
+function upload() {
+      // Get selected files from the input element.
+     presigned_urls_div = document.querySelector("#presigned-urls");
+     var presigned_urls = JSON.parse(presigned_urls_div.textContent);
+
+     console.log(presigned_urls);
+     files = document.querySelector("#id_file_field").files;
+
+     for (var i = 0; i < files.length; i++) {
+         var file = files[i];
+         console.log(file)
+         uploadFile(file, presigned_urls[file.name]);
+     }
+ }
+function uploadFile(file, url) {
+     console.log(url)
+     if (typeof url !== "undefined") {
+        fetch(url, {
+            method: 'PUT',
+            body: file
+        })
+     }
+}
 </script>
+
+
+<style>
+    .htmx-indicator{
+        display: none;
+        opacity:0;
+        transition: opacity 500ms ease-in;
+    }
+    .htmx-request .htmx-indicator{
+        display: block;
+        opacity:1;
+    }
+    .htmx-request.htmx-indicator{
+        display: block;
+        opacity:1;
+    }
+
+    #progress-display {
+        display: flex;
+        gap: 2px;
+    }
+
+    #percent-wrapper{
+        width: 90px;
+        visibility: hidden;
+    }
+
+    #percent {
+        border: none;
+        text-align: right;
+        width: 2em;
+        background: transparent;
+    }
+
+    #upload-path {
+        visibility: hidden;
+    }
+
+    /* Progress bar */
+    #progress {
+        width: 100%;
+        height: 2rem;
+        border: none;
+        border-radius: 10px;
+        background: #f3f3f3;
+    }
+
+    #progress[value]::-webkit-progress-bar {
+        border-radius: 10px;
+        background: #f3f3f3;
+    }
+
+    #progress[value]::-webkit-progress-value {
+        border-radius: 10px;
+        background: #007bff;
+    }
+
+    #progress[value]::-moz-progress-bar {
+        border-radius: 10px;
+        background: #007bff;
+    }
+
+    /* Loader and Success messages */
+    #loader{
+        display: none;
+    }
+
+</style>
