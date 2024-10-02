@@ -6,7 +6,7 @@ from django_htmx.http import retarget
 from django.db import transaction
 from django.shortcuts import HttpResponse
 from django.utils import timezone
-
+from django.views.decorators.http import require_POST
 
 from canvas.models import (
     Sample,
@@ -370,3 +370,49 @@ def idat_upload(request):
             'errors': errors
         }
         return render(request, 'canvas/partials/idat_upload_results.html', context)
+    
+
+@require_POST
+def upload_folder(request):
+    print('a')
+    file_paths = request.POST.getlist('file_paths[]')
+    idat_files = [f for f in file_paths if f.endswith('.idat')]
+    print(file_paths)
+    print(idat_files)
+    if not idat_files:
+        return HttpResponse("No .idat files found in the selected folder.")
+    
+    # Initialize MinIO client
+    minio_client = minio.Minio(
+        "localhost:9000",
+        access_key="",
+        secret_key="your-secret-key",
+        secure=False  # Set to False if not using HTTPS
+    )
+    
+    bucket_name = "canvas"
+    
+    uploaded_count = 0
+    total_files = len(idat_files)
+    
+    for file_path in idat_files:
+        try:
+            # Generate a presigned URL for PUT
+            presigned_url = minio_client.presigned_put_object(
+                bucket_name,
+                os.path.basename(file_path),
+                expires=3600  # URL expires in 1 hour
+            )
+            
+            # In a real-world scenario, you'd use this presigned URL to upload the file
+            # For demonstration, we'll just increment the counter
+            uploaded_count += 1
+            
+            # Calculate and return progress
+            progress = (uploaded_count / total_files) * 100
+            yield f"data: {progress}\n\n"
+        
+        except S3Error as exc:
+            print(f"Error occurred: {exc}")
+    
+    yield "data: complete\n\n"
