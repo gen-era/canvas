@@ -48,6 +48,7 @@ services:
       - MINIO_STORAGE_ACCESS_KEY=minio
       - MINIO_STORAGE_SECRET_KEY=minio123
       - MINIO_STORAGE_STATIC_URL=https://minio.cnvcanvas.com/canvas-static
+      - MINIO_STORAGE_MEDIA_URL=https://minio.cnvcanvas.com/canvas
       - SQL_ENGINE=django.db.backends.postgresql
       - SQL_DATABASE=canvasdb
       - SQL_USER=canvas

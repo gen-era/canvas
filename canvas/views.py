@@ -30,6 +30,11 @@ import os
 import subprocess
 
 
+def get_version():
+    with open(settings.BASE_DIR.joinpath(".git/FETCH_HEAD")) as f:
+        return f.read().splitlines()[0][:6]
+
+
 def index(request):
 
     samples = Sample.objects.order_by("-entry_date")
@@ -46,6 +51,7 @@ def index(request):
             "samples": samples,
             "label": label,
             "len_samples": len_samples,
+            "canvas_version": get_version(),
         },
     )
 
