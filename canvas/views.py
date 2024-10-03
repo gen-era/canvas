@@ -31,7 +31,7 @@ import subprocess
 
 
 def get_version():
-    with open(settings.BASE_DIR.joinpath(".git/FETCH_HEAD")) as f:
+    with open(settings.BASE_DIR.joinpath(".git/ORIG_HEAD")) as f:
         return f.read().splitlines()[0][:6]
 
 
@@ -330,7 +330,7 @@ def save_chip_input(request):
 def put_presigned_url(bucket_name, file_name, expiration=600):
 
     client = minio.Minio(
-        settings.MINIO_STORAGE_ENDPOINT,
+        settings.MINIO_STORAGE_MEDIA_URL,
         settings.MINIO_STORAGE_ACCESS_KEY,
         settings.MINIO_STORAGE_SECRET_KEY,
         secure=False,
