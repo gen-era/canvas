@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from canvas.models import ChipSample, BedGraph, CNV
 import csv
 import tempfile
-
+from collections import defaultdict
 
 class Command(BaseCommand):
     help = "Associate files with ChipSample models"
@@ -65,13 +65,16 @@ class Command(BaseCommand):
             """
             Returns a dictionary of BedGraph file paths in the format:
             {
-                "R03C02": "path to the bedgraphs",
+                "R03C02": ["path to bedgraph1", "path to bedgraph2", ...],
             }
             """
             files = list_files(f"chip-data/{chip_id}/bedgraphs/")
-            return {
-                extract_position(file): file for file in files if extract_position(file)
-            }
+            bedgraph_dict = defaultdict(list)  # Initialize a defaultdict of lists
+            for file in files:
+                position = extract_position(file)
+                if position:
+                    bedgraph_dict[position].append(file)  # Append the file path to the list for that position
+            return bedgraph_dict
 
         def process_cnv_file(file_path):
             cnv_data = {}
@@ -148,25 +151,26 @@ class Command(BaseCommand):
                     )
 
         bedgraphs = gather_bedgraphs()
-        for position, bedgraph_path in bedgraphs.items():
+        for position, bedgraph_paths in bedgraphs.items():  # Note that bedgraph_paths is now a list
             try:
                 chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
             except ChipSample.DoesNotExist:
                 self.stdout.write(self.style.ERROR(f"ChipSample not found for position {position}"))
                 continue
 
-            bedgraph_type = bedgraph_path.split(".")[1].upper()
-            bg, created = BedGraph.objects.get_or_create(
-                chipsample=chipsample,
-                bedgraph_type=bedgraph_type,
-                bedgraph=bedgraph_path,  # Save the MinIO path without downloading
-            )
-            if created:
-                self.stdout.write(self.style.SUCCESS(f"Saved BedGraph {bedgraph_path} to {chipsample}"))
-            else:
-                self.stdout.write(
-                    self.style.WARNING(f"BedGraph {bedgraph_path} for {chipsample} already exists.")
+            for bedgraph_path in bedgraph_paths:  # Iterate over the list of bedgraph paths
+                bedgraph_type = bedgraph_path.split(".")[1].upper()
+                bg, created = BedGraph.objects.get_or_create(
+                    chipsample=chipsample,
+                    bedgraph_type=bedgraph_type,
+                    bedgraph=bedgraph_path,  # Save the MinIO path without downloading
                 )
+                if created:
+                    self.stdout.write(self.style.SUCCESS(f"Saved BedGraph {bedgraph_path} to {chipsample}"))
+                else:
+                    self.stdout.write(
+                        self.style.WARNING(f"BedGraph {bedgraph_path} for {chipsample} already exists.")
+                    )
 
         # Process quality metrics
         gt_sample_summary = list_files(f"chip-data/{chip_id}/gtcs/gt_sample_summary.csv")[0]
