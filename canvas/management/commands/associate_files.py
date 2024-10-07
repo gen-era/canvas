@@ -1,6 +1,7 @@
+import re
 from minio import Minio
 from django.core.management.base import BaseCommand
-from canvas.models import ChipSample, BedGraph, IDAT, GTC, VCF, CNV
+from canvas.models import ChipSample, BedGraph, CNV
 import csv
 import tempfile
 
@@ -29,6 +30,11 @@ class Command(BaseCommand):
             client.fget_object(bucket_name, object_name, tmp_file.name)
             return tmp_file.name
 
+        def extract_position(filename):
+            """Extracts position from filenames using regex like 'R02C03' or 'R01C04'."""
+            match = re.search(r'R\d{2}C\d{2}', filename)
+            return match.group(0) if match else None
+
         def gather_scoresheets():
             """
             Returns a dictionary of scoresheets in the format:
@@ -38,8 +44,8 @@ class Command(BaseCommand):
             """
             files = list_files(f"chip-data/{chip_id}/ClassifyCNV/")
             return {
-                file.split("_")[1]: download_file(file)
-                for file in files if file.endswith("Scoresheet.txt")
+                extract_position(file): download_file(file)
+                for file in files if file.endswith("Scoresheet.txt") and extract_position(file)
             }
 
         def gather_cnvs():
@@ -51,8 +57,8 @@ class Command(BaseCommand):
             """
             files = list_files(f"chip-data/{chip_id}/cnvs/")
             return {
-                file.split("_")[1]: download_file(file)
-                for file in files if "iscn" in file
+                extract_position(file): download_file(file)
+                for file in files if "iscn" in file and extract_position(file)
             }
 
         def gather_bedgraphs():
@@ -64,11 +70,10 @@ class Command(BaseCommand):
             """
             files = list_files(f"chip-data/{chip_id}/bedgraphs/")
             return {
-                file.split("_")[1].split(".")[0]: file for file in files
+                extract_position(file): file for file in files if extract_position(file)
             }
 
         def process_cnv_file(file_path):
-            # Logic remains the same
             cnv_data = {}
             with open(file_path, "r") as f:
                 for line in f:
@@ -101,7 +106,6 @@ class Command(BaseCommand):
             return cnv_data
 
         def process_scoresheet_file(file_path):
-            # Logic remains the same
             scoresheet_data = {}
             with open(file_path, "r") as f:
                 reader = csv.DictReader(f, delimiter="\t")
@@ -171,7 +175,12 @@ class Command(BaseCommand):
         with open(gt_sample_summary_path, "r") as f:
             samples = [i.split(",") for i in f.read().splitlines()[1:]]
             for sample in samples:
-                position = sample[0].split("_")[1]
+                # Extract position using regex
+                position = extract_position(sample[0])
+                if not position:
+                    self.stdout.write(self.style.ERROR(f"Position not found in {sample[0]}"))
+                    continue
+
                 try:
                     chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
                     chipsample.autosomal_call_rate = sample[3]
@@ -185,29 +194,3 @@ class Command(BaseCommand):
                     )
                     continue
                 self.stdout.write(self.style.SUCCESS(f"Updated quality metrics for {chipsample}"))
-
-
-
-# Save IDAT files
-# for filename in files['idats']:
-#     IDAT.objects.create(
-#         chipsample=chipsample,
-#         idat=os.path.join("idats", filename),
-#     )
-#     self.stdout.write(self.style.SUCCESS(f"Saved IDAT {filename} to {chipsample}"))
-
-# Save GTC files
-# for filename in files['gtcs']:
-#     GTC.objects.create(
-#         chipsample=chipsample,
-#         gtc=os.path.join("gtcs", filename),
-#     )
-#     self.stdout.write(self.style.SUCCESS(f"Saved GTC {filename} to {chipsample}"))
-#
-# # Save VCF files
-# for filename in files['vcfs']:
-#     VCF.objects.create(
-#         chipsample=chipsample,
-#         vcf=os.path.join("vcfs", filename),
-#     )
-#     self.stdout.write(self.style.SUCCESS(f"Saved VCF {filename} to {chipsample}"))
