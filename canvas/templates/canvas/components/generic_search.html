@@ -1,5 +1,11 @@
 <details class="dropdown" x-ref="detailsElement"
-  x-data="createSearchComponent('{{ model_name }}-{{ label }}', '{{ isSingleSelect }}', '{{ eventName }}' )">
+  x-data="createSearchComponent('{{ model_name }}-{{ label }}', '{{ isSingleSelect }}', '{{ eventName }}', '{{ selectedItem }}' )"
+  x-init="
+                {% if selectedItem %}
+                selectItem('{{ selectedItem }}', '{{ selectedItem.pk }}')
+                {% endif %}
+                "
+>
   <summary>
     <div class="selected-items" x-show="selectedItems.length > 0 || selectedItem">
       <template x-if="isSingleSelect === 'true' && selectedItem">

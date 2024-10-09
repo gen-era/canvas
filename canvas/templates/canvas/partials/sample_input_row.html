@@ -10,9 +10,9 @@
         type="text"
         name="protocol_id" required>
 
-    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" %}
+    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" selectedItem=institute %}
 
-    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" %}
+    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" selectedItem=sample_type %}
 
     <input
         autocomplete="off"
