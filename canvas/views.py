@@ -327,20 +327,6 @@ def save_chip_input(request):
         return render(request, "canvas/partials/chip_input_results.html", context)
 
 
-def put_presigned_url(bucket_name, file_name, expiration=600):
-
-    client = minio.Minio(
-        settings.MINIO_STORAGE_MEDIA_URL,
-        settings.MINIO_STORAGE_ACCESS_KEY,
-        settings.MINIO_STORAGE_SECRET_KEY,
-        secure=False,
-    )
-
-    return client.presigned_put_object(
-        bucket_name, file_name, expires=timedelta(hours=2)
-    )
-
-
 #    HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
 #    label = secrets.token_urlsafe(6)
 #    subprocess.run(
@@ -349,28 +335,35 @@ def put_presigned_url(bucket_name, file_name, expiration=600):
 #    )
 
 
-@login_required
 def idat_upload(request):
-    if request.method == "POST":
-        bucket_name = settings.MINIO_STORAGE_MEDIA_BUCKET_NAME
-        idats = json.loads(request.POST.get("file_names"))
+    if request.method == 'POST':
+        files = request.FILES.getlist('files')
+        uploaded_files = []
+        errors = []
 
-        presigned_urls = {}
-        for idat in idats:
-            chip_id = idat.split("_")[0]
+        for file in files:
+            if file.name.endswith('.idat'):
+                try:
+                    # Extract chip_id logic (from file or directory name)
+                    chip_id, position = file.name.split("_")[:2]
 
-            chip_id, position = idat.split("_")[:2]
-            chipsample = ChipSample.objects.get(
-                chip__chip_id=chip_id, position=position
-            )
+                    # Get or create ChipSample instance using chip_id
+                    chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
 
-            idat_path = f"chip_data/{chip_id}/idats/{idat}"
-            presigned_urls[idat] = put_presigned_url(bucket_name, idat_path)
+                    # Save the file in the IDAT model and link it to ChipSample
+                    idat_file = IDAT.objects.create(
+                        idat=file,
+                        chipsample=chipsample
+                    )
+                    uploaded_files.append(idat_file)
+                except Exception as e:
+                    errors.append(f"Error uploading {file.name}: {str(e)}")
+            else:
+                errors.append(f"Invalid file type: {file.name}")
 
-            IDAT.objects.create(idat=idat_path, chipsample=chipsample)
-
+        # Render the uploaded files and error messages into HTML
         context = {
-            "presigned_urls": json.dumps(presigned_urls),
-            "path": f"to {bucket_name}",
+            'uploaded_files': uploaded_files,
+            'errors': errors
         }
-        return render(request, "canvas/components/idat_upload.html", context)
+        return render(request, 'canvas/partials/idat_upload_results.html', context)
