@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 "R03C02": "path to the scoresheet",
             }
             """
-            files = list_files(f"chip-data/{chip_id}/ClassifyCNV/")
+            files = list_files(f"chip_data/{chip_id}/ClassifyCNV/")
             return {
                 extract_position(file): download_file(file)
                 for file in files if file.endswith("Scoresheet.txt") and extract_position(file)
@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 "R03C02": "path to the cnvs",
             }
             """
-            files = list_files(f"chip-data/{chip_id}/cnvs/")
+            files = list_files(f"chip_data/{chip_id}/cnvs/")
             return {
                 extract_position(file): download_file(file)
                 for file in files if "iscn" in file and extract_position(file)
@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 "R03C02": ["path to bedgraph1", "path to bedgraph2", ...],
             }
             """
-            files = list_files(f"chip-data/{chip_id}/bedgraphs/")
+            files = list_files(f"chip_data/{chip_id}/bedgraphs/")
             bedgraph_dict = defaultdict(list)  # Initialize a defaultdict of lists
             for file in files:
                 position = extract_position(file)
@@ -173,7 +173,7 @@ class Command(BaseCommand):
                     )
 
         # Process quality metrics
-        gt_sample_summary = list_files(f"chip-data/{chip_id}/gtcs/gt_sample_summary.csv")[0]
+        gt_sample_summary = list_files(f"chip_data/{chip_id}/gtcs/gt_sample_summary.csv")[0]
         gt_sample_summary_path = download_file(gt_sample_summary)
 
         with open(gt_sample_summary_path, "r") as f:
