@@ -1,5 +1,8 @@
 <div id="idat-upload-results"
-     x-init="uploading = false"
+     x-init="uploading = false,
+         document.getElementById('idat-upload-form').reset();
+         "
+     style="height:20vh; overflow:auto;"
 >
     {% if uploaded_files %}
         <h3>Successfully Uploaded Files</h3>

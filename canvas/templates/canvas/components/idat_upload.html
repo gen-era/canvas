@@ -10,7 +10,7 @@
         hx-swap="outerHTML"
         enctype="multipart/form-data">
         <label for="directory-upload">Select a directory with .idat files:</label>
-        <input type="file" id="directory-upload" name="files" webkitdirectory mozdirectory multiple autocomplete="off">
+        <input type="file" id="directory-upload" name="files" autocomplete="off" accept=".idat" multiple>
 
         <button type="submit"
                 x-show="!uploading"
@@ -18,10 +18,14 @@
         >Upload</button>
     </form>
 
-    <progress id="idat-upload-progress"
-            x-show="uploading"
-            value="0" max="100">
-    </progress>
+    <div x-show="uploading"
+    >
+        <progress id="idat-upload-progress"
+                value="0" max="100"
+        >
+        </progress>
+        <span id="idat-upload-span"></span>
+    </div>
 
     <div id="idat-upload-results">
     </div>
@@ -30,7 +34,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
      htmx.on('#idat-upload-form', 'htmx:xhr:progress', function(evt) {
-         htmx.find('#idat-upload-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
+         percent = evt.detail.loaded/evt.detail.total * 100
+         htmx.find('#idat-upload-progress').setAttribute('value', percent)
+         htmx.find('#idat-upload-span').innerHTML = "%" + Math.ceil(percent)
      });
 });
 </script>
