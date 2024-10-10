@@ -370,16 +370,38 @@ def idat_upload(request):
             'errors': errors
         }
         return render(request, 'canvas/partials/idat_upload_results.html', context)
-import openpyxl
-def upload_excel(request):
-    prot_id_list= ['Genetik Protokol No','Protokol No']
-    inst_list =['Bölge', 'Kurum']
+
+def detect_excel_temp(headers):
+    prot_id_list = ['Genetik Protokol No', 'Protokol No']
+    inst_list = ['Kurum', 'Bölge']
+    arrival_date = ['Kayıt Tarihi', 'Test Eklenme Tarihi']
+    sample_type = ['Test Adı', 'Çalışma Yöntemi']
+
+    header_mappings = {
+    'prot_id': prot_id_list,
+    'inst': inst_list,
+    'arrival_date': arrival_date,
+    'sample_type': sample_type,
+    }
+
+    mapping_indices = {}
+    for server_var, possible_headers in header_mappings.items():
+        for header in possible_headers:
+            if header in headers:
+                # Store the column index for this server variable
+                mapping_indices[server_var] = headers.index(header)
+                break
+        else:
+            # Header not found for this server variable
+            mapping_indices[server_var] = None
     
+    return mapping_indices
 
+from .read_sample_from_excel import generate_data_list
+def upload_excel(request):
     excel_file = request.FILES.get('excel_file')
-    wb= openpyxl.load_workbook(excel_file)
-    sheet = wb.active
-    row_range = sheet.max_row
-
-    context={}
-    return render(request, 'canvas/partials/sample_input_row.html', context)
+    sample_list = generate_data_list(excel_file)
+    print(sample_list)
+    for entry in sample_list:
+        print(entry)
+        return render(request, 'canvas/partials/sample_input_row.html', entry)
