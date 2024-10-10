@@ -7,6 +7,8 @@ from django.db import transaction
 from django.shortcuts import HttpResponse
 from django.utils import timezone
 from django.http import QueryDict
+from django.http import JsonResponse
+
 
 from canvas.models import (
     Sample,
@@ -163,19 +165,40 @@ def sample_edit(request):
     return render(request, "canvas/partials/sample_edit.html", {'sample': sample}) # For debugging
 
 
+# def sample_edit_save(request):
+#     if request.method == "PUT":
+#         put_data = QueryDict(request.body.decode('utf-8'))
+#         sample_pk = put_data.get("sample_pk")
+#         protocol_id = put_data.get("protocol_id")
+#         sex = put_data.get("sex")
+#         print("Sample PK:", sample_pk)
+#         print("Protocol ID:", protocol_id)
+#         print("Sex:", sex)
+#         sample = Sample.objects.get("sample_pk")
+#         sample.protocol_id= protocol_id
+#         sample.sex= sex
+#         sample.save()
+#         return    
+    
 def sample_edit_save(request):
     if request.method == "PUT":
         put_data = QueryDict(request.body.decode('utf-8'))
         sample_pk = put_data.get("sample_pk")
         protocol_id = put_data.get("protocol_id")
         sex = put_data.get("sex")
-        print("Sample PK:", sample_pk)
-        print("Protocol ID:", protocol_id)
-        print("Sex:", sex)
 
-    
+        try:
+            sample = Sample.objects.get(pk=sample_pk)  # pk anahtarını doğru kullanıyoruz
+            sample.protocol_id = protocol_id
+            sample.sex = sex
+            sample.save()
 
-     
+            return JsonResponse({"status": "success", "message": "Sample updated successfully"})
+        
+        except Sample.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Sample not found"}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
    
 @login_required
 def get_sample_input_row(request):
