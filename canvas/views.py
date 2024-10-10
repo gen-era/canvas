@@ -29,6 +29,22 @@ import minio
 import os
 import subprocess
 
+import socket
+import struct
+import tempfile
+
+
+def get_default_gateway_linux():
+    """Read the default gateway directly from /proc."""
+    with open("/proc/net/route") as fh:
+        for line in fh:
+            fields = line.strip().split()
+            if fields[1] != '00000000' or not int(fields[3], 16) & 2:
+                # If not default route or not RTF_GATEWAY, skip it
+                continue
+
+            return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+
 
 def get_version():
     with open(settings.BASE_DIR.joinpath(".git/ORIG_HEAD")) as f:
@@ -355,10 +371,37 @@ def idat_upload(request):
             else:
                 errors.append(f"Invalid file type: {file.name}")
 
-        HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
+        HOST_IP = get_default_gateway_linux()
+        MINIO_IP = socket.gethostbyname('minio')
         label = secrets.token_urlsafe(6)
+
+        with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
+            fp.write(
+                f"""
+                aws {{
+                  access_key = "{settings.MINIO_STORAGE_ACCESS_KEY}"
+                  secret_key = "{settings.MINIO_STORAGE_SECRET_KEY}"
+                  client {{
+                    endpoint = "http://{MINIO_IP}:9000"
+                  }}
+                }}
+                profiles {{
+                  docker {{
+                    docker.enabled = true
+                  }}
+                }}
+                """
+            )
+            fp.close()
+            # the file is closed, but not removed
+            # open the file again by using its name
+            subprocess.run(
+                f"scp {fp.name} canvas@{HOST_IP}:/tmp/",
+                shell=True,
+            )
+
         subprocess.run(
-            f"ssh canvas@{HOST_IP} tsp -L {label} nextflow canvas-pipeline/main.nf \
+            f"ssh canvas@{HOST_IP} tsp -L {label} nextflow /home/canvas/canvas-pipeline/main.nf \
                                                   --chip_id {chip_id} \
                                                   --bpm analysis_files/manifest-cluster/GSACyto_20044998_A1.bpm \
                                                   --csv analysis_files/manifest-cluster/GSACyto_20044998_A1.csv \
@@ -368,6 +411,7 @@ def idat_upload(request):
                                                   --band canvas-pipeline/hg19_chrom_band.txt \
                                                   --tex_template canvas-pipeline/template/base_template.tex \
                                                   --output_dir canvas-pipeline-demo-results/ \
+                                                  -c {fp.name} \
                                                   -profile docker",
             shell=True,
         )

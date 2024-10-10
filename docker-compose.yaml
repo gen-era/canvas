@@ -40,7 +40,6 @@ services:
     image: yserdem/canvas-web:latest
     command: bash /app/start.sh
     environment:
-      - HOST_IP=${HOST_IP}
       - HOST_NAME=cnvcanvas.com
       - SECRET_KEY=django-insecure-ax7b&dz))k(q0x+p=5f6wh0y@3k9nd=uu=!h6tmh&95xm(me@+
       - DEBUG=False
