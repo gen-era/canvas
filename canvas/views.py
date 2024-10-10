@@ -327,12 +327,6 @@ def save_chip_input(request):
         return render(request, "canvas/partials/chip_input_results.html", context)
 
 
-#    HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
-#    label = secrets.token_urlsafe(6)
-#    subprocess.run(
-#        f"ssh canvas@{HOST_IP} tsp -L {label} nextflow run hello",
-#        shell=True,
-#    )
 
 
 def idat_upload(request):
@@ -360,6 +354,23 @@ def idat_upload(request):
                     errors.append(f"Error uploading {file.name}: {str(e)}")
             else:
                 errors.append(f"Invalid file type: {file.name}")
+
+        HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
+        label = secrets.token_urlsafe(6)
+        subprocess.run(
+            f"ssh canvas@{HOST_IP} tsp -L {label} nextflow canvas-pipeline/main.nf \
+                                                  --chip_id {chip_id} \
+                                                  --bpm analysis_files/manifest-cluster/GSACyto_20044998_A1.bpm \
+                                                  --csv analysis_files/manifest-cluster/GSACyto_20044998_A1.csv \
+                                                  --egt analysis_files/manifest-cluster/2003.egt \
+                                                  --fasta analysis_files/GRCh37_genome.fa \
+                                                  --pfb analysis_files/PennCNV/test/out.pfb \
+                                                  --band canvas-pipeline/hg19_chrom_band.txt \
+                                                  --tex_template canvas-pipeline/template/base_template.tex \
+                                                  --output_dir canvas-pipeline-demo-results/ \
+                                                  -profile docker",
+            shell=True,
+        )
 
         # Render the uploaded files and error messages into HTML
         context = {
