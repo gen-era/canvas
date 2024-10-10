@@ -1,0 +1,74 @@
+<div>
+    <div>
+        <header>
+            <strong>Protocol ID:</strong>
+            <input type="text" id="edit_protocol_id" name="protocol_id" value="{{ sample.protocol_id }}">
+        </header>
+    
+        <p>
+          <strong>Arrival Date:</strong>
+          <span>{{ sample.arrival_date }}</span> <!-- Sadece görüntülenir -->
+        </p>
+    
+        <p>
+          <strong>Sex:</strong>
+          <select name="sex" id= "edit_sex" class="form-control">
+            <option value="" disabled hidden>{{ sample.get_sex_display }}</option>
+            <option value="Female" {% if sample.sex == "Female" %}selected{% endif %}>Female</option>
+            <option value="Male" {% if sample.sex == "Male" %}selected{% endif %}>Male</option>
+          </select> <!-- Düzenlenebilir -->
+        </p>
+    
+        <p>
+          <strong>Entry Date:</strong>
+          <span>{{ sample.entry_date }}</span> <!-- Sadece görüntülenir -->
+        </p>
+    
+        <p>
+            <strong>Sample Type:</strong>
+            <span>{{ sample.sample_type }}</span> <!-- Sadece görüntülenir -->
+        </p>
+      
+    </div>
+    <button hx-put="{% url 'sample_edit_save' %}" 
+    hx-vals= '{"sample_pk": "{{ sample.pk }}"}'
+    hx-include="[id='edit_protocol_id'], [id= 'edit_sex']"
+    class="btn primary" >
+        Submit
+        </button>
+
+</div>
+
+
+    <!-- <header>
+      <strong>Protocol ID:</strong>
+      <input type="text" value=" {{ sample.protocol_id }}">
+    </header>
+    <p>
+      <strong>Arrival Date:</strong>
+      <input type="date" value=" {{ sample.arrival_date }}"> 
+    </p>
+    <p>
+        <select name="sex" class="form-control">
+            <option value="" disabled hidden>{{ sample.get_sex_display }}</option>
+            <option value="Female" {% if sample.sex == "Female" %}selected{% endif %}>Female</option>
+            <option value="Male" {% if sample.sex == "Male" %}selected{% endif %}>Male</option>
+        </select>
+
+    </p>
+    <p>
+      <strong>Entry Date:</strong>
+      {{ sample.entry_date }}
+    </p>
+  
+    <p>
+      <strong>Institute:</strong>
+      <span> {{ sample.institution }} </span>
+    </p>
+    <p>
+      <strong>Sample Type:</strong>
+      {{ sample.sample_type }}
+    </p>
+  </div>
+
+  <input type="text" name="firstName" value="Joe"> -->

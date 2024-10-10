@@ -16,6 +16,11 @@
   hx-vals='js:{"page": "{{ samples.next_page_number }}", "search": "{{ query }}", "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
   {% endif %}
 >
+<div>
+  <button hx-get="{% url 'sample_edit' %}" hx-vals= '{"sample_pk": "{{ sample.pk }}"}' class="btn primary" style="float: right;"  hx-swap="innerHTML" hx-target="#sample_table">
+    Click To Edit
+    </button>
+  <div id="sample_table">
   <header>
     <strong>Protocol ID: {{ sample.protocol_id }}</strong>
   </header>
@@ -40,7 +45,8 @@
     <strong>Sample Type:</strong>
     {{ sample.sample_type }}
   </p>
-
+  </div>
+</div>
   {% for chipsample in sample.chipsample.all %}
   <article>
     <header>

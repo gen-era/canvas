@@ -6,7 +6,6 @@ from django_htmx.http import retarget
 from django.db import transaction
 from django.shortcuts import HttpResponse
 from django.utils import timezone
-from django.conf import settings
 
 
 from canvas.models import (
@@ -17,7 +16,7 @@ from canvas.models import (
     SampleType,
     ChipType,
     Chip,
-    Lot,
+    Lot
 )
 from django.contrib.auth.decorators import login_required
 
@@ -28,11 +27,6 @@ import secrets
 import minio
 import os
 import subprocess
-
-
-def get_version():
-    with open(settings.BASE_DIR.joinpath(".git/ORIG_HEAD")) as f:
-        return f.read().splitlines()[0][:6]
 
 
 def index(request):
@@ -51,7 +45,6 @@ def index(request):
             "samples": samples,
             "label": label,
             "len_samples": len_samples,
-            "canvas_version": get_version(),
         },
     )
 
@@ -163,7 +156,32 @@ def chipsample_tab_content(request):
         },
     )
 
+def sample_edit(request):
+    sample_pk = request.GET.get("sample_pk")
+    print(sample_pk)
+    sample = Sample.objects.get(id=sample_pk)
+    return render(request, "canvas/partials/sample_edit.html", {'sample': sample}) # For debugging
 
+
+def sample_edit_save(request):
+    sample_pk = request.GET.get("sample_pk")
+    print("Request POST data:", request.POST)
+
+    # protocol_id = request.POST.get("protocol_id")
+    # print(protocol_id)
+    # sex = request.POST.get("sex")
+    # print(sex)
+    # sample = Sample.objects.get("sample_pk")
+    # sample.protocol_id= protocol_id
+    # sample.sex= sex
+    # sample.save()
+    # print(request)
+    # return print(sample)
+
+    
+
+     
+   
 @login_required
 def get_sample_input_row(request):
     label = secrets.token_urlsafe(6)
@@ -277,28 +295,33 @@ def get_chip_type_size(request):
     chip_type = ChipType.objects.get(name=query)
 
     # Generate the card positions based on the chip size
-    num_rows = [f"{i:02d}" for i in range(1, chip_type.rows + 1)]
-    num_cols = [f"{i:02d}" for i in range(1, chip_type.cols + 1)]
+    num_rows=[f"{i:02d}" for i in range(1, chip_type.rows +1)]
+    num_cols=[f"{i:02d}" for i in range(1, chip_type.cols + 1)]
 
     return render(
-        request,
-        "canvas/partials/chip_cards_template.html",
-        {"num_rows": num_rows, "num_cols": num_cols, "chip_type": chip_type},
-    )
+            request,
+            "canvas/partials/chip_cards_template.html",
+            {'num_rows': num_rows,
+                'num_cols': num_cols,
+                'chip_type':chip_type
+             },
+        )
 
 
 @login_required
 def save_chip_input(request):
-    if request.method == "POST":
-        lot_number = request.POST.get("lot")
-        chip_barcode = request.POST.get("chip_barcode")
-        chip_type_name = request.POST.get("chip_type")
+    if request.method == 'POST':
+        lot_number = request.POST.get('lot')
+        chip_barcode = request.POST.get('chip_barcode')
+        chip_type_name = request.POST.get('chip_type')
 
         lot, created = Lot.objects.get_or_create(
-            lot_number=lot_number, defaults={"arrival_date": timezone.now()}
+            lot_number=lot_number,
+            defaults={'arrival_date': timezone.now()}
         )
-
+       
         chip_type = ChipType.objects.get(name=chip_type_name)
+       
 
         # Create the Chip instance
         chip = Chip.objects.create(
@@ -306,25 +329,31 @@ def save_chip_input(request):
             chip_type=chip_type,
             lot=lot,
             lab_practitioner=request.user,
-            protocol_start_date=timezone.now(),
-            scan_date=timezone.now(),
+            protocol_start_date=timezone.now(), 
+            scan_date=timezone.now()            
         )
 
         # Get positions and samples from the form data
-        positions = request.POST.getlist("position")
-        samples = request.POST.getlist("Sample")
+        positions = request.POST.getlist('position')
+        samples = request.POST.getlist('Sample')
 
         # Iterate over positions and samples
         for position, sample_id in zip(positions, samples):
-            if sample_id.strip():  # Ensure the sample_id is not empty
+            if sample_id.strip():  # Ensure the sample_id is not empty  
                 sample_pk = int(sample_id)
                 sample = Sample.objects.get(pk=sample_pk)
-
+                
                 # Create the ChipSample instance
-                ChipSample.objects.create(sample=sample, chip=chip, position=position)
-        context = {}
+                ChipSample.objects.create(
+                    sample=sample,
+                    chip=chip,
+                    position=position
+                )
+        context={
+        }
 
-        return render(request, "canvas/partials/chip_input_results.html", context)
+        return render(request, 'canvas/partials/chip_input_results.html', context)
+
 
 
 #    HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
@@ -333,7 +362,6 @@ def save_chip_input(request):
 #        f"ssh canvas@{HOST_IP} tsp -L {label} nextflow run hello",
 #        shell=True,
 #    )
-
 
 def idat_upload(request):
     if request.method == 'POST':
@@ -367,3 +395,16 @@ def idat_upload(request):
             'errors': errors
         }
         return render(request, 'canvas/partials/idat_upload_results.html', context)
+import openpyxl
+def upload_excel(request):
+    prot_id_list= ['Genetik Protokol No','Protokol No']
+    inst_list =['Bölge', 'Kurum']
+    
+
+    excel_file = request.FILES.get('excel_file')
+    wb= openpyxl.load_workbook(excel_file)
+    sheet = wb.active
+    row_range = sheet.max_row
+
+    context={}
+    return render(request, 'canvas/partials/sample_input_row.html', context)
