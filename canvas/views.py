@@ -6,7 +6,7 @@ from django_htmx.http import retarget
 from django.db import transaction
 from django.shortcuts import HttpResponse
 from django.utils import timezone
-
+from django.http import QueryDict
 
 from canvas.models import (
     Sample,
@@ -164,19 +164,14 @@ def sample_edit(request):
 
 
 def sample_edit_save(request):
-    sample_pk = request.GET.get("sample_pk")
-    print("Request POST data:", request.POST)
-
-    # protocol_id = request.POST.get("protocol_id")
-    # print(protocol_id)
-    # sex = request.POST.get("sex")
-    # print(sex)
-    # sample = Sample.objects.get("sample_pk")
-    # sample.protocol_id= protocol_id
-    # sample.sex= sex
-    # sample.save()
-    # print(request)
-    # return print(sample)
+    if request.method == "PUT":
+        put_data = QueryDict(request.body.decode('utf-8'))
+        sample_pk = put_data.get("sample_pk")
+        protocol_id = put_data.get("protocol_id")
+        sex = put_data.get("sex")
+        print("Sample PK:", sample_pk)
+        print("Protocol ID:", protocol_id)
+        print("Sex:", sex)
 
     
 
