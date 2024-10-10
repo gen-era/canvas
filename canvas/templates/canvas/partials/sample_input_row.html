@@ -8,7 +8,9 @@
     <input
         autocomplete="off"
         type="text"
-        name="protocol_id" required>
+        name="protocol_id" 
+        value="{{ protocol_id }}"
+        required>
 
     {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" selectedItem=institute %}
 
@@ -16,7 +18,9 @@
 
     <input
         autocomplete="off"
-        type="date" name="arrival_date" required>
+        type="date" name="arrival_date" 
+        value="{{ arrival_date }}"
+        required>
     <input
         autocomplete="off"
         type="date" name="study_date">

@@ -401,7 +401,5 @@ from .read_sample_from_excel import generate_data_list
 def upload_excel(request):
     excel_file = request.FILES.get('excel_file')
     sample_list = generate_data_list(excel_file)
-    print(sample_list)
-    for entry in sample_list:
-        print(entry)
-        return render(request, 'canvas/partials/sample_input_row.html', entry)
+    context = {"sample_list":sample_list}
+    return render(request, 'canvas/partials/samples_from_excel.html', context)

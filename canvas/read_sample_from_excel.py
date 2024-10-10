@@ -4,7 +4,6 @@ def generate_data_list(file_path):
     prot_id_list = ['Genetik Protokol No', 'Protokol No']
     inst_list = ['Kurum', 'Bölge']
     arrival_date = ['Kayıt Tarihi', 'Test Eklenme Tarihi']
-    sample_type = ['Test Adı', 'Çalışma Yöntemi']
 
     # Load the workbook and select the active worksheet
     wb = openpyxl.load_workbook(file_path, data_only=True)
@@ -26,14 +25,14 @@ def generate_data_list(file_path):
     prot_id_col = find_column(prot_id_list)
     inst_col = find_column(inst_list)
     arrival_date_col = find_column(arrival_date)
-    sample_type_col = find_column(sample_type)
+
 
     # Check if all required columns are found
     required_columns = {
         'prot_id': prot_id_col,
         'inst': inst_col,
         'arrival_date': arrival_date_col,
-        'sample_type': sample_type_col
+
     }
 
     missing_columns = [key for key, val in required_columns.items() if val is None]
@@ -48,14 +47,13 @@ def generate_data_list(file_path):
         prot_id = row[prot_id_col - 1]
         inst = row[inst_col - 1]
         arrival = row[arrival_date_col - 1]
-        sample = row[sample_type_col - 1]
+
 
         # Create a dictionary for the current row
         row_dict = {
             'prot_id': prot_id,
             'inst': inst,
             'arrival_date': arrival,
-            'sample_type': sample
         }
 
         data_list.append(row_dict)
