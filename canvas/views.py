@@ -370,3 +370,16 @@ def idat_upload(request):
             'errors': errors
         }
         return render(request, 'canvas/partials/idat_upload_results.html', context)
+import openpyxl
+def upload_excel(request):
+    prot_id_list= ['Genetik Protokol No','Protokol No']
+    inst_list =['Bölge', 'Kurum']
+    
+
+    excel_file = request.FILES.get('excel_file')
+    wb= openpyxl.load_workbook(excel_file)
+    sheet = wb.active
+    row_range = sheet.max_row
+
+    context={}
+    return render(request, 'canvas/partials/sample_input_row.html', context)
