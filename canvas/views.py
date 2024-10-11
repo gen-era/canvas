@@ -113,6 +113,25 @@ def generic_search(request, model_name, field_name):
         },
     )
 
+@login_required
+def chip_search(request):
+    query = request.GET.get("search", "")
+    page = request.GET.get("page")
+
+    chips = Chip.objects.filter(chip_id__contains=query)
+
+    chips = chips.order_by("-entry_date")
+    len_chips = len(chips)
+
+    paginator = Paginator(chips, 12)
+    chips = paginator.get_page(page)
+
+    return render(
+        request,
+        "canvas/partials/chips.html",
+        {"chips": chips, "query": query, "len_chips": len_chips},
+    )
+
 
 @login_required
 def sample_search(request):
@@ -200,7 +219,7 @@ def chip_edit(request):
 
         edit = request.POST.get("edit", None)
         if edit == "false":
-            return render(request, "canvas/components/chip.html", {'chip': chip}) # For debugging
+            return render(request, "canvas/partials/chip.html", {'chip': chip}) # For debugging
 
         positions = request.POST.getlist("position")
         samples = request.POST.getlist("Sample")
@@ -220,7 +239,7 @@ def chip_edit(request):
                         sample=sample
                     )
 
-        return render(request, "canvas/components/chip.html", {'chip': chip})
+        return render(request, "canvas/partials/chip.html", {'chip': chip})
 
 
 @login_required

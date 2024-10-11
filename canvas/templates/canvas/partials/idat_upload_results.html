@@ -1,6 +1,7 @@
 <div id="idat-upload-results"
      x-init="uploading = false,
          document.getElementById('idat-upload-form').reset();
+         document.dispatchEvent(new Event('searchChips'));
          "
      style="height:20vh; overflow:auto;"
 >

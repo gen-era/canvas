@@ -34,7 +34,10 @@
 
       <template x-if="!selectedItem">
       <input autocomplete="off" style="opacity: 0; height: 1px !important; float: right" name="{{ model_name }}"
-        value="" 
+        value=""
+        {% if model_name == "ChipType" %}
+        required
+        {% endif %}
         {% if model_name == "Institution" %} 
         required 
         {% endif %} 
