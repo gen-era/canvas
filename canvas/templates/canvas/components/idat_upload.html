@@ -3,20 +3,25 @@
     x-data="{ uploading: false }"
 >
     <form
+        @click="uploading = false"
         id="idat-upload-form"
         hx-post="{% url 'idat_upload' %}"
         hx-encoding="multipart/form-data"
         hx-target="#idat-upload-results"
         hx-swap="outerHTML"
         enctype="multipart/form-data">
+
+        {% include 'canvas/components/generic_search.html' with model_name="ChipType" field_name="name" isSingleSelect="true" %}
+
         <label for="directory-upload">Select a directory with .idat files:</label>
-        <input type="file" id="directory-upload" name="files" autocomplete="off" accept=".idat" multiple>
+        <input type="file" id="directory-upload" name="files" autocomplete="off" accept=".idat" multiple required="true">
 
         <button type="submit"
                 x-show="!uploading"
                 @click="uploading = true"
         >Upload</button>
     </form>
+
 
     <div x-show="uploading"
     >

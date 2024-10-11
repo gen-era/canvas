@@ -34,7 +34,7 @@ class Chip(models.Model):
     )
     chip_id = models.CharField(max_length=200)
     chip_type = models.ForeignKey(ChipType, on_delete=models.PROTECT)
-    lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
+    lot = models.ForeignKey(Lot, on_delete=models.CASCADE, null=True, blank=True)
     entry_date = models.DateTimeField(auto_now_add=True)
     protocol_start_date = models.DateTimeField("Start date")
     scan_date = models.DateTimeField("Scan date")
@@ -93,7 +93,7 @@ class Sample(models.Model):
 
 class ChipSample(models.Model):
     sample = models.ForeignKey(
-        Sample, on_delete=models.PROTECT, related_name="chipsample"
+        Sample, on_delete=models.PROTECT, related_name="chipsample", null=True
     )
 
     call_rate = models.DecimalField(max_digits=10, decimal_places=8, default=0)
@@ -118,7 +118,10 @@ class ChipSample(models.Model):
     )
 
     def __str__(self):
-        return f"{self.sample.protocol_id} - {self.chip.scan_date}"
+        if self.sample:
+            return f"{self.sample.protocol_id} - {self.chip.scan_date}"
+        else:
+            return f"No sample - {self.chip.scan_date}"
 
 
 def idat_directory_path(instance, filename):
