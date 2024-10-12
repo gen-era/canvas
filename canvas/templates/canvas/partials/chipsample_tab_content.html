@@ -1,6 +1,7 @@
 <div
   id="tab-content-{{ chipsample.pk }}"
   x-show="activeTab === {{ chipsample.pk }}"
+  x-transition
 >
   {% include 'canvas/components/reports.html' with button="true" %}
 

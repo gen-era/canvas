@@ -8,6 +8,7 @@
     hx-get="{% url 'sample_search' %}"
     hx-trigger="input changed delay:500ms, searchSamples from:document"
     hx-target="next div.container"
+    hx-swap="swap:200ms"
     hx-vals='js:{"page": 1, "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
   />
 
@@ -16,7 +17,7 @@
     {% include 'canvas/components/generic_search.html' with model_name="Chip" field_name="chip_id" label="sample-search" isSingleSelect="false" eventName="searchSamples" %}
   </div>
 
-  <div class="container" style="overflow:auto; height:80vh;">
+  <div style="overflow:auto; height:80vh;">
     {% include "canvas/partials/sample_results.html" %}
   </div>
 </div>

@@ -2,7 +2,7 @@
   <div
     {% if forloop.last and chips.has_next %}
       hx-get="{% url 'chip_search' %}" hx-trigger="intersect once"
-      hx-swap="afterend" hx-target="this" hx-vals='js:{"page":
+      hx-swap="afterend swap:500ms" hx-target="this" hx-vals='js:{"page":
       "{{ chips.next_page_number }}", "search": "{{ query }}"}'
     {% endif %}
   >

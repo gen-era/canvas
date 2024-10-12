@@ -15,7 +15,10 @@ def sortedchip(chip):
             position = f"R{row:02}C{col:02}"
             chipsample = chipsamples.filter(position=position).first()
             if chipsample:
-                chipsample_rows.append(chipsample)
+                if chipsample.sample:
+                    chipsample_rows.append(chipsample)
+                else:
+                    chipsample_rows.append(position)
             else:
                 chipsample_rows.append(position)
 

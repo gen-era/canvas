@@ -1,14 +1,15 @@
 {% load static %}
 
-<article>
+<article style="min-width:9vw;">
   <header>
     <img
       src="{% static 'canvas/img/canvas.png' %}"
       alt="canvas_logo"
-      style="width:8em"
+      style="width:10em"
     />
 
-    <p>CaNVas version: v24.10 {{ canvas_version }}</p>
+    <p>version: v24.10</p>
+    <p>commit: {{ canvas_version }}</p>
   </header>
 
   <aside>

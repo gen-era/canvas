@@ -1,3 +1,17 @@
+<a @click="chipFormOpen = !chipFormOpen">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 448 512"
+    style="height: 1em;"
+  >
+    <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+    <path
+      d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+    />
+  </svg>
+  New Chip
+</a>
+
 <input
   autocomplete="off"
   id="chip-search"
@@ -7,11 +21,12 @@
   hx-get="{% url 'chip_search' %}"
   hx-trigger="input changed delay:500ms, searchChips from:document"
   hx-target="#chips"
+  hx-swap="swap:200ms"
 />
 
-<div class="overflow-auto" style="height:90vh; width:90vw;">
+<div class="overflow-auto" style="height:90vh; width:88vw;">
   <div class="grid-container">
-    <article class="chip-container">
+    <article class="chip-container" x-show="chipFormOpen === true" x-transition>
       <header>
         <h3>New Chip</h3>
       </header>
@@ -44,7 +59,6 @@
   .chip-container {
     flex: 0 0 20vw; /* Each chip takes up 20% of the viewport width */
     padding: 1rem;
-    border: 1px solid #ddd;
     min-width: 20vw;
   }
 
@@ -55,6 +69,8 @@
 
   .sample {
     min-width: 8vw;
-    height: 6vh;
+    min-height: 8vh;
+    height: 8vh;
+    width: 8vw;
   }
 </style>

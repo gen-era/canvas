@@ -17,14 +17,14 @@
 
       <!-- Main content area -->
       <div>
-        <!-- Sample Search View -->
         <div
           x-show="views.currentView === 'samples'"
-          class="container-fluid"
-          :class="collapseSampleSearch === false ? 'sample-container' : 'container'"
+          :class="(sampleSearchOpen === true && (sampleFormOpen === true || activeTab > 0)) ? 'sample-container' : 'container-fluid'"
+          x-transition
+          x-transition.duration.500ms
         >
           <div>
-            <a @click="collapseSampleSearch = !collapseSampleSearch">
+            <a @click="sampleSearchOpen = !sampleSearchOpen">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
@@ -37,7 +37,7 @@
               </svg>
               Sample Search
             </a>
-            <a @click="samplesNew = !samplesNew">
+            <a @click="sampleFormOpen = !sampleFormOpen">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
@@ -50,22 +50,34 @@
               </svg>
               New Samples
             </a>
-            <div x-show="collapseSampleSearch === false">
+
+            <div x-show="sampleSearchOpen === true" x-transition>
               {% include "canvas/components/sample_search.html" %}
             </div>
           </div>
-          <div x-show="samplesNew === true">
+
+          <div x-show="sampleFormOpen === true" x-transition>
             {% include "canvas/components/sample_input.html" %}
           </div>
 
-          <div x-show="samplesNew === false" style="height:80vh">
+          <div
+            x-show="activeTab > 0 && sampleFormOpen === false"
+            style="height:80vh"
+            x-transition
+          >
             {% include "canvas/components/chipsample_tabs.html" %}
           </div>
         </div>
-        <div x-show="views.currentView === 'chips'">
+
+        <div
+          class="container-fluid"
+          x-show="views.currentView === 'chips'"
+          x-transition
+        >
           {% include "canvas/components/chip_page.html" %}
         </div>
-        <div x-show="views.currentView === 'acmgLoss'">
+
+        <div x-show="views.currentView === 'acmgLoss'" x-transition>
           {% include "canvas/components/acmg_loss.html" %}
         </div>
       </div>
@@ -134,15 +146,15 @@
     .dropdown > summary input:focus {
       box-shadow: none;
     }
-
     .badge {
       border-radius: 2em;
       padding: 0.2em 0.6em;
       display: inline-flex;
       align-items: center;
       gap: 0.3em;
+      transform: translateY(-15%);
+      margin-top: 5px;
     }
-
     .badge a {
       background: none;
       border: none;
@@ -152,6 +164,10 @@
       cursor: pointer;
       transition: color 0.3s ease;
     }
+    .htmx-swapping {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
   </style>
 
   <script>
@@ -159,8 +175,10 @@
       Alpine.data("main", () => ({
         sidebar: { isExpanded: true },
         views: { currentView: "samples" },
-        collapseSampleSearch: false,
-        samplesNew: false,
+        sampleSearchOpen: true,
+        sampleFormOpen: false,
+        chipFormOpen: true,
+        activeTab: 0,
 
         async init() {
           this.updateViewFromURL();
@@ -186,11 +204,9 @@
         },
         showAcmgLoss() {
           this.views.currentView = "acmgLoss";
-          this.collapseSampleSearch = false;
         },
         showChips() {
           this.views.currentView = "chips";
-          this.collapseSampleSearch = false;
         },
       }));
     });
