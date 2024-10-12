@@ -1,58 +1,60 @@
 <input
-    autocomplete="off"
-    id="chip-search"
-    type="search"
-    name="search"
-    placeholder="Chip Search..."
-    hx-get="{% url 'chip_search' %}"
-    hx-trigger="input changed delay:500ms, searchChips from:document"
-    hx-target="#chips"
+  autocomplete="off"
+  id="chip-search"
+  type="search"
+  name="search"
+  placeholder="Chip Search..."
+  hx-get="{% url 'chip_search' %}"
+  hx-trigger="input changed delay:500ms, searchChips from:document"
+  hx-target="#chips"
 />
 
-<div class="overflow-auto">
-    <div class="grid-container">
-        <article class="chip-container">
-            <div class="chip_upload">
-                {% include 'canvas/components/idat_upload.html' %}
-            </div>
-        </article>
+<div class="overflow-auto" style="height:90vh; width:90vw;">
+  <div class="grid-container">
+    <article class="chip-container">
+      <header>
+        <h3>New Chip</h3>
+      </header>
+      <div class="chip_upload">
+        {% include 'canvas/components/idat_upload.html' %}
+      </div>
+    </article>
 
-        <div id="chips" class="grid-container" style="width:75vw;">
-            {% include 'canvas/partials/chips.html' with chips=chips %}
-        </div>
+    <div id="chips" class="grid-container">
+      {% include 'canvas/partials/chips.html' with chips=chips %}
     </div>
+  </div>
 </div>
 
 <script>
-    function getSelectedChipType(label) {
-        return Array.from(document.getElementsByClassName(`selected-ChipType-${label}`)).map(e => e.innerText)
-    }
+  function getSelectedChipType(label) {
+    return Array.from(
+      document.getElementsByClassName(`selected-ChipType-${label}`),
+    ).map((e) => e.innerText);
+  }
 </script>
 <style>
-    .grid-container {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 1rem;
-        overflow-x: auto;
-    }
+  .grid-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+  }
 
-    .chip-container {
-        flex: 0 0 20vw; /* Each chip takes up 20% of the viewport width */
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border: 1px solid #ddd;
-        min-width: 20vw;
-    }
+  .chip-container {
+    flex: 0 0 20vw; /* Each chip takes up 20% of the viewport width */
+    padding: 1rem;
+    border: 1px solid #ddd;
+    min-width: 20vw;
+  }
 
-    .sample-row {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+  .sample-row {
+    display: flex;
+    flex-direction: column;
+  }
 
-    .sample {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        min-width: 8vw;
-    }
+  .sample {
+    min-width: 8vw;
+    height: 6vh;
+  }
 </style>

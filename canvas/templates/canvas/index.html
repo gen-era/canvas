@@ -7,26 +7,8 @@
 {% block content %}
   {% if user.is_authenticated %}
     <main
-      x-data="{
-        sidebar: { isExpanded: true },
-        views: { currentView: 'samplePage' },
-        collapseSampleSearch: false,
-        showSamplePage() {
-            this.views.currentView = 'samplePage';
-            $nextTick(() => { window.dispatchEvent(new Event('resize')); });
-        },
-        showSampleInput() {
-            this.views.currentView = 'sampleInput';
-        },
-        showAcmgLoss() {
-            this.views.currentView = 'acmgLoss';
-            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
-        },
-        showChipInput() {
-            this.views.currentView = 'chipInput';
-            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
-        }
-    }"
+      x-data="main
+              "
       id="authenticated-content"
       class="container-fluid main"
     >
@@ -35,29 +17,52 @@
 
       <!-- Main content area -->
       <div>
-
         <!-- Sample Search View -->
         <div
-          x-show="views.currentView === 'samplePage'"
+          x-show="views.currentView === 'samples'"
           class="container-fluid"
           :class="collapseSampleSearch === false ? 'sample-container' : 'container'"
         >
-
           <div>
-            <a
-                @click="collapseSampleSearch = !collapseSampleSearch"
-            > Sample Search </a>
+            <a @click="collapseSampleSearch = !collapseSampleSearch">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                style="height: 1em;"
+              >
+                <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path
+                  d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+                />
+              </svg>
+              Sample Search
+            </a>
+            <a @click="samplesNew = !samplesNew">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 448 512"
+                style="height: 1em;"
+              >
+                <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path
+                  d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                />
+              </svg>
+              New Samples
+            </a>
             <div x-show="collapseSampleSearch === false">
               {% include "canvas/components/sample_search.html" %}
             </div>
           </div>
+          <div x-show="samplesNew === true">
+            {% include "canvas/components/sample_input.html" %}
+          </div>
 
-          <div>{% include "canvas/components/chipsample_tabs.html" %}</div>
+          <div x-show="samplesNew === false" style="height:80vh">
+            {% include "canvas/components/chipsample_tabs.html" %}
+          </div>
         </div>
-        <div x-show="views.currentView === 'sampleInput'">
-          {% include "canvas/components/sample_input.html" %}
-        </div>
-        <div x-show="views.currentView === 'chipInput'">
+        <div x-show="views.currentView === 'chips'">
           {% include "canvas/components/chip_page.html" %}
         </div>
         <div x-show="views.currentView === 'acmgLoss'">
@@ -150,6 +155,46 @@
   </style>
 
   <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("main", () => ({
+        sidebar: { isExpanded: true },
+        views: { currentView: "samples" },
+        collapseSampleSearch: false,
+        samplesNew: false,
+
+        async init() {
+          this.updateViewFromURL();
+          this.$watch("views.currentView", () => this.updateURL());
+        },
+
+        updateViewFromURL() {
+          let qp = new URLSearchParams(window.location.search);
+          if (qp.get("view")) this.views.currentView = qp.get("view");
+        },
+
+        updateURL() {
+          let qp = new URLSearchParams();
+          if (this.views.currentView) qp.set("view", this.views.currentView);
+          history.replaceState(null, null, "?" + qp.toString());
+        },
+
+        showSamples() {
+          this.views.currentView = "samples";
+          this.$nextTick(() => {
+            window.dispatchEvent(new Event("resize"));
+          });
+        },
+        showAcmgLoss() {
+          this.views.currentView = "acmgLoss";
+          this.collapseSampleSearch = false;
+        },
+        showChips() {
+          this.views.currentView = "chips";
+          this.collapseSampleSearch = false;
+        },
+      }));
+    });
+
     function getSelectedInstitutions() {
       return Array.from(
         document.getElementsByClassName("selected-Institution-sample-search"),
@@ -215,16 +260,15 @@
       };
     }
 
+    document.body.addEventListener("htmx:configRequest", (event) => {
+      const csrfToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("csrftoken="))
+        ?.split("=")[1];
 
-document.body.addEventListener('htmx:configRequest', (event) => {
-    const csrfToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken='))
-        ?.split('=')[1];
-
-    if (csrfToken) {
-        event.detail.headers['X-CSRFToken'] = csrfToken;
-    }
-});
+      if (csrfToken) {
+        event.detail.headers["X-CSRFToken"] = csrfToken;
+      }
+    });
   </script>
 {% endblock content %}
