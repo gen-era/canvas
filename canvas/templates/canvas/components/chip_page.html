@@ -1,4 +1,8 @@
-<a @click="chipFormOpen = !chipFormOpen">
+<a
+  data-tooltip="Upload new idats."
+  data-placement="bottom"
+  @click="chipFormOpen = !chipFormOpen"
+>
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 448 512"
@@ -17,7 +21,7 @@
   id="chip-search"
   type="search"
   name="search"
-  placeholder="Chip Search..."
+  placeholder="Chip search start by tying in barcode"
   hx-get="{% url 'chip_search' %}"
   hx-trigger="input changed delay:500ms, searchChips from:document"
   hx-target="#chips"
@@ -26,7 +30,12 @@
 
 <div class="overflow-auto" style="height:90vh; width:88vw;">
   <div class="grid-container">
-    <article class="chip-container" x-show="chipFormOpen === true" x-transition>
+    <article
+      class="chip-container"
+      x-show="chipFormOpen === true"
+      x-transition
+      x-transition.duration.200ms
+    >
       <header>
         <h3>New Chip</h3>
       </header>

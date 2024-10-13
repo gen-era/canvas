@@ -17,6 +17,8 @@
       <ul>
         <li>
           <a
+            data-tooltip="Browse your samples or add new samples."
+            data-placement="right"
             href="#"
             @click="showSamples()"
             :class="views.currentView === 'samples' ? 'primary' : 'secondary'"
@@ -35,6 +37,8 @@
         </li>
         <li>
           <a
+            data-tooltip="Browse/edit chips or upload idats."
+            data-placement="right"
             href="#"
             @click="showChips()"
             :class="views.currentView === 'chips' ? 'primary' : 'secondary'"

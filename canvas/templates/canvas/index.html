@@ -24,7 +24,11 @@
           x-transition.duration.500ms
         >
           <div>
-            <a @click="sampleSearchOpen = !sampleSearchOpen">
+            <a
+              data-tooltip="Hide/Show sample search component."
+              data-placement="bottom"
+              @click="sampleSearchOpen = !sampleSearchOpen"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
@@ -37,7 +41,11 @@
               </svg>
               Sample Search
             </a>
-            <a @click="sampleFormOpen = !sampleFormOpen">
+            <a
+              data-tooltip="Add new samples."
+              data-placement="bottom"
+              @click="sampleFormOpen = !sampleFormOpen"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
