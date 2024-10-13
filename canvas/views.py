@@ -115,7 +115,7 @@ def generic_search(request, model_name, field_name):
 
 @login_required
 def chip_search(request):
-    query = request.GET.get("search", "")
+    query = request.GET.get("search", "").strip()
     page = request.GET.get("page")
 
     chips = Chip.objects.filter(chip_id__contains=query)

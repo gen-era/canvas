@@ -19,61 +19,55 @@
       <div>
         <div
           x-show="views.currentView === 'samples'"
-          :class="(sampleSearchOpen === true && (sampleFormOpen === true || activeTab > 0)) ? 'sample-container' : 'container-fluid'"
           x-transition
           x-transition.duration.500ms
         >
-          <div>
-            <a
-              data-tooltip="Hide/Show sample search component."
-              data-placement="bottom"
-              @click="sampleSearchOpen = !sampleSearchOpen"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                style="height: 1em;"
-              >
-                <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                <path
-                  d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
-                />
-              </svg>
-              Sample Search
-            </a>
-            <a
-              data-tooltip="Add new samples."
-              data-placement="bottom"
-              @click="sampleFormOpen = !sampleFormOpen"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 448 512"
-                style="height: 1em;"
-              >
-                <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                <path
-                  d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
-                />
-              </svg>
-              New Samples
-            </a>
+          <nav>
+            <ul>
+              <li>
+                <a
+                  data-tooltip="Hide/Show sample search component."
+                  data-placement="bottom"
+                  @click="sampleSearchOpen = !sampleSearchOpen"
+                >
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  Sample Search
+                </a>
+              </li>
+              <li>
+                <a
+                  data-tooltip="Add new samples."
+                  data-placement="bottom"
+                  @click="sampleFormOpen = !sampleFormOpen"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                  New Samples
+                </a>
+              </li>
+            </ul>
 
+            <ul id="tab-buttons"></ul>
+            <ul></ul>
+          </nav>
+
+          <div
+            :class="(sampleSearchOpen === true && (sampleFormOpen === true || activeTab > 0)) ? 'sample-container' : 'container-fluid'"
+          >
             <div x-show="sampleSearchOpen === true" x-transition>
               {% include "canvas/components/sample_search.html" %}
             </div>
-          </div>
 
-          <div x-show="sampleFormOpen === true" x-transition>
-            {% include "canvas/components/sample_input.html" %}
-          </div>
+            <div x-show="sampleFormOpen === true" x-transition>
+              {% include "canvas/components/sample_input.html" %}
+            </div>
 
-          <div
-            x-show="activeTab > 0 && sampleFormOpen === false"
-            style="height:80vh"
-            x-transition
-          >
-            {% include "canvas/components/chipsample_tabs.html" %}
+            <div
+              x-show="activeTab > 0 && sampleFormOpen === false"
+              style="height:80vh"
+              x-transition
+            >
+              {% include "canvas/components/chipsample_tabs.html" %}
+            </div>
           </div>
         </div>
 

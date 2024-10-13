@@ -1,20 +1,17 @@
-<a
-  data-tooltip="Upload new idats."
-  data-placement="bottom"
-  @click="chipFormOpen = !chipFormOpen"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 448 512"
-    style="height: 1em;"
-  >
-    <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-    <path
-      d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
-    />
-  </svg>
-  New Chip
-</a>
+<nav>
+  <ul>
+    <li>
+      <a
+        data-tooltip="Upload new idats."
+        data-placement="bottom"
+        @click="chipFormOpen = !chipFormOpen"
+      >
+        <i class="fa-solid fa-plus"></i>
+        New Chip
+      </a>
+    </li>
+  </ul>
+</nav>
 
 <input
   autocomplete="off"
@@ -28,7 +25,7 @@
   hx-swap="swap:200ms"
 />
 
-<div class="overflow-auto" style="height:90vh; width:88vw;">
+<div class="overflow-auto" style="height:86vh; width:88vw;">
   <div class="grid-container">
     <article
       class="chip-container"
@@ -66,9 +63,9 @@
   }
 
   .chip-container {
-    flex: 0 0 20vw; /* Each chip takes up 20% of the viewport width */
+    flex: 0 0 18vw; /* Each chip takes up 20% of the viewport width */
     padding: 1rem;
-    min-width: 20vw;
+    min-width: 18vw;
   }
 
   .sample-row {

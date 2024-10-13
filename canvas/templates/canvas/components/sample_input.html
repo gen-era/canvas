@@ -1,75 +1,71 @@
 <form
-    id="sample-input-form"
-    class="container-fluid"
-    style="max-height:97vh;"
-    hx-post="{% url 'save_samples' %}"
-    hx-target="#sample-input-form-errors"
-    autocomplete="off"
+  id="sample-input-form"
+  class="container-fluid"
+  style="max-height:86vh;"
+  hx-post="{% url 'save_samples' %}"
+  hx-target="#sample-input-form-errors"
+  autocomplete="off"
 >
-    <div id="sample-input-form-errors"> </div>
+  <div id="sample-input-form-errors"></div>
 
-    <div id="sample-input-rows">
-        <!-- Table Header -->
-        <div class="grid">
-
-            <div>Protocol ID</div>
-            <div>Institution</div>
-            <div>Sample Type</div>
-            <div>Arrival Date</div>
-            <div>Study Date</div>
-            <div>Description</div>
-            <div>Sex</div>
-            <div>Concentration</div>
-            <div>Repeat</div>
-            <div>Remove row</div>
-        </div>
-        {% include "canvas/partials/sample_input_row.html" %}
+  <div id="sample-input-rows">
+    <div class="grid">
+      <strong style="text-align:center">Protocol ID</strong>
+      <strong style="text-align:center">Institution</strong>
+      <strong style="text-align:center">Sample Type</strong>
+      <strong style="text-align:center">Arrival Date</strong>
+      <strong style="text-align:center">Study Date</strong>
+      <strong style="text-align:center">Description</strong>
+      <strong style="text-align:center">Sex</strong>
+      <strong style="text-align:center">Concentration</strong>
+      <strong style="text-align:center">Repeat</strong>
+      <strong style="text-align:center">Remove row</strong>
     </div>
-    <button
-        type="submit"
-        onclick="prepareFormSubmission();"
-        >
-        Save Samples
-    </button>
+    <hr />
+    {% include "canvas/partials/sample_input_row.html" %}
+  </div>
+  <button type="submit" onclick="prepareFormSubmission();">Save Samples</button>
 </form>
 
 <script>
-function removeRow(button) {
-  const row = button.closest('.sample-input-row');
-  const rows = document.querySelectorAll('.sample-input-row');
-  if (rows.length > 1) {
-    row.remove();
-  } else {
-    showError(row.querySelector('input[name="protocol_id"]'), "At least one row is required.");
-    setTimeout(() => {
-      clearError(row.querySelector('input[name="protocol_id"]'));
-    }, 2000);
+  function removeRow(button) {
+    const row = button.closest(".sample-input-row");
+    const rows = document.querySelectorAll(".sample-input-row");
+    if (rows.length > 1) {
+      row.remove();
+    } else {
+      showError(
+        row.querySelector('input[name="protocol_id"]'),
+        "At least one row is required.",
+      );
+      setTimeout(() => {
+        clearError(row.querySelector('input[name="protocol_id"]'));
+      }, 2000);
+    }
   }
-}
 
-function isRowEmpty(row) {
-  const inputs = row.querySelectorAll('input, select');
-  return Array.from(inputs).every(input => !input.value.trim());
-}
-
-function prepareFormSubmission() {
-  const rows = document.querySelectorAll('.sample-input-row');
-  const lastRow = rows[rows.length - 1];
-
-  if (rows.length > 1 && isRowEmpty(lastRow)) {
-    lastRow.remove();
+  function isRowEmpty(row) {
+    const inputs = row.querySelectorAll("input, select");
+    return Array.from(inputs).every((input) => !input.value.trim());
   }
-}
-function showError(input, message) {
-  clearError(input);
-  input.setCustomValidity(message);
-  input.reportValidity();
-  input.classList.add('error');
-}
 
-function clearError(input) {
-  input.setCustomValidity('');
-  input.classList.remove('error');
-}
+  function prepareFormSubmission() {
+    const rows = document.querySelectorAll(".sample-input-row");
+    const lastRow = rows[rows.length - 1];
 
+    if (rows.length > 1 && isRowEmpty(lastRow)) {
+      lastRow.remove();
+    }
+  }
+  function showError(input, message) {
+    clearError(input);
+    input.setCustomValidity(message);
+    input.reportValidity();
+    input.classList.add("error");
+  }
+
+  function clearError(input) {
+    input.setCustomValidity("");
+    input.classList.remove("error");
+  }
 </script>
