@@ -93,7 +93,7 @@ class Sample(models.Model):
 
 class ChipSample(models.Model):
     sample = models.ForeignKey(
-        Sample, on_delete=models.PROTECT, related_name="chipsample", null=True
+        Sample, on_delete=models.PROTECT, related_name="chipsample", null=True, blank=True
     )
 
     call_rate = models.DecimalField(max_digits=10, decimal_places=8, default=0)

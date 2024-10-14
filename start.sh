@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Run migrations
+# Run migrate
 echo "Running migrations..."
-python manage.py makemigrations
 python manage.py migrate --run-syncdb
 
 # Collect static files
