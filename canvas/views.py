@@ -1,37 +1,33 @@
-from http.client import HTTPResponse
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from django.apps import apps
-from django_htmx.http import retarget
-from django.db import transaction
-from django.shortcuts import HttpResponse
-from django.utils import timezone
-from django.conf import settings
-
-
-from canvas.models import (
-    Sample,
-    ChipSample,
-    Institution,
-    IDAT,
-    SampleType,
-    ChipType,
-    Chip,
-    Lot,
-)
-from django.contrib.auth.decorators import login_required
-
-from datetime import timedelta
 import json
-
-import secrets
-import minio
 import os
-import subprocess
-
+import secrets
 import socket
 import struct
+import subprocess
 import tempfile
+from datetime import timedelta
+from http.client import HTTPResponse
+
+import minio
+from django.apps import apps
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db import transaction
+from django.shortcuts import HttpResponse, render
+from django.utils import timezone
+from django_htmx.http import retarget
+
+from canvas.models import (
+    IDAT,
+    Chip,
+    ChipSample,
+    ChipType,
+    Institution,
+    Lot,
+    Sample,
+    SampleType,
+)
 
 
 def get_default_gateway_linux():
@@ -39,7 +35,7 @@ def get_default_gateway_linux():
     with open("/proc/net/route") as fh:
         for line in fh:
             fields = line.strip().split()
-            if fields[1] != '00000000' or not int(fields[3], 16) & 2:
+            if fields[1] != "00000000" or not int(fields[3], 16) & 2:
                 # If not default route or not RTF_GATEWAY, skip it
                 continue
 
@@ -54,7 +50,7 @@ def get_version():
 def start_run(chip_id):
     if not settings.DEBUG:
         HOST_IP = get_default_gateway_linux()
-        MINIO_IP = socket.gethostbyname('minio')
+        MINIO_IP = socket.gethostbyname("minio")
         label = secrets.token_urlsafe(6)
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
@@ -103,7 +99,6 @@ def index(request):
     len_samples = len(samples)
     sample_paginator = Paginator(samples, 12)
     samples = sample_paginator.get_page(1)
-
 
     chips = Chip.objects.order_by("-entry_date")
     len_chips = len(chips)
@@ -158,6 +153,7 @@ def generic_search(request, model_name, field_name):
             "field_name": field_name,
         },
     )
+
 
 @login_required
 def chip_search(request):
@@ -252,12 +248,15 @@ def chipsample_tab_content(request):
         },
     )
 
+
 @login_required
 def chip_edit(request):
     if request.method == "GET":
         chip_pk = request.GET.get("chip_pk")
         chip = Chip.objects.get(id=chip_pk)
-        return render(request, "canvas/partials/chip_edit.html", {'chip': chip}) # For debugging
+        return render(
+            request, "canvas/partials/chip_edit.html", {"chip": chip}
+        )  # For debugging
 
     if request.method == "POST":
         chip_pk = request.POST.get("chip_pk")
@@ -265,7 +264,9 @@ def chip_edit(request):
 
         edit = request.POST.get("edit", None)
         if edit == "false":
-            return render(request, "canvas/partials/chip.html", {'chip': chip}) # For debugging
+            return render(
+                request, "canvas/partials/chip.html", {"chip": chip}
+            )  # For debugging
 
         positions = request.POST.getlist("position")
         samples = request.POST.getlist("Sample")
@@ -274,20 +275,20 @@ def chip_edit(request):
             if sample_pk.strip():
                 sample = Sample.objects.get(pk=int(sample_pk))
 
-                chipsample = ChipSample.objects.filter(chip=chip, position=position).first()
+                chipsample = ChipSample.objects.filter(
+                    chip=chip, position=position
+                ).first()
                 if chipsample:
                     chipsample.sample = sample
                     chipsample.save()
                 else:
                     ChipSample.objects.create(
-                        chip=chip,
-                        position=position,
-                        sample=sample
+                        chip=chip, position=position, sample=sample
                     )
 
         if not chipsample.call_rate:
             start_run(chip.chip_id)
-        return render(request, "canvas/partials/chip.html", {'chip': chip})
+        return render(request, "canvas/partials/chip.html", {"chip": chip})
 
 
 @login_required
@@ -395,31 +396,31 @@ def get_reports(request):
 
 
 def idat_upload(request):
-    if request.method == 'POST':
-        files = request.FILES.getlist('files')
+    if request.method == "POST":
+        files = request.FILES.getlist("files")
         uploaded_files = []
         errors = []
 
-        chip_type_pk = request.POST.get('ChipType')
-        chip_type = ChipType.objects.get(pk= int(chip_type_pk[0]))
+        chip_type_pk = request.POST.get("ChipType")
+        chip_type = ChipType.objects.get(pk=int(chip_type_pk[0]))
 
         for file in files:
-            if file.name.endswith('.idat'):
+            if file.name.endswith(".idat"):
                 try:
                     chip_id, position = file.name.split("_")[:2]
-                    chip, created = Chip.objects.get_or_create(chip_id=chip_id,
-                                                               defaults={
-                                                                    "chip_type":chip_type,
-                                                                    "lab_practitioner":request.user,
-                                                                    "protocol_start_date":timezone.now(),
-                                                                    "scan_date":timezone.now()
-                                                               }
-                                                      )
-                    chipsample, created = ChipSample.objects.get_or_create(chip=chip, position=position)
-                    idat_file = IDAT.objects.create(
-                        idat=file,
-                        chipsample=chipsample
+                    chip, created = Chip.objects.get_or_create(
+                        chip_id=chip_id,
+                        defaults={
+                            "chip_type": chip_type,
+                            "lab_practitioner": request.user,
+                            "protocol_start_date": timezone.now(),
+                            "scan_date": timezone.now(),
+                        },
                     )
+                    chipsample, created = ChipSample.objects.get_or_create(
+                        chip=chip, position=position
+                    )
+                    idat_file = IDAT.objects.create(idat=file, chipsample=chipsample)
                     uploaded_files.append(idat_file)
                 except Exception as e:
                     errors.append(f"Error uploading {file.name}: {str(e)}")
@@ -427,8 +428,5 @@ def idat_upload(request):
                 errors.append(f"Invalid file type: {file.name}")
 
         # Render the uploaded files and error messages into HTML
-        context = {
-            'uploaded_files': uploaded_files,
-            'errors': errors
-        }
-        return render(request, 'canvas/partials/idat_upload_results.html', context)
+        context = {"uploaded_files": uploaded_files, "errors": errors}
+        return render(request, "canvas/partials/idat_upload_results.html", context)
