@@ -51,6 +51,52 @@ def get_version():
         return f.read().splitlines()[0][:6]
 
 
+def start_run(chip_id):
+    if not settings.DEBUG:
+        HOST_IP = get_default_gateway_linux()
+        MINIO_IP = socket.gethostbyname('minio')
+        label = secrets.token_urlsafe(6)
+
+        with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
+            fp.write(
+                f"""
+                aws {{
+                access_key = "{settings.MINIO_STORAGE_ACCESS_KEY}"
+                secret_key = "{settings.MINIO_STORAGE_SECRET_KEY}"
+                client {{
+                    endpoint = "http://{MINIO_IP}:9000"
+                }}
+                }}
+                profiles {{
+                docker {{
+                    docker.enabled = true
+                }}
+                }}
+                """
+            )
+            fp.close()
+            subprocess.run(
+                f"scp {fp.name} canvas@{HOST_IP}:/tmp/",
+                shell=True,
+            )
+
+        subprocess.run(
+            f"ssh canvas@{HOST_IP} tsp -L {label} nextflow /home/canvas/canvas-pipeline/main.nf \
+                                                --chip_id {chip_id} \
+                                                --bpm analysis_files/manifest-cluster/GSACyto_20044998_A1.bpm \
+                                                --csv analysis_files/manifest-cluster/GSACyto_20044998_A1.csv \
+                                                --egt analysis_files/manifest-cluster/2003.egt \
+                                                --fasta analysis_files/GRCh37_genome.fa \
+                                                --pfb analysis_files/PennCNV/test/out.pfb \
+                                                --band canvas-pipeline/hg19_chrom_band.txt \
+                                                --tex_template canvas-pipeline/template/base_template.tex \
+                                                --output_dir canvas-pipeline-demo-results/ \
+                                                -c {fp.name} \
+                                                -profile docker",
+            shell=True,
+        )
+
+
 def index(request):
 
     samples = Sample.objects.order_by("-entry_date")
@@ -239,6 +285,8 @@ def chip_edit(request):
                         sample=sample
                     )
 
+        if not chipsample.call_rate:
+            start_run(chip.chip_id)
         return render(request, "canvas/partials/chip.html", {'chip': chip})
 
 
@@ -377,50 +425,6 @@ def idat_upload(request):
                     errors.append(f"Error uploading {file.name}: {str(e)}")
             else:
                 errors.append(f"Invalid file type: {file.name}")
-
-        if not settings.DEBUG:
-            HOST_IP = get_default_gateway_linux()
-            MINIO_IP = socket.gethostbyname('minio')
-            label = secrets.token_urlsafe(6)
-
-            with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
-                fp.write(
-                    f"""
-                    aws {{
-                    access_key = "{settings.MINIO_STORAGE_ACCESS_KEY}"
-                    secret_key = "{settings.MINIO_STORAGE_SECRET_KEY}"
-                    client {{
-                        endpoint = "http://{MINIO_IP}:9000"
-                    }}
-                    }}
-                    profiles {{
-                    docker {{
-                        docker.enabled = true
-                    }}
-                    }}
-                    """
-                )
-                fp.close()
-                subprocess.run(
-                    f"scp {fp.name} canvas@{HOST_IP}:/tmp/",
-                    shell=True,
-                )
-
-            subprocess.run(
-                f"ssh canvas@{HOST_IP} tsp -L {label} nextflow /home/canvas/canvas-pipeline/main.nf \
-                                                    --chip_id {chip_id} \
-                                                    --bpm analysis_files/manifest-cluster/GSACyto_20044998_A1.bpm \
-                                                    --csv analysis_files/manifest-cluster/GSACyto_20044998_A1.csv \
-                                                    --egt analysis_files/manifest-cluster/2003.egt \
-                                                    --fasta analysis_files/GRCh37_genome.fa \
-                                                    --pfb analysis_files/PennCNV/test/out.pfb \
-                                                    --band canvas-pipeline/hg19_chrom_band.txt \
-                                                    --tex_template canvas-pipeline/template/base_template.tex \
-                                                    --output_dir canvas-pipeline-demo-results/ \
-                                                    -c {fp.name} \
-                                                    -profile docker",
-                shell=True,
-            )
 
         # Render the uploaded files and error messages into HTML
         context = {
