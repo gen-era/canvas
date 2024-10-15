@@ -402,4 +402,5 @@ def upload_excel(request):
     excel_file = request.FILES.get('excel_file')
     sample_list = generate_data_list(excel_file)
     context = {"sample_list":sample_list}
+    print(context)
     return render(request, 'canvas/partials/samples_from_excel.html', context)
