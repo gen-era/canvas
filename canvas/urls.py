@@ -28,5 +28,6 @@ urlpatterns = [
     path("create_report/", views.create_report, name="create_report"),
     path("get_reports/", views.get_reports, name="get_reports"),
     path("chip_edit/", views.chip_edit, name="chip_edit"),
+    path("sample_edit/", views.sample_edit, name="sample_edit"),
     path("chip_search", views.chip_search, name="chip_search"),
 ]

@@ -250,6 +250,28 @@ def chipsample_tab_content(request):
 
 
 @login_required
+def sample_edit(request):
+    if request.method == "GET":
+        sample_pk = request.GET.get("sample_pk")
+        sample = Sample.objects.get(id=sample_pk)
+        return render(
+            request, "canvas/partials/sample_edit.html", {"sample": sample}
+        )  # For debugging
+
+    if request.method == "POST":
+        sample_pk = request.POST.get("sample_pk")
+        sample = Sample.objects.get(id=sample_pk)
+
+        edit = request.POST.get("edit", None)
+        if edit == "false":
+            return render(
+                request, "canvas/partials/sample.html", {"sample": sample}
+            )  # For debugging
+
+        return render(request, "canvas/partials/sample.html", {"sample": sample})
+
+
+@login_required
 def chip_edit(request):
     if request.method == "GET":
         chip_pk = request.GET.get("chip_pk")
