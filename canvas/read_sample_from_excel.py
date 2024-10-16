@@ -51,14 +51,17 @@ def generate_data_list(file_path):
         prot_id = row[prot_id_col - 1]
         inst = row[inst_col - 1]
         arrival = row[arrival_date_col - 1]
-        inst_validated = Institution.objects.filter(name__icontains=inst)
-        if len(inst_validated) > 1:
-            inst_validated = None
-        elif inst_validated:
-            inst_validated = inst_validated.first()
+
+        if inst in existing_institutions:
+            inst_validated = Institution.objects.filter(name__icontains=inst)
+            if len(inst_validated) > 1:
+                inst_validated = None
+            elif inst_validated:
+                inst_validated = inst_validated.first()
+            else:
+                inst_validated = None
         else:
-            inst_validated = None
-           
+            inst_validated = None   
 
 
         # Format 'arrival_date' if it's a datetime object
