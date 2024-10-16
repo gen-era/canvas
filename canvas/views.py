@@ -260,7 +260,7 @@ def chip_edit(request):
 
     if request.method == "POST":
         chip_pk = request.POST.get("chip_pk")
-        chip = Chip.objects.filter(id=chip_pk).first()
+        chip = Chip.objects.get(id=chip_pk)
 
         edit = request.POST.get("edit", None)
         if edit == "false":
