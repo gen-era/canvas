@@ -51,12 +51,15 @@ def generate_data_list(file_path):
         prot_id = row[prot_id_col - 1]
         inst = row[inst_col - 1]
         arrival = row[arrival_date_col - 1]
-
-        # Validate institution name
-        if inst not in existing_institutions:
+        inst_validated = Institution.objects.filter(name__icontains=inst)
+        if len(inst_validated) > 1:
             inst_validated = 'Wrong Institution Name'
+        elif inst_validated:
+            inst_validated = inst_validated.first()
         else:
-            inst_validated = inst
+            inst_validated = 'Wrong Institution Name'
+           
+
 
         # Format 'arrival_date' if it's a datetime object
         if isinstance(arrival, datetime):
