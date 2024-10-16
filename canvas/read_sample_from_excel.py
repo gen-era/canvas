@@ -53,11 +53,11 @@ def generate_data_list(file_path):
         arrival = row[arrival_date_col - 1]
         inst_validated = Institution.objects.filter(name__icontains=inst)
         if len(inst_validated) > 1:
-            inst_validated = 'Wrong Institution Name'
+            inst_validated = None
         elif inst_validated:
             inst_validated = inst_validated.first()
         else:
-            inst_validated = 'Wrong Institution Name'
+            inst_validated = None
            
 
 
