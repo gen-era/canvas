@@ -29,13 +29,15 @@
           </li>
         </ul>
       </nav>
-      <strong>Protocol ID:</strong>
+      <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+        <label for="protocol_id"><strong>Protocol ID:</strong></label>
       <input
         type="text"
         id="edit_protocol_id"
         name="protocol_id"
         value="{{ sample.protocol_id }}"
       />
+      </div>
     </header>
 
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
@@ -49,8 +51,9 @@
       <!-- Düzenlenebilir ve takvim ile seçilebilir -->
     </div>
 
-    <p>
-      <strong>Sex:</strong>
+    
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="sex"><strong>Sex:</strong></label>
       <select name="sex" id="edit_sex" class="form-control">
         <option value="" disabled hidden>{{ sample.get_sex_display }}</option>
         <option
@@ -64,26 +67,20 @@
         </option>
       </select>
       <!-- Düzenlenebilir -->
-    </p>
+    </div>
 
-    <p>
+    <div>
       <strong>Entry Date:</strong>
-      <input
-        type="date"
-        id="edit_entry_date"
-        name="entry_date"
-        value="{{ sample.entry_date }}"
-      />
-      <!-- Düzenlenebilir ve takvim ile seçilebilir -->
-    </p>
+      <span>{{ sample.entry_date }}</span> 
+    </div>
 
-    <p>
-      <strong>Sample Type:</strong>
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="sample_type"><strong>Sample Type::</strong></label>
       {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" selectedItem=sample.sample_type %}
-    </p>
+    </div>
 
-    <p>
-      <strong>Scan Date:</strong>
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="scan_date"><strong>Scan Date::</strong></label>
       <input
         type="date"
         id="edit_scan_date"
@@ -91,6 +88,6 @@
         value="{{ sample.scan_date }}"
       />
       <!-- Düzenlenebilir ve takvim ile seçilebilir -->
-    </p>
+    </div>
   </article>
 </form>
