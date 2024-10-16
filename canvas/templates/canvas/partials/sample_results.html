@@ -1,18 +1,17 @@
 {% if samples.number == 1 %}
-<div
-  class="badge"
-  :class="{'pico-background-green-400': {{ len_samples }} > 0,
+  <div
+    class="badge"
+    :class="{'pico-background-green-400': {{ len_samples }} > 0,
                 'pico-background-red-500': {{ len_samples }} == 0}"
->
-  Found {{ len_samples }} samples.
-</div>
-{% endif %} {% for sample in samples %}
-
-{% include 'canvas/partials/sample.html' with sample=sample %}
-
+  >
+    Found {{ len_samples }} samples.
+  </div>
+{% endif %}
+{% for sample in samples %}
+  {% include 'canvas/partials/sample.html' with sample=sample %}
 {% endfor %}
 {% if not samples.has_next %}
-    {% if len_samples != 0 %}
-        <div class="badge pico-background-orange-300">No more items</div>
-    {% endif %}
+  {% if len_samples != 0 %}
+    <div class="badge pico-background-orange-300">No more items</div>
+  {% endif %}
 {% endif %}

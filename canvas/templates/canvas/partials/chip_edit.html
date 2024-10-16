@@ -1,0 +1,65 @@
+{% load sortedchip %}
+
+<form>
+  <article class="chip-container">
+    <h2 style="display:inline">{{ chip }}</h2>
+    <span class="badge pico-background-orange-400"
+      >Editing
+      <i class="fa-solid fa-pencil"></i>
+    </span>
+
+    <nav style="float:right; transform:translateY(-25%);">
+      <ul>
+        <li>
+          <a
+            hx-post="{% url 'chip_edit' %}"
+            hx-target="closest form"
+            hx-swap="outerHTML swap:200ms"
+            hx-vals='{"chip_pk": "{{ chip.pk }}"}'
+            href="#"
+          >
+            <i class="fa-solid fa-check pico-color-green-500"></i>
+          </a>
+        </li>
+        <li>
+          <a
+            hx-post="{% url 'chip_edit' %}"
+            hx-target="closest form"
+            hx-swap="outerHTML swap:200ms"
+            hx-vals='{"chip_pk": "{{ chip.pk }}", "edit": "false"}'
+            href="#"
+          >
+            <i class="fa-solid fa-xmark pico-color-red-500"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <p>{{ chip.chip_type }}</p>
+    <div class="grid">
+      {% for chipsample_rows in chip|sortedchip %}
+        <div class="sample-row">
+          {% for chipsample in chipsample_rows %}
+            {% if chipsample.sample %}
+              <article class="sample">
+                <p>{{ chipsample.position }}</p>
+                {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" selectedItem=chipsample.sample %}
+                <input
+                  type="hidden"
+                  name="position"
+                  value="{{ chipsample.position }}"
+                />
+              </article>
+            {% else %}
+              <article class="sample">
+                <p>{{ chipsample }}</p>
+                {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" %}
+                <input type="hidden" name="position" value="{{ chipsample }}" />
+              </article>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </article>
+</form>

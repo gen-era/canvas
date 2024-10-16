@@ -7,26 +7,8 @@
 {% block content %}
   {% if user.is_authenticated %}
     <main
-      x-data="{
-        sidebar: { isExpanded: true },
-        views: { currentView: 'samplePage' },
-        collapseSampleSearch: false,
-        showSamplePage() {
-            this.views.currentView = 'samplePage';
-            $nextTick(() => { window.dispatchEvent(new Event('resize')); });
-        },
-        showSampleInput() {
-            this.views.currentView = 'sampleInput';
-        },
-        showAcmgLoss() {
-            this.views.currentView = 'acmgLoss';
-            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
-        },
-        showChipInput() {
-            this.views.currentView = 'chipInput';
-            this.collapseSampleSearch = false; // Ensure sample search is visible for other views
-        }
-    }"
+      x-data="main
+              "
       id="authenticated-content"
       class="container-fluid main"
     >
@@ -35,32 +17,69 @@
 
       <!-- Main content area -->
       <div>
-
-        <!-- Sample Search View -->
         <div
-          x-show="views.currentView === 'samplePage'"
-          class="container-fluid"
-          :class="collapseSampleSearch === false ? 'sample-container' : 'container'"
+          x-show="views.currentView === 'samples'"
+          x-transition
+          x-transition.duration.500ms
         >
+          <nav>
+            <ul>
+              <li>
+                <a
+                  data-tooltip="Hide/Show sample search component."
+                  data-placement="bottom"
+                  @click="sampleSearchOpen = !sampleSearchOpen"
+                >
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  Sample Search
+                </a>
+              </li>
+              <li>
+                <a
+                  data-tooltip="Add new samples."
+                  data-placement="bottom"
+                  @click="sampleFormOpen = !sampleFormOpen"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                  New Samples
+                </a>
+              </li>
+            </ul>
 
-          <div>
-            <a
-                @click="collapseSampleSearch = !collapseSampleSearch"
-            > Sample Search </a>
-            <div x-show="collapseSampleSearch === false">
+            <ul id="tab-buttons"></ul>
+            <ul></ul>
+          </nav>
+
+          <div
+            :class="(sampleSearchOpen === true && (sampleFormOpen === true || activeTab > 0)) ? 'sample-container' : 'container-fluid'"
+          >
+            <div x-show="sampleSearchOpen === true" x-transition>
               {% include "canvas/components/sample_search.html" %}
             </div>
-          </div>
 
-          <div>{% include "canvas/components/chipsample_tabs.html" %}</div>
+            <div x-show="sampleFormOpen === true" x-transition>
+              {% include "canvas/components/sample_input.html" %}
+            </div>
+
+            <div
+              x-show="activeTab > 0 && sampleFormOpen === false"
+              style="height:80vh"
+              x-transition
+            >
+              {% include "canvas/components/chipsample_tabs.html" %}
+            </div>
+          </div>
         </div>
-        <div x-show="views.currentView === 'sampleInput'">
-          {% include "canvas/components/sample_input.html" %}
+
+        <div
+          class="container-fluid"
+          x-show="views.currentView === 'chips'"
+          x-transition
+        >
+          {% include "canvas/components/chip_page.html" %}
         </div>
-        <div x-show="views.currentView === 'chipInput'">
-          {% include "canvas/components/chip_input.html" %}
-        </div>
-        <div x-show="views.currentView === 'acmgLoss'">
+
+        <div x-show="views.currentView === 'acmgLoss'" x-transition>
           {% include "canvas/components/acmg_loss.html" %}
         </div>
       </div>
@@ -129,15 +148,15 @@
     .dropdown > summary input:focus {
       box-shadow: none;
     }
-
     .badge {
       border-radius: 2em;
       padding: 0.2em 0.6em;
       display: inline-flex;
       align-items: center;
       gap: 0.3em;
+      transform: translateY(-15%);
+      margin-top: 5px;
     }
-
     .badge a {
       background: none;
       border: none;
@@ -147,9 +166,53 @@
       cursor: pointer;
       transition: color 0.3s ease;
     }
+    .htmx-swapping {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
   </style>
 
   <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("main", () => ({
+        sidebar: { isExpanded: true },
+        views: { currentView: "samples" },
+        sampleSearchOpen: true,
+        sampleFormOpen: false,
+        chipFormOpen: true,
+        activeTab: 0,
+
+        async init() {
+          this.updateViewFromURL();
+          this.$watch("views.currentView", () => this.updateURL());
+        },
+
+        updateViewFromURL() {
+          let qp = new URLSearchParams(window.location.search);
+          if (qp.get("view")) this.views.currentView = qp.get("view");
+        },
+
+        updateURL() {
+          let qp = new URLSearchParams();
+          if (this.views.currentView) qp.set("view", this.views.currentView);
+          history.replaceState(null, null, "?" + qp.toString());
+        },
+
+        showSamples() {
+          this.views.currentView = "samples";
+          this.$nextTick(() => {
+            window.dispatchEvent(new Event("resize"));
+          });
+        },
+        showAcmgLoss() {
+          this.views.currentView = "acmgLoss";
+        },
+        showChips() {
+          this.views.currentView = "chips";
+        },
+      }));
+    });
+
     function getSelectedInstitutions() {
       return Array.from(
         document.getElementsByClassName("selected-Institution-sample-search"),
@@ -165,6 +228,7 @@
       type,
       isSingleSelect = false,
       eventName = "",
+      selectedItem = null,
     ) {
       return {
         searchQuery: "",
@@ -200,9 +264,12 @@
           } else {
             this.selectedItems = this.selectedItems.filter((i) => i !== item);
           }
-          setTimeout(() => {
-            document.dispatchEvent(new Event("searchSamples")), 50;
-          });
+
+          if (this.eventName) {
+            setTimeout(() => {
+              document.dispatchEvent(new Event(eventName)), 50;
+            });
+          }
         },
         openDropdown() {
           this.open = true;
@@ -215,16 +282,15 @@
       };
     }
 
+    document.body.addEventListener("htmx:configRequest", (event) => {
+      const csrfToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("csrftoken="))
+        ?.split("=")[1];
 
-document.body.addEventListener('htmx:configRequest', (event) => {
-    const csrfToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken='))
-        ?.split('=')[1];
-
-    if (csrfToken) {
-        event.detail.headers['X-CSRFToken'] = csrfToken;
-    }
-});
+      if (csrfToken) {
+        event.detail.headers["X-CSRFToken"] = csrfToken;
+      }
+    });
   </script>
 {% endblock content %}

@@ -22,6 +22,7 @@ services:
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=1200s"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.cnvcanvas.com`)"
@@ -39,7 +40,6 @@ services:
     image: yserdem/canvas-web:latest
     command: bash /app/start.sh
     environment:
-      - HOST_IP=${HOST_IP}
       - HOST_NAME=cnvcanvas.com
       - SECRET_KEY=django-insecure-ax7b&dz))k(q0x+p=5f6wh0y@3k9nd=uu=!h6tmh&95xm(me@+
       - DEBUG=False
@@ -61,6 +61,11 @@ services:
       - "traefik.http.routers.canvas.entrypoints=websecure"
       - "traefik.http.routers.canvas.tls.certresolver=myresolver"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=5000000000"  # Set max request body size (5 GB)
+      - "traefik.http.middlewares.limit.buffering.memRequestBodyBytes=100000000"   # Buffer to disk after 100 MB
+      - "traefik.http.middlewares.limit.buffering.maxResponseBodyBytes=5000000000" # Set max response size (5 GB)
+      - "traefik.http.middlewares.limit.buffering.memResponseBodyBytes=100000000"  # Buffer response to disk after 100 MB
+      - "traefik.http.routers.canvas.middlewares=limit@docker"
     deploy:
       mode: replicated
       replicas: 3

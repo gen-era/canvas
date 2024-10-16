@@ -169,11 +169,6 @@ ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 
 DATA_UPLOAD_MAX_NUMBER_FILES = 10240  # higher than the count of fields
-DATA_UPLOAD_MAX_MEMORY_SIZE = 2000000000
-DATA_UPLOAD_MAX_NUMBER_FIELDS = None
-
-FILE_UPLOAD_MAX_MEMORY_SIZE = 2000000000
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

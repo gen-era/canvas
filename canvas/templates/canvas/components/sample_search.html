@@ -1,23 +1,23 @@
 <div>
-      <input
-          autocomplete="off"
-          id="sample-search"
-          type="search"
-          name="search"
-          placeholder="Sample Search..."
-          hx-get="{% url 'sample_search' %}"
-          hx-trigger="input changed delay:500ms, searchSamples from:document"
-          hx-target="next div.container"
-          hx-vals='js:{"page": 1, "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
-      />
+  <input
+    autocomplete="off"
+    id="sample-search"
+    type="search"
+    name="search"
+    placeholder="Sample Search..."
+    hx-get="{% url 'sample_search' %}"
+    hx-trigger="input changed delay:500ms, searchSamples from:document"
+    hx-target="#sample-search-results"
+    hx-swap="swap:200ms"
+    hx-vals='js:{"page": 1, "institutions": getSelectedInstitutions(), "chips": getSelectedChips()}'
+  />
 
-      <div class="grid">
-          {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" label="sample-search" isSingleSelect="false" eventName="searchSamples"%}
+  <div class="grid">
+    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" label="sample-search" isSingleSelect="false" eventName="searchSamples" %}
+    {% include 'canvas/components/generic_search.html' with model_name="Chip" field_name="chip_id" label="sample-search" isSingleSelect="false" eventName="searchSamples" %}
+  </div>
 
-          {% include 'canvas/components/generic_search.html' with model_name="Chip" field_name="chip_id" label="sample-search" isSingleSelect="false" eventName="searchSamples" %}
-      </div>
-
-    <div class="container" style="overflow:auto; height:90vh;">
-        {% include "canvas/partials/sample_results.html" %}
-    </div>
+  <div id="sample-search-results" style="overflow:auto; height:80vh;">
+    {% include "canvas/partials/sample_results.html" %}
+  </div>
 </div>

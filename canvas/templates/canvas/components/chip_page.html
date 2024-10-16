@@ -1,0 +1,82 @@
+<nav>
+  <ul>
+    <li>
+      <a
+        data-tooltip="Upload new idats."
+        data-placement="bottom"
+        @click="chipFormOpen = !chipFormOpen"
+      >
+        <i class="fa-solid fa-plus"></i>
+        New Chip
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<input
+  autocomplete="off"
+  id="chip-search"
+  type="search"
+  name="search"
+  placeholder="Chip search start by tying in barcode"
+  hx-get="{% url 'chip_search' %}"
+  hx-trigger="input changed delay:500ms, searchChips from:document"
+  hx-target="#chips"
+  hx-swap="swap:200ms"
+/>
+
+<div class="overflow-auto" style="height:86vh; width:88vw;">
+  <div class="grid-container">
+    <article
+      class="chip-container"
+      x-show="chipFormOpen === true"
+      x-transition
+      x-transition.duration.200ms
+    >
+      <header>
+        <h3>New Chip</h3>
+      </header>
+      <div class="chip_upload">
+        {% include 'canvas/components/idat_upload.html' %}
+      </div>
+    </article>
+
+    <div id="chips" class="grid-container">
+      {% include 'canvas/partials/chips.html' with chips=chips %}
+    </div>
+  </div>
+</div>
+
+<script>
+  function getSelectedChipType(label) {
+    return Array.from(
+      document.getElementsByClassName(`selected-ChipType-${label}`),
+    ).map((e) => e.innerText);
+  }
+</script>
+<style>
+  .grid-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+  }
+
+  .chip-container {
+    flex: 0 0 18vw; /* Each chip takes up 20% of the viewport width */
+    padding: 1rem;
+    min-width: 18vw;
+  }
+
+  .sample-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sample {
+    min-width: 8vw;
+    min-height: 8vh;
+    height: 8vh;
+    width: 8vw;
+  }
+</style>

@@ -1,3 +1,11 @@
+import json
+import os
+import secrets
+import socket
+import struct
+import subprocess
+import tempfile
+from datetime import timedelta
 from http.client import HTTPResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
@@ -5,38 +13,106 @@ from django.apps import apps
 from django_htmx.http import retarget
 from django.db import transaction
 from django.shortcuts import HttpResponse
-from django.utils import timezone
-from django.http import QueryDict
 from django.utils.dateparse import parse_date
+from django.utils import timezone
+from django.conf import settings
 
+import minio
+from django.apps import apps
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db import transaction
+from django.shortcuts import HttpResponse, render
+from django.utils import timezone
+from django_htmx.http import retarget
 
 from canvas.models import (
-    Sample,
-    ChipSample,
-    Institution,
     IDAT,
-    SampleType,
-    ChipType,
     Chip,
+    ChipSample,
+    ChipType,
+    Institution,
     Lot,
+    Sample,
+    SampleType,
 )
-from django.contrib.auth.decorators import login_required
 
-from datetime import timedelta
-import json
 
-import secrets
-import minio
-import os
-import subprocess
+def get_default_gateway_linux():
+    """Read the default gateway directly from /proc."""
+    with open("/proc/net/route") as fh:
+        for line in fh:
+            fields = line.strip().split()
+            if fields[1] != "00000000" or not int(fields[3], 16) & 2:
+                # If not default route or not RTF_GATEWAY, skip it
+                continue
+
+            return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+
+
+def get_version():
+    with open(settings.BASE_DIR.joinpath(".git/ORIG_HEAD")) as f:
+        return f.read().splitlines()[0][:6]
+
+
+def start_run(chip_id):
+    if not settings.DEBUG:
+        HOST_IP = get_default_gateway_linux()
+        MINIO_IP = socket.gethostbyname("minio")
+        label = secrets.token_urlsafe(6)
+
+        with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
+            fp.write(
+                f"""
+                aws {{
+                access_key = "{settings.MINIO_STORAGE_ACCESS_KEY}"
+                secret_key = "{settings.MINIO_STORAGE_SECRET_KEY}"
+                client {{
+                    endpoint = "http://{MINIO_IP}:9000"
+                }}
+                }}
+                profiles {{
+                docker {{
+                    docker.enabled = true
+                }}
+                }}
+                """
+            )
+            fp.close()
+            subprocess.run(
+                f"scp {fp.name} canvas@{HOST_IP}:/tmp/",
+                shell=True,
+            )
+
+        subprocess.run(
+            f"ssh canvas@{HOST_IP} tsp -L {label} nextflow /home/canvas/canvas-pipeline/main.nf \
+                                                --chip_id {chip_id} \
+                                                --bpm analysis_files/manifest-cluster/GSACyto_20044998_A1.bpm \
+                                                --csv analysis_files/manifest-cluster/GSACyto_20044998_A1.csv \
+                                                --egt analysis_files/manifest-cluster/2003.egt \
+                                                --fasta analysis_files/GRCh37_genome.fa \
+                                                --pfb analysis_files/PennCNV/test/out.pfb \
+                                                --band canvas-pipeline/hg19_chrom_band.txt \
+                                                --tex_template canvas-pipeline/template/base_template.tex \
+                                                --output_dir canvas-pipeline-demo-results/ \
+                                                -c {fp.name} \
+                                                -profile docker",
+            shell=True,
+        )
 
 
 def index(request):
 
     samples = Sample.objects.order_by("-entry_date")
     len_samples = len(samples)
-    paginator = Paginator(samples, 12)
-    samples = paginator.get_page(1)
+    sample_paginator = Paginator(samples, 12)
+    samples = sample_paginator.get_page(1)
+
+    chips = Chip.objects.order_by("-entry_date")
+    len_chips = len(chips)
+    chip_paginator = Paginator(chips, 12)
+    chips = chip_paginator.get_page(1)
 
     label = secrets.token_urlsafe(6)
     return render(
@@ -44,9 +120,12 @@ def index(request):
         "canvas/index.html",
         {
             "title": "Index",
-            "samples": samples,
             "label": label,
+            "samples": samples,
             "len_samples": len_samples,
+            "chips": chips,
+            "len_chips": len_chips,
+            "canvas_version": get_version(),
         },
     )
 
@@ -82,6 +161,26 @@ def generic_search(request, model_name, field_name):
             "model_name": model_name,
             "field_name": field_name,
         },
+    )
+
+
+@login_required
+def chip_search(request):
+    query = request.GET.get("search", "").strip()
+    page = request.GET.get("page")
+
+    chips = Chip.objects.filter(chip_id__contains=query)
+
+    chips = chips.order_by("-entry_date")
+    len_chips = len(chips)
+
+    paginator = Paginator(chips, 12)
+    chips = paginator.get_page(page)
+
+    return render(
+        request,
+        "canvas/partials/chips.html",
+        {"chips": chips, "query": query, "len_chips": len_chips},
     )
 
 
@@ -196,6 +295,48 @@ def sample_edit(request):
 
 
 @login_required
+def chip_edit(request):
+    if request.method == "GET":
+        chip_pk = request.GET.get("chip_pk")
+        chip = Chip.objects.get(id=chip_pk)
+        return render(
+            request, "canvas/partials/chip_edit.html", {"chip": chip}
+        )  # For debugging
+
+    if request.method == "POST":
+        chip_pk = request.POST.get("chip_pk")
+        chip = Chip.objects.get(id=chip_pk)
+
+        edit = request.POST.get("edit", None)
+        if edit == "false":
+            return render(
+                request, "canvas/partials/chip.html", {"chip": chip}
+            )  # For debugging
+
+        positions = request.POST.getlist("position")
+        samples = request.POST.getlist("Sample")
+
+        for position, sample_pk in zip(positions, samples):
+            if sample_pk.strip():
+                sample = Sample.objects.get(pk=int(sample_pk))
+
+                chipsample = ChipSample.objects.filter(
+                    chip=chip, position=position
+                ).first()
+                if chipsample:
+                    chipsample.sample = sample
+                    chipsample.save()
+                else:
+                    ChipSample.objects.create(
+                        chip=chip, position=position, sample=sample
+                    )
+
+        if not chipsample.call_rate:
+            start_run(chip.chip_id)
+        return render(request, "canvas/partials/chip.html", {"chip": chip})
+
+
+@login_required
 def get_sample_input_row(request):
     label = secrets.token_urlsafe(6)
     return render(request, "canvas/partials/sample_input_row.html", {"label": label})
@@ -284,10 +425,6 @@ def create_report(request):
     form_data = dict(request.POST)
     print(form_data)
     return HTTPResponse("hi")
-    # return render(
-    #     request,
-    #     "canvas/partials/sample_input_.html",
-    # )
 
 
 def get_reports(request):
@@ -303,87 +440,31 @@ def get_reports(request):
     return render(request, "canvas/partials/report_list.html", context=context)
 
 
-def get_chip_type_size(request):
-    query = request.GET.get("chipType", "").strip()
-    chip_type = ChipType.objects.get(name=query)
-
-    # Generate the card positions based on the chip size
-    num_rows = [f"{i:02d}" for i in range(1, chip_type.rows + 1)]
-    num_cols = [f"{i:02d}" for i in range(1, chip_type.cols + 1)]
-
-    return render(
-        request,
-        "canvas/partials/chip_cards_template.html",
-        {"num_rows": num_rows, "num_cols": num_cols, "chip_type": chip_type},
-    )
-
-
-@login_required
-def save_chip_input(request):
-    if request.method == "POST":
-        lot_number = request.POST.get("lot")
-        chip_barcode = request.POST.get("chip_barcode")
-        chip_type_name = request.POST.get("chip_type")
-
-        lot, created = Lot.objects.get_or_create(
-            lot_number=lot_number, defaults={"arrival_date": timezone.now()}
-        )
-
-        chip_type = ChipType.objects.get(name=chip_type_name)
-
-        # Create the Chip instance
-        chip = Chip.objects.create(
-            chip_id=chip_barcode,
-            chip_type=chip_type,
-            lot=lot,
-            lab_practitioner=request.user,
-            protocol_start_date=timezone.now(),
-            scan_date=timezone.now(),
-        )
-
-        # Get positions and samples from the form data
-        positions = request.POST.getlist("position")
-        samples = request.POST.getlist("Sample")
-
-        # Iterate over positions and samples
-        for position, sample_id in zip(positions, samples):
-            if sample_id.strip():  # Ensure the sample_id is not empty
-                sample_pk = int(sample_id)
-                sample = Sample.objects.get(pk=sample_pk)
-
-                # Create the ChipSample instance
-                ChipSample.objects.create(sample=sample, chip=chip, position=position)
-        context = {}
-
-        return render(request, "canvas/partials/chip_input_results.html", context)
-
-
-#    HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
-#    label = secrets.token_urlsafe(6)
-#    subprocess.run(
-#        f"ssh canvas@{HOST_IP} tsp -L {label} nextflow run hello",
-#        shell=True,
-#    )
-
-
 def idat_upload(request):
     if request.method == "POST":
         files = request.FILES.getlist("files")
         uploaded_files = []
         errors = []
 
+        chip_type_pk = request.POST.get("ChipType")
+        chip_type = ChipType.objects.get(pk=int(chip_type_pk[0]))
+
         for file in files:
             if file.name.endswith(".idat"):
                 try:
-                    # Extract chip_id logic (from file or directory name)
                     chip_id, position = file.name.split("_")[:2]
-
-                    # Get or create ChipSample instance using chip_id
-                    chipsample = ChipSample.objects.get(
-                        chip__chip_id=chip_id, position=position
+                    chip, created = Chip.objects.get_or_create(
+                        chip_id=chip_id,
+                        defaults={
+                            "chip_type": chip_type,
+                            "lab_practitioner": request.user,
+                            "protocol_start_date": timezone.now(),
+                            "scan_date": timezone.now(),
+                        },
                     )
-
-                    # Save the file in the IDAT model and link it to ChipSample
+                    chipsample, created = ChipSample.objects.get_or_create(
+                        chip=chip, position=position
+                    )
                     idat_file = IDAT.objects.create(idat=file, chipsample=chipsample)
                     uploaded_files.append(idat_file)
                 except Exception as e:
@@ -396,17 +477,12 @@ def idat_upload(request):
         return render(request, "canvas/partials/idat_upload_results.html", context)
 
 
-import openpyxl
+from .read_sample_from_excel import generate_data_list
 
 
 def upload_excel(request):
-    prot_id_list = ["Genetik Protokol No", "Protokol No"]
-    inst_list = ["Bölge", "Kurum"]
-
     excel_file = request.FILES.get("excel_file")
-    wb = openpyxl.load_workbook(excel_file)
-    sheet = wb.active
-    row_range = sheet.max_row
-
-    context = {}
-    return render(request, "canvas/partials/sample_input_row.html", context)
+    sample_list = generate_data_list(excel_file)
+    context = {"sample_list": sample_list}
+    print(context)
+    return render(request, "canvas/partials/samples_from_excel.html", context)

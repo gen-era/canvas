@@ -68,7 +68,10 @@ class ChipSampleAdmin(admin.ModelAdmin):
     autocomplete_fields = ["sample", "chip"]
 
     def protocol_id(self, obj):
-        return obj.sample.protocol_id
+        if obj.sample:
+            return obj.sample.protocol_id
+        else:
+            return "No sample yet"
 
 
 class IDATAdmin(admin.ModelAdmin):
@@ -77,7 +80,8 @@ class IDATAdmin(admin.ModelAdmin):
 
     def protocol_id(self, obj):
         if obj.chipsample:
-            return obj.chipsample.sample.protocol_id
+            if obj.chipsample.sample:
+                return obj.chipsample.sample.protocol_id
         else:
             return "none"
 

@@ -1,27 +1,38 @@
-<button @click="
+<li>
+  <button
+    @click="
         activeTab = {{ chipsample.pk }};
         igv_browsers['{{ chipsample.pk }}'].then(browser => {
             setTimeout(() => {
                 browser.visibilityChange(), 50
             });
         });
-    " x-init="activeTab = {{ chipsample.pk }}" class="tab-button" style="padding:0.2em"
+        sampleFormOpen = false;
+    "
+    x-init="activeTab = {{ chipsample.pk }}"
+    class="tab-button outline"
+    style="padding:0.2em"
     :class="activeTab === {{ chipsample.pk }} ? 'primary outline' : 'secondary outline'"
-    id="tab-button-{{ chipsample.pk }}">
+    id="tab-button-{{ chipsample.pk }}"
+  >
     <span style="font-size:small;">
-        {{ chipsample.sample.protocol_id }}
+      {{ chipsample.sample.protocol_id }}
 
-        <br>
-        {{ chipsample.chip.chip_id }} - {{ chipsample.position }}
+      <br />
+      {{ chipsample.chip.chip_id }} - {{ chipsample.position }}
     </span>
 
-    <span @click="
+    <span
+      @click="
         document.getElementById('tab-button-{{ chipsample.pk }}').remove();
         document.getElementById('tab-content-{{ chipsample.pk }}').remove();
         if (activeTab === {{ chipsample.pk }}) {
             const remainingTabs = Array.from(document.querySelectorAll('.tab-button')).map(btn => parseInt(btn.id.replace('tab-button-', '')));
             activeTab = remainingTabs.length > 0 ? remainingTabs[remainingTabs.length - 1] : null;
         }
-        ">  &times;</span>
-
-</button>
+        "
+    >
+      <i class="fa-solid fa-xmark pico-color-red-500"></i>
+    </span>
+  </button>
+</li>
