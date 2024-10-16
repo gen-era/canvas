@@ -7,7 +7,7 @@ from django.db import transaction
 from django.shortcuts import HttpResponse
 from django.utils import timezone
 from django.http import QueryDict
-from django.http import JsonResponse
+from django.utils.dateparse import parse_date
 
 
 from canvas.models import (
@@ -158,12 +158,47 @@ def chipsample_tab_content(request):
         },
     )
 
-def sample_edit(request):
-    sample_pk = request.GET.get("sample_pk")
-    print(sample_pk)
-    sample = Sample.objects.get(id=sample_pk)
-    return render(request, "canvas/partials/sample_edit.html", {'sample': sample}) # For debugging
+# def sample_edit(request):
+#     sample_pk = request.GET.get("sample_pk")
+#     print(sample_pk)
+#     sample = Sample.objects.get(id=sample_pk)
+#     return render(request, "canvas/partials/sample_edit.html", {'sample': sample}) # For debugging
 
+
+@login_required
+def sample_edit(request):
+    if request.method == "GET":
+        sample_pk = request.GET.get("sample_pk")
+        sample = Sample.objects.get(id=sample_pk)
+        return render(
+            request, "canvas/partials/sample_edit.html", {"sample": sample}
+        )  # For debugging
+
+    if request.method == "POST":
+        
+        sample_pk = request.POST.get("sample_pk")
+        sample = Sample.objects.get(id=sample_pk)
+
+        protocol_id = request.POST.get("protocol_id")
+        arrival_date = request.POST.get("arrival_date")
+        scan_date = request.POST.get("scan_date")
+        sex = request.POST.get("sex")
+        print(protocol_id, arrival_date, scan_date)
+
+        edit = request.POST.get("edit", None)
+        if edit == "false":
+            return render(
+                request, "canvas/partials/sample.html", {"sample": sample}
+            )  # For debugging
+
+        sample.protocol_id = protocol_id
+        sample.arrival_date = parse_date(arrival_date)
+        sample.scan_date = parse_date(scan_date)
+        sample.sex = sex
+        
+        sample.save()
+
+        return render(request, "canvas/partials/sample.html", {"sample": sample})
 
 # def sample_edit_save(request):
 #     if request.method == "PUT":
@@ -180,25 +215,101 @@ def sample_edit(request):
 #         sample.save()
 #         return    
     
-def sample_edit_save(request):
-    if request.method == "PUT":
-        put_data = QueryDict(request.body.decode('utf-8'))
-        sample_pk = put_data.get("sample_pk")
-        protocol_id = put_data.get("protocol_id")
-        sex = put_data.get("sex")
+# def sample_edit_save(request):
+#     edit = request.POST.get("edit", None)
 
-        try:
-            sample = Sample.objects.get(pk=sample_pk)  # pk anahtarını doğru kullanıyoruz
-            sample.protocol_id = protocol_id
-            sample.sex = sex
-            sample.save()
+#     if request.method == "PUT":
+#         put_data = QueryDict(request.body.decode('utf-8'))
+#         sample_pk = put_data.get("sample_pk")
+#         protocol_id = put_data.get("protocol_id")
+#         arrival_date = put_data.get("arrival_date")
+#         scan_date = put_data.get("scan_date")
+#         entry_date = put_data.get("entry")
+#         sex = put_data.get("sex")
 
-            return JsonResponse({"status": "success", "message": "Sample updated successfully"})
+#         if edit == "false":
+#             # Edit iptal edildiyse, sadece işlemi sonlandır ve hiçbir yanıt döndürme
+#             return  # Hiçbir yanıt döndürmeden çık
+
+#         try:
+#             sample = Sample.objects.get(pk=sample_pk)
+#             sample.protocol_id = protocol_id
+#             sample.sex = sex
+
+#             if arrival_date:
+#                 sample.arrival_date = parse_date(arrival_date)  # Tarihleri parse et
+#             if scan_date:
+#                 sample.scan_date = parse_date(scan_date)
+#             if entry_date:
+#                 sample.entry_date = parse_date(entry_date)
+
+#             sample.save()
+
+#             return HttpResponse("")
         
-        except Sample.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "Sample not found"}, status=404)
+#         except Sample.DoesNotExist:
+#             return HttpResponse("Sample not found", status=404)
 
-    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+#     if edit is None:
+#         sample_pk = request.POST.get("sample_pk")
+#         try:
+#             sample = Sample.objects.get(pk=sample_pk)
+#             return render(request, "canvas/partials/sample_results.html", {'sample': sample})  # Yeni yol burada
+#         except Sample.DoesNotExist:
+#             return HttpResponse("Sample not found", status=404)
+
+#     return 
+
+
+
+# def sample_edit_save(request):
+#     # POST isteğinde "edit" parametresini kontrol et
+#     edit = request.POST.get("edit", None)
+
+#     if request.method == "PUT":
+#         put_data = QueryDict(request.body.decode('utf-8'))
+#         sample_pk = put_data.get("sample_pk")
+#         protocol_id = put_data.get("protocol_id")
+#         sex = put_data.get("sex")
+
+#         if edit== "false":
+#         # Eğer edit parametresi yoksa sample_result.html'yi render et
+#             return render(request, "canvas/partials/sample_results.html", {'sample': sample})
+
+#         try:
+#             sample = Sample.objects.get(pk=sample_pk)
+#             sample.protocol_id = protocol_id
+#             sample.sex = sex
+#             sample.save()
+
+#             return
+        
+#         except Sample.DoesNotExist:
+#             return HttpResponse("Sample not found", status=404)
+
+
+
+
+# def sample_edit_save(request):
+#     if request.method == "PUT":
+#         put_data = QueryDict(request.body.decode('utf-8'))
+#         sample_pk = put_data.get("sample_pk")
+#         protocol_id = put_data.get("protocol_id")
+#         sex = put_data.get("sex")
+
+#         try:
+#             sample = Sample.objects.get(pk=sample_pk)  # pk anahtarını doğru kullanıyoruz
+#             sample.protocol_id = protocol_id
+#             sample.sex = sex
+#             sample.save()
+
+#             return JsonResponse({"status": "success", "message": "Sample updated successfully"})
+        
+#         except Sample.DoesNotExist:
+#             return JsonResponse({"status": "error", "message": "Sample not found"}, status=404)
+
+#     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
    
 @login_required
 def get_sample_input_row(request):

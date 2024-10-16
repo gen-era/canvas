@@ -31,6 +31,4 @@ urlpatterns = [
     path("save_chip_input/", views.save_chip_input, name="save_chip_input"),
     path("upload_excel/", views.upload_excel, name="upload_excel"),
     path("sample_edit/", views.sample_edit, name="sample_edit"),
-    path("sample_edit_save/", views.sample_edit_save, name="sample_edit_save"),
-
 ]
