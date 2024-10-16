@@ -276,6 +276,8 @@ def sample_edit(request):
         arrival_date = request.POST.get("arrival_date")
         scan_date = request.POST.get("scan_date")
         sex = request.POST.get("sex")
+        sample_type_id = request.POST.get("SampleType")
+        
         print(protocol_id, arrival_date, scan_date)
 
         edit = request.POST.get("edit", None)
@@ -288,6 +290,7 @@ def sample_edit(request):
         sample.arrival_date = parse_date(arrival_date)
         sample.scan_date = parse_date(scan_date)
         sample.sex = sex
+        sample_type = SampleType.objects.get(pk=sample_type_id)
 
         sample.save()
 
