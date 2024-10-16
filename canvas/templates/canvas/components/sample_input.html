@@ -1,3 +1,13 @@
+<form id="upload-form" 
+          hx-post="upload_excel/" 
+          hx-trigger="change from:input[name='excel_file']" 
+          hx-encoding="multipart/form-data"
+          hx-target="#sample-input-rows"
+          hx-swap="outerHTML"
+          >
+  <input type="file" name="excel_file" accept=".xlsx, .xls, .csv, .tsv" required>
+</form>
+
 <form
   id="sample-input-form"
   class="container-fluid"

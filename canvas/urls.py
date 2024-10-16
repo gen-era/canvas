@@ -29,4 +29,8 @@ urlpatterns = [
     path("get_reports/", views.get_reports, name="get_reports"),
     path("chip_edit/", views.chip_edit, name="chip_edit"),
     path("chip_search", views.chip_search, name="chip_search"),
+    path("get_chip_type_size/", views.get_chip_type_size, name="get_chip_type_size"),
+    path("save_chip_input/", views.save_chip_input, name="save_chip_input"),
+    path("upload_excel/", views.upload_excel, name="upload_excel"),
+
 ]

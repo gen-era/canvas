@@ -430,3 +430,11 @@ def idat_upload(request):
         # Render the uploaded files and error messages into HTML
         context = {"uploaded_files": uploaded_files, "errors": errors}
         return render(request, "canvas/partials/idat_upload_results.html", context)
+    
+from .read_sample_from_excel import generate_data_list
+def upload_excel(request):
+    excel_file = request.FILES.get('excel_file')
+    sample_list = generate_data_list(excel_file)
+    context = {"sample_list":sample_list}
+    print(context)
+    return render(request, 'canvas/partials/samples_from_excel.html', context)

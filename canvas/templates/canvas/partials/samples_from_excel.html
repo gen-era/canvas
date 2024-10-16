@@ -1,0 +1,19 @@
+<div id="sample-input-rows">
+    <!-- Table Header -->
+    <div class="grid">
+
+        <div>Protocol ID</div>
+        <div>Institution</div>
+        <div>Sample Type</div>
+        <div>Arrival Date</div>
+        <div>Study Date</div>
+        <div>Description</div>
+        <div>Sex</div>
+        <div>Concentration</div>
+        <div>Repeat</div>
+        <div>Remove row</div>
+    </div>
+    {% for entry in sample_list %}
+        {% include 'canvas/partials/sample_input_row.html' with institute=entry.inst protocol_id=entry.prot_id arrival_date=entry.arrival_date %}
+    {% endfor %}
+</div>
