@@ -5,6 +5,8 @@ from canvas.models import ChipSample, BedGraph, CNV
 import csv
 import tempfile
 from collections import defaultdict
+from django.conf import settings
+
 
 class Command(BaseCommand):
     help = "Associate files with ChipSample models"
@@ -20,10 +22,18 @@ class Command(BaseCommand):
         bucket_name = options["bucket_name"]
 
         # MinIO client setup
-        client = Minio("minio:9000", "minio", "minio123", secure=False)
+        client = Minio(
+            settings.MINIO_STORAGE_ENDPOINT,
+            settings.MINIO_STORAGE_ACCESS_KEY,
+            settings.MINIO_STORAGE_SECRET_KEY,
+            secure=False,
+        )
 
         def list_files(prefix):
-            return [i.object_name for i in client.list_objects(bucket_name, prefix, recursive=True)]
+            return [
+                i.object_name
+                for i in client.list_objects(bucket_name, prefix, recursive=True)
+            ]
 
         def download_file(object_name):
             tmp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -32,7 +42,7 @@ class Command(BaseCommand):
 
         def extract_position(filename):
             """Extracts position from filenames using regex like 'R02C03' or 'R01C04'."""
-            match = re.search(r'R\d{2}C\d{2}', filename)
+            match = re.search(r"R\d{2}C\d{2}", filename)
             return match.group(0) if match else None
 
         def gather_scoresheets():
@@ -45,7 +55,8 @@ class Command(BaseCommand):
             files = list_files(f"chip_data/{chip_id}/ClassifyCNV/")
             return {
                 extract_position(file): download_file(file)
-                for file in files if file.endswith("Scoresheet.txt") and extract_position(file)
+                for file in files
+                if file.endswith("Scoresheet.txt") and extract_position(file)
             }
 
         def gather_cnvs():
@@ -58,7 +69,8 @@ class Command(BaseCommand):
             files = list_files(f"chip_data/{chip_id}/cnvs/")
             return {
                 extract_position(file): download_file(file)
-                for file in files if "iscn" in file and extract_position(file)
+                for file in files
+                if "iscn" in file and extract_position(file)
             }
 
         def gather_bedgraphs():
@@ -73,7 +85,9 @@ class Command(BaseCommand):
             for file in files:
                 position = extract_position(file)
                 if position:
-                    bedgraph_dict[position].append(file)  # Append the file path to the list for that position
+                    bedgraph_dict[position].append(
+                        file
+                    )  # Append the file path to the list for that position
             return bedgraph_dict
 
         def process_cnv_file(file_path):
@@ -114,7 +128,9 @@ class Command(BaseCommand):
                 reader = csv.DictReader(f, delimiter="\t")
                 for row in reader:
                     variant_id = row["VariantID"]
-                    clean_variant_id = variant_id.replace("_DEL", "").replace("_DUP", "")
+                    clean_variant_id = variant_id.replace("_DEL", "").replace(
+                        "_DUP", ""
+                    )
                     scoresheet_data[clean_variant_id] = dict(row)
             return scoresheet_data
 
@@ -132,10 +148,14 @@ class Command(BaseCommand):
                 cnvs[variant_id] = merged_dict
 
             try:
-                chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
+                chipsample = ChipSample.objects.get(
+                    chip__chip_id=chip_id, position=position
+                )
             except ChipSample.DoesNotExist:
                 self.stdout.write(
-                    self.style.ERROR(f"ChipSample not found for {chip_id} position {position}")
+                    self.style.ERROR(
+                        f"ChipSample not found for {chip_id} position {position}"
+                    )
                 )
                 continue
 
@@ -144,21 +164,34 @@ class Command(BaseCommand):
                     variant_id=variant_id, cnv_json=cnv, chipsample=chipsample
                 )
                 if created:
-                    self.stdout.write(self.style.SUCCESS(f"Saved CNV {variant_id} to {chipsample}"))
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Saved CNV {variant_id} to {chipsample}")
+                    )
                 else:
                     self.stdout.write(
-                        self.style.WARNING(f"CNV {variant_id} for {chipsample} already exists.")
+                        self.style.WARNING(
+                            f"CNV {variant_id} for {chipsample} already exists."
+                        )
                     )
 
         bedgraphs = gather_bedgraphs()
-        for position, bedgraph_paths in bedgraphs.items():  # Note that bedgraph_paths is now a list
+        for (
+            position,
+            bedgraph_paths,
+        ) in bedgraphs.items():  # Note that bedgraph_paths is now a list
             try:
-                chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
+                chipsample = ChipSample.objects.get(
+                    chip__chip_id=chip_id, position=position
+                )
             except ChipSample.DoesNotExist:
-                self.stdout.write(self.style.ERROR(f"ChipSample not found for position {position}"))
+                self.stdout.write(
+                    self.style.ERROR(f"ChipSample not found for position {position}")
+                )
                 continue
 
-            for bedgraph_path in bedgraph_paths:  # Iterate over the list of bedgraph paths
+            for (
+                bedgraph_path
+            ) in bedgraph_paths:  # Iterate over the list of bedgraph paths
                 bedgraph_type = bedgraph_path.split(".")[1].upper()
                 bg, created = BedGraph.objects.get_or_create(
                     chipsample=chipsample,
@@ -166,14 +199,22 @@ class Command(BaseCommand):
                     bedgraph=bedgraph_path,  # Save the MinIO path without downloading
                 )
                 if created:
-                    self.stdout.write(self.style.SUCCESS(f"Saved BedGraph {bedgraph_path} to {chipsample}"))
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Saved BedGraph {bedgraph_path} to {chipsample}"
+                        )
+                    )
                 else:
                     self.stdout.write(
-                        self.style.WARNING(f"BedGraph {bedgraph_path} for {chipsample} already exists.")
+                        self.style.WARNING(
+                            f"BedGraph {bedgraph_path} for {chipsample} already exists."
+                        )
                     )
 
         # Process quality metrics
-        gt_sample_summary = list_files(f"chip_data/{chip_id}/gtcs/gt_sample_summary.csv")[0]
+        gt_sample_summary = list_files(
+            f"chip_data/{chip_id}/gtcs/gt_sample_summary.csv"
+        )[0]
         gt_sample_summary_path = download_file(gt_sample_summary)
 
         with open(gt_sample_summary_path, "r") as f:
@@ -182,11 +223,15 @@ class Command(BaseCommand):
                 # Extract position using regex
                 position = extract_position(sample[0])
                 if not position:
-                    self.stdout.write(self.style.ERROR(f"Position not found in {sample[0]}"))
+                    self.stdout.write(
+                        self.style.ERROR(f"Position not found in {sample[0]}")
+                    )
                     continue
 
                 try:
-                    chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
+                    chipsample = ChipSample.objects.get(
+                        chip__chip_id=chip_id, position=position
+                    )
                     chipsample.autosomal_call_rate = sample[3]
                     chipsample.call_rate = sample[4]
                     chipsample.lrr_std_dev = sample[5]
@@ -194,7 +239,11 @@ class Command(BaseCommand):
                     chipsample.save()
                 except ChipSample.DoesNotExist:
                     self.stdout.write(
-                        self.style.ERROR(f"ChipSample not found for position {position}")
+                        self.style.ERROR(
+                            f"ChipSample not found for position {position}"
+                        )
                     )
                     continue
-                self.stdout.write(self.style.SUCCESS(f"Updated quality metrics for {chipsample}"))
+                self.stdout.write(
+                    self.style.SUCCESS(f"Updated quality metrics for {chipsample}")
+                )
