@@ -18,7 +18,7 @@ from canvas.models import (
     SampleType,
     ChipType,
     Chip,
-    Lot
+    Lot,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -158,12 +158,6 @@ def chipsample_tab_content(request):
         },
     )
 
-# def sample_edit(request):
-#     sample_pk = request.GET.get("sample_pk")
-#     print(sample_pk)
-#     sample = Sample.objects.get(id=sample_pk)
-#     return render(request, "canvas/partials/sample_edit.html", {'sample': sample}) # For debugging
-
 
 @login_required
 def sample_edit(request):
@@ -175,7 +169,7 @@ def sample_edit(request):
         )  # For debugging
 
     if request.method == "POST":
-        
+
         sample_pk = request.POST.get("sample_pk")
         sample = Sample.objects.get(id=sample_pk)
 
@@ -195,122 +189,12 @@ def sample_edit(request):
         sample.arrival_date = parse_date(arrival_date)
         sample.scan_date = parse_date(scan_date)
         sample.sex = sex
-        
+
         sample.save()
 
         return render(request, "canvas/partials/sample.html", {"sample": sample})
 
-# def sample_edit_save(request):
-#     if request.method == "PUT":
-#         put_data = QueryDict(request.body.decode('utf-8'))
-#         sample_pk = put_data.get("sample_pk")
-#         protocol_id = put_data.get("protocol_id")
-#         sex = put_data.get("sex")
-#         print("Sample PK:", sample_pk)
-#         print("Protocol ID:", protocol_id)
-#         print("Sex:", sex)
-#         sample = Sample.objects.get("sample_pk")
-#         sample.protocol_id= protocol_id
-#         sample.sex= sex
-#         sample.save()
-#         return    
-    
-# def sample_edit_save(request):
-#     edit = request.POST.get("edit", None)
 
-#     if request.method == "PUT":
-#         put_data = QueryDict(request.body.decode('utf-8'))
-#         sample_pk = put_data.get("sample_pk")
-#         protocol_id = put_data.get("protocol_id")
-#         arrival_date = put_data.get("arrival_date")
-#         scan_date = put_data.get("scan_date")
-#         entry_date = put_data.get("entry")
-#         sex = put_data.get("sex")
-
-#         if edit == "false":
-#             # Edit iptal edildiyse, sadece işlemi sonlandır ve hiçbir yanıt döndürme
-#             return  # Hiçbir yanıt döndürmeden çık
-
-#         try:
-#             sample = Sample.objects.get(pk=sample_pk)
-#             sample.protocol_id = protocol_id
-#             sample.sex = sex
-
-#             if arrival_date:
-#                 sample.arrival_date = parse_date(arrival_date)  # Tarihleri parse et
-#             if scan_date:
-#                 sample.scan_date = parse_date(scan_date)
-#             if entry_date:
-#                 sample.entry_date = parse_date(entry_date)
-
-#             sample.save()
-
-#             return HttpResponse("")
-        
-#         except Sample.DoesNotExist:
-#             return HttpResponse("Sample not found", status=404)
-
-#     if edit is None:
-#         sample_pk = request.POST.get("sample_pk")
-#         try:
-#             sample = Sample.objects.get(pk=sample_pk)
-#             return render(request, "canvas/partials/sample_results.html", {'sample': sample})  # Yeni yol burada
-#         except Sample.DoesNotExist:
-#             return HttpResponse("Sample not found", status=404)
-
-#     return 
-
-
-
-# def sample_edit_save(request):
-#     # POST isteğinde "edit" parametresini kontrol et
-#     edit = request.POST.get("edit", None)
-
-#     if request.method == "PUT":
-#         put_data = QueryDict(request.body.decode('utf-8'))
-#         sample_pk = put_data.get("sample_pk")
-#         protocol_id = put_data.get("protocol_id")
-#         sex = put_data.get("sex")
-
-#         if edit== "false":
-#         # Eğer edit parametresi yoksa sample_result.html'yi render et
-#             return render(request, "canvas/partials/sample_results.html", {'sample': sample})
-
-#         try:
-#             sample = Sample.objects.get(pk=sample_pk)
-#             sample.protocol_id = protocol_id
-#             sample.sex = sex
-#             sample.save()
-
-#             return
-        
-#         except Sample.DoesNotExist:
-#             return HttpResponse("Sample not found", status=404)
-
-
-
-
-# def sample_edit_save(request):
-#     if request.method == "PUT":
-#         put_data = QueryDict(request.body.decode('utf-8'))
-#         sample_pk = put_data.get("sample_pk")
-#         protocol_id = put_data.get("protocol_id")
-#         sex = put_data.get("sex")
-
-#         try:
-#             sample = Sample.objects.get(pk=sample_pk)  # pk anahtarını doğru kullanıyoruz
-#             sample.protocol_id = protocol_id
-#             sample.sex = sex
-#             sample.save()
-
-#             return JsonResponse({"status": "success", "message": "Sample updated successfully"})
-        
-#         except Sample.DoesNotExist:
-#             return JsonResponse({"status": "error", "message": "Sample not found"}, status=404)
-
-#     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
-
-   
 @login_required
 def get_sample_input_row(request):
     label = secrets.token_urlsafe(6)
@@ -424,33 +308,28 @@ def get_chip_type_size(request):
     chip_type = ChipType.objects.get(name=query)
 
     # Generate the card positions based on the chip size
-    num_rows=[f"{i:02d}" for i in range(1, chip_type.rows +1)]
-    num_cols=[f"{i:02d}" for i in range(1, chip_type.cols + 1)]
+    num_rows = [f"{i:02d}" for i in range(1, chip_type.rows + 1)]
+    num_cols = [f"{i:02d}" for i in range(1, chip_type.cols + 1)]
 
     return render(
-            request,
-            "canvas/partials/chip_cards_template.html",
-            {'num_rows': num_rows,
-                'num_cols': num_cols,
-                'chip_type':chip_type
-             },
-        )
+        request,
+        "canvas/partials/chip_cards_template.html",
+        {"num_rows": num_rows, "num_cols": num_cols, "chip_type": chip_type},
+    )
 
 
 @login_required
 def save_chip_input(request):
-    if request.method == 'POST':
-        lot_number = request.POST.get('lot')
-        chip_barcode = request.POST.get('chip_barcode')
-        chip_type_name = request.POST.get('chip_type')
+    if request.method == "POST":
+        lot_number = request.POST.get("lot")
+        chip_barcode = request.POST.get("chip_barcode")
+        chip_type_name = request.POST.get("chip_type")
 
         lot, created = Lot.objects.get_or_create(
-            lot_number=lot_number,
-            defaults={'arrival_date': timezone.now()}
+            lot_number=lot_number, defaults={"arrival_date": timezone.now()}
         )
-       
+
         chip_type = ChipType.objects.get(name=chip_type_name)
-       
 
         # Create the Chip instance
         chip = Chip.objects.create(
@@ -458,31 +337,25 @@ def save_chip_input(request):
             chip_type=chip_type,
             lot=lot,
             lab_practitioner=request.user,
-            protocol_start_date=timezone.now(), 
-            scan_date=timezone.now()            
+            protocol_start_date=timezone.now(),
+            scan_date=timezone.now(),
         )
 
         # Get positions and samples from the form data
-        positions = request.POST.getlist('position')
-        samples = request.POST.getlist('Sample')
+        positions = request.POST.getlist("position")
+        samples = request.POST.getlist("Sample")
 
         # Iterate over positions and samples
         for position, sample_id in zip(positions, samples):
-            if sample_id.strip():  # Ensure the sample_id is not empty  
+            if sample_id.strip():  # Ensure the sample_id is not empty
                 sample_pk = int(sample_id)
                 sample = Sample.objects.get(pk=sample_pk)
-                
+
                 # Create the ChipSample instance
-                ChipSample.objects.create(
-                    sample=sample,
-                    chip=chip,
-                    position=position
-                )
-        context={
-        }
+                ChipSample.objects.create(sample=sample, chip=chip, position=position)
+        context = {}
 
-        return render(request, 'canvas/partials/chip_input_results.html', context)
-
+        return render(request, "canvas/partials/chip_input_results.html", context)
 
 
 #    HOST_IP = os.getenv('HOST_IP', '127.0.0.1')  # default to localhost if not set
@@ -492,26 +365,26 @@ def save_chip_input(request):
 #        shell=True,
 #    )
 
+
 def idat_upload(request):
-    if request.method == 'POST':
-        files = request.FILES.getlist('files')
+    if request.method == "POST":
+        files = request.FILES.getlist("files")
         uploaded_files = []
         errors = []
 
         for file in files:
-            if file.name.endswith('.idat'):
+            if file.name.endswith(".idat"):
                 try:
                     # Extract chip_id logic (from file or directory name)
                     chip_id, position = file.name.split("_")[:2]
 
                     # Get or create ChipSample instance using chip_id
-                    chipsample = ChipSample.objects.get(chip__chip_id=chip_id, position=position)
+                    chipsample = ChipSample.objects.get(
+                        chip__chip_id=chip_id, position=position
+                    )
 
                     # Save the file in the IDAT model and link it to ChipSample
-                    idat_file = IDAT.objects.create(
-                        idat=file,
-                        chipsample=chipsample
-                    )
+                    idat_file = IDAT.objects.create(idat=file, chipsample=chipsample)
                     uploaded_files.append(idat_file)
                 except Exception as e:
                     errors.append(f"Error uploading {file.name}: {str(e)}")
@@ -519,21 +392,21 @@ def idat_upload(request):
                 errors.append(f"Invalid file type: {file.name}")
 
         # Render the uploaded files and error messages into HTML
-        context = {
-            'uploaded_files': uploaded_files,
-            'errors': errors
-        }
-        return render(request, 'canvas/partials/idat_upload_results.html', context)
-import openpyxl
-def upload_excel(request):
-    prot_id_list= ['Genetik Protokol No','Protokol No']
-    inst_list =['Bölge', 'Kurum']
-    
+        context = {"uploaded_files": uploaded_files, "errors": errors}
+        return render(request, "canvas/partials/idat_upload_results.html", context)
 
-    excel_file = request.FILES.get('excel_file')
-    wb= openpyxl.load_workbook(excel_file)
+
+import openpyxl
+
+
+def upload_excel(request):
+    prot_id_list = ["Genetik Protokol No", "Protokol No"]
+    inst_list = ["Bölge", "Kurum"]
+
+    excel_file = request.FILES.get("excel_file")
+    wb = openpyxl.load_workbook(excel_file)
     sheet = wb.active
     row_range = sheet.max_row
 
-    context={}
-    return render(request, 'canvas/partials/sample_input_row.html', context)
+    context = {}
+    return render(request, "canvas/partials/sample_input_row.html", context)
