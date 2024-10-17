@@ -1,30 +1,19 @@
 import json
-import os
 import secrets
 import socket
 import struct
 import subprocess
 import tempfile
-from datetime import timedelta
 from http.client import HTTPResponse
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from django.apps import apps
-from django_htmx.http import retarget
-from django.db import transaction
-from django.shortcuts import HttpResponse
-from django.utils.dateparse import parse_date
-from django.utils import timezone
-from django.conf import settings
 
-import minio
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.shortcuts import HttpResponse, render
+from django.shortcuts import render
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django_htmx.http import retarget
 
 from canvas.models import (
@@ -33,10 +22,11 @@ from canvas.models import (
     ChipSample,
     ChipType,
     Institution,
-    Lot,
     Sample,
     SampleType,
 )
+
+from canvas.read_sample_from_excel import generate_data_list
 
 
 def get_default_gateway_linux():
@@ -61,6 +51,16 @@ def start_run(chip_id):
         HOST_IP = get_default_gateway_linux()
         MINIO_IP = socket.gethostbyname("minio")
         label = secrets.token_urlsafe(6)
+
+        with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as ss:
+            for cs in ChipSample.objects.filter(chip_id=chip_id):
+                ss.write(
+                    f"{cs.position}\t{cs.sample.protocol_id}\t{cs.sample.institution.name}\n"
+                )
+            subprocess.run(
+                f"scp {ss.name} canvas@{HOST_IP}:/tmp/",
+                shell=True,
+            )
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
             fp.write(
@@ -96,8 +96,16 @@ def start_run(chip_id):
                                                 --band canvas-pipeline/hg19_chrom_band.txt \
                                                 --tex_template canvas-pipeline/template/base_template.tex \
                                                 --output_dir canvas-pipeline-demo-results/ \
+                                                --samplesheet {ss.name} \
                                                 -c {fp.name} \
                                                 -profile docker",
+            shell=True,
+        )
+        subprocess.run(
+            f"ssh canvas@{HOST_IP} tsp -D $(tsp -p {label}) \
+                                   docker compose exec \
+                                   -f /home/canvas/canvas/docker-compose_prod.yaml canvas \
+                                   python manage.py associate_files {chip_id} canvas",
             shell=True,
         )
 
@@ -277,10 +285,10 @@ def sample_edit(request):
         scan_date = request.POST.get("scan_date")
         sex = request.POST.get("sex")
         sample_type_id = request.POST.get("SampleType")
-        
+
         print(protocol_id, arrival_date, scan_date)
         sample_type = SampleType.objects.get(pk=sample_type_id)
-        
+
         edit = request.POST.get("edit", None)
         if edit == "false":
             return render(
@@ -479,9 +487,6 @@ def idat_upload(request):
         # Render the uploaded files and error messages into HTML
         context = {"uploaded_files": uploaded_files, "errors": errors}
         return render(request, "canvas/partials/idat_upload_results.html", context)
-
-
-from .read_sample_from_excel import generate_data_list
 
 
 def upload_excel(request):

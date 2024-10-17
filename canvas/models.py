@@ -73,7 +73,16 @@ class Sample(models.Model):
     )  # Change to DateTimeField with auto_now_add=True
     arrival_date = models.DateField()
     study_date = models.DateField(null=True)
-    protocol_id = models.CharField(max_length=100)
+    protocol_id = models.CharField(
+        max_length=100,
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9a-zA-ZçÇğĞıİöÖşŞüÜ]*$",
+                message="Only alphanumeric characters",
+                code="invalid_protocol_id",
+            ),
+        ],
+    )
     concentration = models.DecimalField(max_digits=5, decimal_places=1)
     institution = models.ForeignKey(
         Institution, on_delete=models.PROTECT, related_name="sample"
