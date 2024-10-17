@@ -53,6 +53,11 @@
     </nav>
   </aside>
 
+  <div x-show="idat_uploading">
+    <progress id="idat-upload-progress" value="0" max="100"></progress>
+    <span id="idat-upload-span"></span>
+  </div>
+
   <!-- Include Logout Form -->
   {% include "canvas/logout.html" %}
 </div>

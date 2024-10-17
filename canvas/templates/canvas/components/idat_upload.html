@@ -1,4 +1,4 @@
-<div id="idat-upload" x-data="{ uploading: false }">
+<div id="idat-upload">
   <form
     id="idat-upload-form"
     hx-post="{% url 'idat_upload' %}"
@@ -20,12 +20,16 @@
       required="true"
     />
 
-    <button type="submit" x-show="!uploading" @click="uploading = true">
+    <button
+      type="submit"
+      x-show="!idat_uploading"
+      @click="idat_uploading = true"
+    >
       Upload
     </button>
   </form>
 
-  <div x-show="uploading">
+  <div x-show="idat_uploading">
     <progress id="idat-upload-progress" value="0" max="100"></progress>
     <span id="idat-upload-span"></span>
   </div>
