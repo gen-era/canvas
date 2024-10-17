@@ -228,7 +228,7 @@
       type,
       isSingleSelect = false,
       eventName = "",
-      selectedItem = null
+      selectedItem = null,
     ) {
       return {
         searchQuery: "",
@@ -264,9 +264,12 @@
           } else {
             this.selectedItems = this.selectedItems.filter((i) => i !== item);
           }
-          setTimeout(() => {
-            document.dispatchEvent(new Event("searchSamples")), 50;
-          });
+
+          if (this.eventName) {
+            setTimeout(() => {
+              document.dispatchEvent(new Event(eventName)), 50;
+            });
+          }
         },
         openDropdown() {
           this.open = true;

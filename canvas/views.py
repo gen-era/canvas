@@ -7,6 +7,15 @@ import subprocess
 import tempfile
 from datetime import timedelta
 from http.client import HTTPResponse
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.apps import apps
+from django_htmx.http import retarget
+from django.db import transaction
+from django.shortcuts import HttpResponse
+from django.utils.dateparse import parse_date
+from django.utils import timezone
+from django.conf import settings
 
 import minio
 from django.apps import apps
@@ -250,6 +259,46 @@ def chipsample_tab_content(request):
 
 
 @login_required
+def sample_edit(request):
+    if request.method == "GET":
+        sample_pk = request.GET.get("sample_pk")
+        sample = Sample.objects.get(id=sample_pk)
+        return render(
+            request, "canvas/partials/sample_edit.html", {"sample": sample}
+        )  # For debugging
+
+    if request.method == "POST":
+
+        sample_pk = request.POST.get("sample_pk")
+        sample = Sample.objects.get(id=sample_pk)
+
+        protocol_id = request.POST.get("protocol_id")
+        arrival_date = request.POST.get("arrival_date")
+        scan_date = request.POST.get("scan_date")
+        sex = request.POST.get("sex")
+        sample_type_id = request.POST.get("SampleType")
+        
+        print(protocol_id, arrival_date, scan_date)
+        sample_type = SampleType.objects.get(pk=sample_type_id)
+        
+        edit = request.POST.get("edit", None)
+        if edit == "false":
+            return render(
+                request, "canvas/partials/sample.html", {"sample": sample}
+            )  # For debugging
+
+        sample.protocol_id = protocol_id
+        sample.arrival_date = parse_date(arrival_date)
+        sample.scan_date = parse_date(scan_date)
+        sample.sex = sex
+        sample.sample_type = sample_type
+
+        sample.save()
+
+        return render(request, "canvas/partials/sample.html", {"sample": sample})
+
+
+@login_required
 def chip_edit(request):
     if request.method == "GET":
         chip_pk = request.GET.get("chip_pk")
@@ -430,11 +479,14 @@ def idat_upload(request):
         # Render the uploaded files and error messages into HTML
         context = {"uploaded_files": uploaded_files, "errors": errors}
         return render(request, "canvas/partials/idat_upload_results.html", context)
-    
+
+
 from .read_sample_from_excel import generate_data_list
+
+
 def upload_excel(request):
-    excel_file = request.FILES.get('excel_file')
+    excel_file = request.FILES.get("excel_file")
     sample_list = generate_data_list(excel_file)
-    context = {"sample_list":sample_list}
+    context = {"sample_list": sample_list}
     print(context)
-    return render(request, 'canvas/partials/samples_from_excel.html', context)
+    return render(request, "canvas/partials/samples_from_excel.html", context)

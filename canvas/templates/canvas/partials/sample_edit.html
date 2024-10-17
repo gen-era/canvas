@@ -1,0 +1,101 @@
+<form
+  hx-post="{% url 'sample_edit' %}"
+  hx-target="closest form"
+  hx-swap="outerHTML"
+  hx-vals='{"sample_pk": "{{ sample.pk }}"}'
+  hx-trigger="click from:find a"
+>
+  <article
+  style="border-style: solid;
+  border-radius: 2em;
+  border-color: var(--pico-color-orange-400);">
+    <header>
+      <span class="badge pico-background-orange-400"
+      >Editing
+      <i class="fa-solid fa-pencil"></i>
+    </span>
+
+      <nav style="float:right; transform:translateY(-25%);">
+        <ul>
+          <li>
+            <a href="#">
+              <i class="fa-solid fa-check pico-color-green-500"></i>
+              <!-- Submit butonu -->
+            </a>
+          </li>
+          <li>
+            <a
+              hx-post="{% url 'sample_edit' %}"
+              hx-target="closest form"
+              hx-swap="outerHTML"
+              hx-vals='{"sample_pk": "{{ sample.pk }}", "edit": "false"}'
+              href="#"
+            >
+              <i class="fa-solid fa-xmark pico-color-red-500"></i>
+              <!-- Close butonu -->
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+    </header>
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="protocol_id"><strong>Protocol ID:</strong></label>
+    <input
+      type="text"
+      id="edit_protocol_id"
+      name="protocol_id"
+      value="{{ sample.protocol_id }}"
+    />
+    </div>
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="arrival_date"><strong>Arrival Date:</strong></label>
+      <input
+        type="date"
+        id="edit_arrival_date"
+        name="arrival_date"
+        value="{{ sample.arrival_date|date:'Y-m-d' }}"
+      />
+      <!-- Düzenlenebilir ve takvim ile seçilebilir -->
+    </div>
+
+    
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="sex"><strong>Sex:</strong></label>
+      <select name="sex" id="edit_sex" class="form-control">
+        <option value="" disabled hidden>{{ sample.get_sex_display }}</option>
+        <option
+          value="Female"
+          {% if sample.sex == "Female" %}selected{% endif %}
+        >
+          Female
+        </option>
+        <option value="Male" {% if sample.sex == "Male" %}selected{% endif %}>
+          Male
+        </option>
+      </select>
+      <!-- Düzenlenebilir -->
+    </div>
+
+    <div>
+      <strong>Entry Date:</strong>
+      <span>{{ sample.entry_date }}</span> 
+    </div>
+
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="sample_type"><strong>Sample Type:</strong></label>
+      {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" selectedItem=sample.sample_type %}
+    </div>
+
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="scan_date"><strong>Scan Date::</strong></label>
+      <input
+        type="date"
+        id="edit_scan_date"
+        name="scan_date"
+        value="{{ sample.scan_date }}"
+      />
+      <!-- Düzenlenebilir ve takvim ile seçilebilir -->
+    </div>
+  </article>
+</form>
