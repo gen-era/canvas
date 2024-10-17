@@ -1,41 +1,46 @@
 {% load sortedchip %}
 
 <form>
-  <article style="border-style: solid;
+  <article
+    style="border-style: solid;
   border-radius: 2em;
-  border-color: var(--pico-color-orange-400);" class="chip-container">
-    <h2 style="display:inline">{{ chip }}</h2>
-    <span class="badge pico-background-orange-400"
-      >Editing
-      <i class="fa-solid fa-pencil"></i>
-    </span>
+  border-color: var(--pico-color-orange-400);"
+    class="chip-container"
+  >
+    <header style="border-radius: 2em;">
+      <h2 style="display:inline">{{ chip }}</h2>
+      <span class="badge pico-background-orange-400"
+        >Editing
+        <i class="fa-solid fa-pencil"></i>
+      </span>
 
-    <nav style="float:right; transform:translateY(-25%);">
-      <ul>
-        <li>
-          <a
-            hx-post="{% url 'chip_edit' %}"
-            hx-target="closest form"
-            hx-swap="outerHTML swap:200ms"
-            hx-vals='{"chip_pk": "{{ chip.pk }}"}'
-            href="#"
-          >
-            <i class="fa-solid fa-check pico-color-green-500"></i>
-          </a>
-        </li>
-        <li>
-          <a
-            hx-post="{% url 'chip_edit' %}"
-            hx-target="closest form"
-            hx-swap="outerHTML swap:200ms"
-            hx-vals='{"chip_pk": "{{ chip.pk }}", "edit": "false"}'
-            href="#"
-          >
-            <i class="fa-solid fa-xmark pico-color-red-500"></i>
-          </a>
-        </li>
-      </ul>
-    </nav>
+      <nav style="float:right; transform:translateY(-25%);">
+        <ul>
+          <li>
+            <a
+              hx-post="{% url 'chip_edit' %}"
+              hx-target="closest form"
+              hx-swap="outerHTML swap:200ms"
+              hx-vals='{"chip_pk": "{{ chip.pk }}"}'
+              href="#"
+            >
+              <i class="fa-solid fa-check pico-color-green-500"></i>
+            </a>
+          </li>
+          <li>
+            <a
+              hx-post="{% url 'chip_edit' %}"
+              hx-target="closest form"
+              hx-swap="outerHTML swap:200ms"
+              hx-vals='{"chip_pk": "{{ chip.pk }}", "edit": "false"}'
+              href="#"
+            >
+              <i class="fa-solid fa-xmark pico-color-red-500"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
 
     <p>{{ chip.chip_type }}</p>
     <div class="grid">

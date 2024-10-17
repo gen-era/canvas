@@ -6,49 +6,45 @@
     getSelectedInstitutions(), "chips": getSelectedChips()}'
   {% endif %}
 >
-  <div>
-    <div>
-      <header>
-        <nav style="float:right; transform:translateY(-25%);">
-          <ul>
-            <li>
-              <a
-                href="#"
-                hx-get="{% url 'sample_edit' %}"
-                hx-vals='{"sample_pk": "{{ sample.pk }}"}'
-                hx-target="closest article"
-                hx-swap="outerHTML swap:200ms"
-              >
-                <i class="fa-solid fa-pencil pico-color-blue-500"></i>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <strong>Protocol ID: {{ sample.protocol_id }}</strong>
-      </header>
-      <p>
-        <strong>Arrival Date:</strong>
-        {{ sample.arrival_date }}
-      </p>
-      <p>
-        <strong>Sex:</strong>
-        {{ sample.sex }}
-      </p>
-      <p>
-        <strong>Entry Date:</strong>
-        {{ sample.entry_date }}
-      </p>
+  <header>
+    <nav style="float:right; transform:translateY(-25%);">
+      <ul>
+        <li>
+          <a
+            href="#"
+            hx-get="{% url 'sample_edit' %}"
+            hx-vals='{"sample_pk": "{{ sample.pk }}"}'
+            hx-target="closest article"
+            hx-swap="outerHTML swap:200ms"
+          >
+            <i class="fa-solid fa-pencil pico-color-blue-500"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <strong>Protocol ID: {{ sample.protocol_id }}</strong>
+  </header>
+  <p>
+    <strong>Arrival Date:</strong>
+    {{ sample.arrival_date }}
+  </p>
+  <p>
+    <strong>Sex:</strong>
+    {{ sample.sex }}
+  </p>
+  <p>
+    <strong>Entry Date:</strong>
+    {{ sample.entry_date }}
+  </p>
 
-      <p>
-        <strong>Institute:</strong>
-        <span> {{ sample.institution }} </span>
-      </p>
-      <p>
-        <strong>Sample Type:</strong>
-        {{ sample.sample_type }}
-      </p>
-    </div>
-  </div>
+  <p>
+    <strong>Institute:</strong>
+    <span> {{ sample.institution }} </span>
+  </p>
+  <p>
+    <strong>Sample Type:</strong>
+    {{ sample.sample_type }}
+  </p>
   {% for chipsample in sample.chipsample.all %}
     <article>
       <header>

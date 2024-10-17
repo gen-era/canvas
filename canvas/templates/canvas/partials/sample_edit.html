@@ -6,14 +6,15 @@
   hx-trigger="click from:find a"
 >
   <article
-  style="border-style: solid;
+    style="border-style: solid;
   border-radius: 2em;
-  border-color: var(--pico-color-orange-400);">
-    <header>
+  border-color: var(--pico-color-orange-400);"
+  >
+    <header style="border-radius: 2em;">
       <span class="badge pico-background-orange-400"
-      >Editing
-      <i class="fa-solid fa-pencil"></i>
-    </span>
+        >Editing
+        <i class="fa-solid fa-pencil"></i>
+      </span>
 
       <nav style="float:right; transform:translateY(-25%);">
         <ul>
@@ -37,16 +38,15 @@
           </li>
         </ul>
       </nav>
-      
     </header>
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
       <label for="protocol_id"><strong>Protocol ID:</strong></label>
-    <input
-      type="text"
-      id="edit_protocol_id"
-      name="protocol_id"
-      value="{{ sample.protocol_id }}"
-    />
+      <input
+        type="text"
+        id="edit_protocol_id"
+        name="protocol_id"
+        value="{{ sample.protocol_id }}"
+      />
     </div>
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
       <label for="arrival_date"><strong>Arrival Date:</strong></label>
@@ -59,7 +59,6 @@
       <!-- Düzenlenebilir ve takvim ile seçilebilir -->
     </div>
 
-    
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
       <label for="sex"><strong>Sex:</strong></label>
       <select name="sex" id="edit_sex" class="form-control">
@@ -79,7 +78,7 @@
 
     <div>
       <strong>Entry Date:</strong>
-      <span>{{ sample.entry_date }}</span> 
+      <span>{{ sample.entry_date }}</span>
     </div>
 
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
