@@ -53,7 +53,7 @@ def start_run(chip_id):
         label = secrets.token_urlsafe(6)
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as ss:
-            for cs in ChipSample.objects.filter(chip_id=chip_id):
+            for cs in ChipSample.objects.filter(chip__chip_id=chip_id):
                 ss.write(
                     f"{cs.position}\t{cs.sample.protocol_id}\t{cs.sample.institution.name}\n"
                 )
@@ -64,20 +64,18 @@ def start_run(chip_id):
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as fp:
             fp.write(
-                f"""
-                aws {{
-                access_key = "{settings.MINIO_STORAGE_ACCESS_KEY}"
-                secret_key = "{settings.MINIO_STORAGE_SECRET_KEY}"
-                client {{
-                    endpoint = "http://{MINIO_IP}:9000"
-                }}
-                }}
-                profiles {{
-                docker {{
-                    docker.enabled = true
-                }}
-                }}
-                """
+                f"""aws {{
+  access_key = "{settings.MINIO_STORAGE_ACCESS_KEY}"
+  secret_key = "{settings.MINIO_STORAGE_SECRET_KEY}"
+  client {{
+    endpoint = "http://{MINIO_IP}:9000"
+  }}
+}}
+profiles {{
+  docker {{
+    docker.enabled = true
+  }}
+}}"""
             )
             fp.close()
             subprocess.run(
@@ -103,8 +101,9 @@ def start_run(chip_id):
         )
         subprocess.run(
             f"ssh canvas@{HOST_IP} tsp -D $(tsp -p {label}) \
-                                   docker compose exec \
-                                   -f /home/canvas/canvas/docker-compose_prod.yaml canvas \
+                                   docker compose \
+                                   -f /home/canvas/canvas/docker-compose_prod.yaml \
+                                   exec canvas \
                                    python manage.py associate_files {chip_id} canvas",
             shell=True,
         )
