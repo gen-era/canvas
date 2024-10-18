@@ -171,7 +171,9 @@ EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "") in ("True")
 EMAIL_USE_TSL = os.getenv("EMAIL_USE_TSL", "") in ("True")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-ADMINS = os.getenv("ADMINS", "").split(";")
+ADMINS = tuple(
+    [(i.split("@")[0], i) for i in os.getenv("ADMINS", "").split(";") if "@" in i]
+)
 
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
