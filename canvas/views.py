@@ -97,6 +97,7 @@ profiles {{
                                                 --output_dir canvas-pipeline-demo-results/ \
                                                 --samplesheet {ss.name} \
                                                 -c {fp.name} \
+                                                -with-report {chip_id}.html \
                                                 -profile docker",
             shell=True,
         )
