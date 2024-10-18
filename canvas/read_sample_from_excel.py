@@ -2,11 +2,12 @@ import openpyxl
 from datetime import datetime
 from canvas.models import Institution  # Adjust the import based on your app name
 
+
 def generate_data_list(file_path):
     # Define corresponding headers for each field
-    prot_id_list = ['Genetik Protokol No', 'Protokol No']
-    inst_list = ['Kurum', 'Bölge']
-    arrival_date_list = ['Kayıt Tarihi', 'Test Eklenme Tarihi']
+    prot_id_list = ["Genetik Protokol No", "Protokol No"]
+    inst_list = ["Kurum", "Bölge"]
+    arrival_date_list = ["Kayıt Tarihi", "Test Eklenme Tarihi"]
 
     # Load the workbook and select the active worksheet
     wb = openpyxl.load_workbook(file_path, data_only=True)
@@ -29,19 +30,19 @@ def generate_data_list(file_path):
 
     # Check if all required columns are found
     required_columns = {
-        'prot_id': prot_id_col,
-        'inst': inst_col,
-        'arrival_date': arrival_date_col,
+        "prot_id": prot_id_col,
+        "inst": inst_col,
+        "arrival_date": arrival_date_col,
     }
 
     missing_columns = [key for key, val in required_columns.items() if val is None]
     if missing_columns:
-        raise ValueError(f"Missing columns in the Excel file: {', '.join(missing_columns)}")
+        raise ValueError(
+            f"Missing columns in the Excel file: {', '.join(missing_columns)}"
+        )
 
     # Fetch existing institution names from the database
-    existing_institutions = set(
-        Institution.objects.values_list('name', flat=True)
-    )
+    existing_institutions = set(Institution.objects.values_list("name", flat=True))
 
     data_list = []
 
@@ -53,7 +54,10 @@ def generate_data_list(file_path):
         arrival = row[arrival_date_col - 1]
 
         if inst in existing_institutions:
-            inst_validated = Institution.objects.filter(name__icontains=inst)
+            try:
+                inst_validated = Institution.objects.filter(name__icontains=inst[:5])
+            except:
+                inst_validated = None
             if len(inst_validated) > 1:
                 inst_validated = None
             elif inst_validated:
@@ -61,30 +65,29 @@ def generate_data_list(file_path):
             else:
                 inst_validated = None
         else:
-            inst_validated = None   
-
+            inst_validated = None
 
         # Format 'arrival_date' if it's a datetime object
         if isinstance(arrival, datetime):
-            arrival_formatted = arrival.strftime('%Y-%m-%d')
+            arrival_formatted = arrival.strftime("%Y-%m-%d")
         elif isinstance(arrival, str):
             # If it's already a string, you might want to validate or reformat it
             try:
                 # Attempt to parse and reformat
-                arrival_dt = datetime.strptime(arrival, '%Y-%m-%d')
-                arrival_formatted = arrival_dt.strftime('%Y-%m-%d')
+                arrival_dt = datetime.strptime(arrival, "%Y-%m-%d")
+                arrival_formatted = arrival_dt.strftime("%Y-%m-%d")
             except ValueError:
                 # If parsing fails, keep it as is or handle accordingly
                 arrival_formatted = arrival
         else:
             # Handle other possible types (e.g., None)
-            arrival_formatted = ''
+            arrival_formatted = ""
 
         # Create a dictionary for the current row
         row_dict = {
-            'prot_id': prot_id,
-            'inst': inst_validated,  # Use the validated institution name
-            'arrival_date': arrival_formatted,  # Use the formatted date string
+            "prot_id": prot_id,
+            "inst": inst_validated,  # Use the validated institution name
+            "arrival_date": arrival_formatted,  # Use the formatted date string
         }
 
         data_list.append(row_dict)
