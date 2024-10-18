@@ -100,8 +100,7 @@ profiles {{
             shell=True,
         )
         subprocess.run(
-            f"ssh canvas@{HOST_IP} tsp -D $(tsp -p {label}) \
-                                   docker compose \
+            f"ssh canvas@{HOST_IP} tsp -D $(tsp -l | grep {label} | awk '{{print $1}}') docker compose \
                                    -f /home/canvas/canvas/docker-compose_prod.yaml \
                                    exec canvas \
                                    python manage.py associate_files {chip_id} canvas",
