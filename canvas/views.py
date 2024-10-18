@@ -53,6 +53,7 @@ def start_run(chip_id):
         label = secrets.token_urlsafe(6)
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as ss:
+            ss.write(f"sample_id\tprotocol_id\tinstitution\n")
             for cs in ChipSample.objects.filter(chip__chip_id=chip_id):
                 ss.write(
                     f"{cs.position}\t{cs.sample.protocol_id}\t{cs.sample.institution.name}\n"
