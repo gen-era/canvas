@@ -7,34 +7,32 @@
   hx-target="#sample-input-rows"
   hx-swap="beforeend"
 >
-    <input
-        autocomplete="off"
-        type="text"
-        name="protocol_id" 
-        value="{{ protocol_id }}"
-        required>
+  <input
+    autocomplete="off"
+    type="text"
+    name="protocol_id"
+    value="{{ protocol_id }}"
+    required
+  />
 
-    {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" selectedItem=institute %}
+  {% include 'canvas/components/generic_search.html' with model_name="Institution" field_name="name" isSingleSelect="true" eventName="None" selectedItem=institute %}
+  {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" selectedItem=sample_type %}
 
-    {% include 'canvas/components/generic_search.html' with model_name="SampleType" field_name="name" isSingleSelect="true" eventName="None" selectedItem=sample_type %}
-
-    <input
-        autocomplete="off"
-        type="date" name="arrival_date" 
-        value="{{ arrival_date }}"
-        required>
-    <input
-        autocomplete="off"
-        type="date" name="study_date">
-    <input
-        autocomplete="off"
-        type="text" name="description">
-    <select name="sex" aria-label="Enter observed sex" required>
-      <option selected disabled value="">Enter observed sex…</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Unknown</option>
-    </select>
+  <input
+    autocomplete="off"
+    type="date"
+    name="arrival_date"
+    value="{{ arrival_date }}"
+    required
+  />
+  <input autocomplete="off" type="date" name="study_date" />
+  <input autocomplete="off" type="text" name="description" />
+  <select name="sex" aria-label="Enter observed sex" required>
+    <option selected disabled value="">Enter observed sex…</option>
+    <option value="M">Male</option>
+    <option value="F">Female</option>
+    <option value="U">Unknown</option>
+  </select>
 
   <input
     autocomplete="off"

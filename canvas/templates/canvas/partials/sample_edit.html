@@ -62,15 +62,14 @@
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
       <label for="sex"><strong>Sex:</strong></label>
       <select name="sex" id="edit_sex" class="form-control">
-        <option value="" disabled hidden>{{ sample.get_sex_display }}</option>
-        <option
-          value="Female"
-          {% if sample.sex == "Female" %}selected{% endif %}
-        >
+        <option value="M" {% if sample.sex == "M" %}selected{% endif %}>
+          Male
+        </option>
+        <option value="F" {% if sample.sex == "F" %}selected{% endif %}>
           Female
         </option>
-        <option value="Male" {% if sample.sex == "Male" %}selected{% endif %}>
-          Male
+        <option value="U" {% if sample.sex == "U" %}selected{% endif %}>
+          Unknown
         </option>
       </select>
       <!-- Düzenlenebilir -->
