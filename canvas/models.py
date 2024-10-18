@@ -77,7 +77,7 @@ class Sample(models.Model):
         max_length=100,
         validators=[
             RegexValidator(
-                regex=r"^[0-9a-zA-ZçÇğĞıİöÖşŞüÜ]*$",
+                regex=r"^[0-9a-zA-ZçÇğĞıİöÖşŞüÜ-_]*$",
                 message="Only alphanumeric characters",
                 code="invalid_protocol_id",
             ),
