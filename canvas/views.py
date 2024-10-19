@@ -276,31 +276,28 @@ def sample_edit(request):
         )  # For debugging
 
     if request.method == "POST":
-
         sample_pk = request.POST.get("sample_pk")
         sample = Sample.objects.get(id=sample_pk)
+        edit = request.POST.get("edit", None)
+        if edit == "false":
+            return render(request, "canvas/partials/sample.html", {"sample": sample})
 
         protocol_id = request.POST.get("protocol_id")
         arrival_date = request.POST.get("arrival_date")
         scan_date = request.POST.get("scan_date")
         sex = request.POST.get("sex")
         sample_type_id = request.POST.get("SampleType")
+        repeat_id = request.POST.get("Sample")
 
-        print(protocol_id, arrival_date, scan_date)
         sample_type = SampleType.objects.get(pk=sample_type_id)
-
-        edit = request.POST.get("edit", None)
-        if edit == "false":
-            return render(
-                request, "canvas/partials/sample.html", {"sample": sample}
-            )  # For debugging
+        repeat = Sample.objects.get(pk=repeat_id)
 
         sample.protocol_id = protocol_id
         sample.arrival_date = parse_date(arrival_date)
         sample.scan_date = parse_date(scan_date)
         sample.sex = sex
         sample.sample_type = sample_type
-
+        sample.repeat = repeat
         sample.save()
 
         return render(request, "canvas/partials/sample.html", {"sample": sample})
@@ -350,8 +347,7 @@ def chip_edit(request):
 
 @login_required
 def get_sample_input_row(request):
-    label = secrets.token_urlsafe(6)
-    return render(request, "canvas/partials/sample_input_row.html", {"label": label})
+    return render(request, "canvas/partials/sample_input_row.html")
 
 
 @login_required

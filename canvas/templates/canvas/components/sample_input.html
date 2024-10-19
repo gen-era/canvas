@@ -1,11 +1,22 @@
-<form id="upload-form" 
-          hx-post="upload_excel/" 
-          hx-trigger="change from:input[name='excel_file']" 
-          hx-encoding="multipart/form-data"
-          hx-target="#sample-input-rows"
-          hx-swap="outerHTML"
-          >
-  <input type="file" name="excel_file" accept=".xlsx, .xls, .csv, .tsv" required>
+<form
+  id="upload-form"
+  hx-post="upload_excel/"
+  hx-trigger="change from:input[name='excel_file']"
+  hx-encoding="multipart/form-data"
+  hx-target="#sample-input-rows"
+  hx-swap="outerHTML"
+>
+  <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+    <label for="excel_file">
+      <strong> Enter excel file: </strong>
+    </label>
+    <input
+      type="file"
+      name="excel_file"
+      accept=".xlsx, .xls, .csv, .tsv"
+      required
+    />
+  </div>
 </form>
 
 <form

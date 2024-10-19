@@ -86,7 +86,7 @@
     </div>
 
     <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
-      <label for="scan_date"><strong>Scan Date::</strong></label>
+      <label for="scan_date"><strong>Scan Date:</strong></label>
       <input
         type="date"
         id="edit_scan_date"
@@ -94,6 +94,10 @@
         value="{{ sample.scan_date }}"
       />
       <!-- Düzenlenebilir ve takvim ile seçilebilir -->
+    </div>
+    <div style="display:flex; flex-direction: row; text-wrap: nowrap;">
+      <label for="repeat"><strong>Repeat:</strong></label>
+      {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="None" selectedItem=sample.repeat %}
     </div>
   </article>
 </form>

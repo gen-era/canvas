@@ -72,6 +72,89 @@
         }
       })();
     </script>
+
+    <style>
+      :root {
+        --pico-typography-spacing-vertical: 0.5rem;
+        --pico-form-element-spacing-vertical: 0.1rem;
+        --pico-form-element-spacing-horizontal: 0.25rem;
+        --pico-font-size: 0.8rem;
+      }
+      select {
+        height: 2em;
+      }
+      .main {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        grid-column-gap: 0.6em;
+        grid-row-gap: 0.6em;
+        justify-items: stretch;
+        align-items: stretch;
+      }
+
+      .sample-container {
+        display: grid;
+        grid-template-columns: 3fr 9fr;
+        grid-column-gap: 0.6em;
+        grid-row-gap: 0.6em;
+        justify-items: stretch;
+        align-items: stretch;
+      }
+      .evidence-container {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        grid-column-gap: 0.6em;
+        grid-row-gap: 0.6em;
+        justify-items: stretch;
+        align-items: stretch;
+        border-top-width: thin;
+        border-top-style: solid;
+      }
+      .evidence-group {
+        margin: auto;
+      }
+
+      .dropdown > summary {
+        height: unset !important;
+        padding: 0 !important;
+        border-radius: 2em !important;
+      }
+      details.dropdown summary::after {
+        display: none;
+      }
+
+      .dropdown > summary input {
+        margin: 0;
+        background: transparent;
+        border: none;
+      }
+
+      .dropdown > summary input:focus {
+        box-shadow: none;
+      }
+      .badge {
+        border-radius: 2em;
+        padding: 0.2em 0.6em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+        transform: translateY(-15%);
+        margin-top: 5px;
+      }
+      .badge a {
+        background: none;
+        border: none;
+        color: #888;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+      .htmx-swapping {
+        opacity: 0;
+        transition: opacity 1s ease-out;
+      }
+    </style>
   </head>
   <body style="font-family: Inter Tight">
     {% block content %}
