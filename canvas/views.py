@@ -110,14 +110,42 @@ profiles {{
         )
 
 
-def index(request):
+def get_samples_for_user(user, samples=None):
+    if not samples:
+        samples = Sample.objects.all()
+    user_groups = user.groups.all()
+    if user.is_staff:
+        samples = samples
+    else:
+        samples = samples.filter(institution__group__in=user_groups).order_by(
+            "-entry_date"
+        )
+    return samples
 
-    samples = Sample.objects.order_by("-entry_date")
+
+def get_chips_for_user(user, chips=None):
+    if not chips:
+        chips = Chip.objects.all()
+
+    user_groups = user.groups.all()
+    if user.is_staff:
+        chips = chips
+    else:
+        chips = (
+            chips.filter(chipsample__sample__institution__group__in=user_groups)
+            .distinct()
+            .order_by("-entry_date")
+        )
+    return chips
+
+
+def index(request):
+    samples = get_samples_for_user(request.user).order_by("-entry_date")
     len_samples = len(samples)
     sample_paginator = Paginator(samples, 12)
     samples = sample_paginator.get_page(1)
 
-    chips = Chip.objects.order_by("-entry_date")
+    chips = get_chips_for_user(request.user).order_by("-entry_date")
     len_chips = len(chips)
     chip_paginator = Paginator(chips, 12)
     chips = chip_paginator.get_page(1)
@@ -153,6 +181,13 @@ def generic_search(request, model_name, field_name):
     else:
         items = model.objects.none()
 
+    if model_name == "Sample":
+        items = get_samples_for_user(request.user, items)
+    if model_name == "Chip":
+        items = get_chips_for_user(request.user, items)
+    if model_name == "Institution":
+        items = items.filter(group__in=request.user.groups.all())
+
     items = items.order_by(field_name)
     len_items = len(items)
 
@@ -177,9 +212,9 @@ def chip_search(request):
     query = request.GET.get("search", "").strip()
     page = request.GET.get("page")
 
-    chips = Chip.objects.filter(chip_id__contains=query)
+    chips = Chip.objects.filter(chip_id__contains=query).order_by("-entry_date")
+    chips = get_chips_for_user(request.user, chips)
 
-    chips = chips.order_by("-entry_date")
     len_chips = len(chips)
 
     paginator = Paginator(chips, 12)
@@ -212,6 +247,7 @@ def sample_search(request):
 
     # Order by entry date
     samples = samples.order_by("-entry_date")
+    samples = get_samples_for_user(request.user, samples)
     len_samples = len(samples)
 
     paginator = Paginator(samples, 12)

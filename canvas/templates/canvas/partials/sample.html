@@ -7,21 +7,23 @@
   {% endif %}
 >
   <header>
-    <nav style="float:right; transform:translateY(-25%);">
-      <ul>
-        <li>
-          <a
-            href="#"
-            hx-get="{% url 'sample_edit' %}"
-            hx-vals='{"sample_pk": "{{ sample.pk }}"}'
-            hx-target="closest article"
-            hx-swap="outerHTML swap:200ms"
-          >
-            <i class="fa-solid fa-pencil pico-color-blue-500"></i>
-          </a>
-        </li>
-      </ul>
-    </nav>
+    {% if user.is_staff %}
+      <nav style="float:right; transform:translateY(-25%);">
+        <ul>
+          <li>
+            <a
+              href="#"
+              hx-get="{% url 'sample_edit' %}"
+              hx-vals='{"sample_pk": "{{ sample.pk }}"}'
+              hx-target="closest article"
+              hx-swap="outerHTML swap:200ms"
+            >
+              <i class="fa-solid fa-pencil pico-color-blue-500"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    {% endif %}
     <strong>Protocol ID: {{ sample.protocol_id }}</strong>
   </header>
   <p>

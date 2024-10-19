@@ -59,6 +59,13 @@
     <span id="idat-upload-span"></span>
   </div>
 
+  <ul>
+    {% for group in user.groups.all %}
+      <li>{{ group }}</li>
+    {% endfor %}
+  </ul>
+
+  <p>{{ user.username }}</p>
   <!-- Include Logout Form -->
   {% include "canvas/logout.html" %}
 </div>

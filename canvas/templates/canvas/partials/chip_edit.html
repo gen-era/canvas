@@ -43,30 +43,29 @@
     </header>
 
     <p>{{ chip.chip_type }}</p>
-    <div class="grid">
-      {% for chipsample_rows in chip|sortedchip %}
-        <div class="sample-row">
-          {% for chipsample in chipsample_rows %}
-            {% if chipsample.sample %}
-              <article class="sample">
-                <p>{{ chipsample.position }}</p>
-                {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" selectedItem=chipsample.sample %}
-                <input
-                  type="hidden"
-                  name="position"
-                  value="{{ chipsample.position }}"
-                />
-              </article>
-            {% else %}
-              <article class="sample">
-                <p>{{ chipsample }}</p>
-                {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" %}
-                <input type="hidden" name="position" value="{{ chipsample }}" />
-              </article>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endfor %}
-    </div>
+    {% sortedchip chip as chipsample_rows %}
+    {% for chipsample_row in chipsample_rows %}
+      <div class="grid">
+        {% for chipsample in chipsample_row %}
+          {% if chipsample.sample %}
+            <article class="sample">
+              <p>{{ chipsample.position }}</p>
+              {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" selectedItem=chipsample.sample %}
+              <input
+                type="hidden"
+                name="position"
+                value="{{ chipsample.position }}"
+              />
+            </article>
+          {% else %}
+            <article class="sample">
+              <p>{{ chipsample }}</p>
+              {% include 'canvas/components/generic_search.html' with model_name="Sample" field_name="protocol_id" isSingleSelect="true" eventName="none" %}
+              <input type="hidden" name="position" value="{{ chipsample }}" />
+            </article>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
   </article>
 </form>
