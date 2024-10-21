@@ -97,15 +97,15 @@ profiles {{
                                                 --output_dir canvas-pipeline-demo-results/ \
                                                 --samplesheet {ss.name} \
                                                 -c {fp.name} \
-                                                -with-report {chip_id}.html \
+                                                -with-report {chip_id}_{label}.html \
                                                 -profile docker",
             shell=True,
         )
         subprocess.run(
-            f"ssh canvas@{HOST_IP} tsp -D $(tsp -l | grep {label} | awk '{{print $1}}') docker compose \
+            f"ssh canvas@{HOST_IP} 'tsp -D $(tsp -l | grep {label} | cut -d\" \" -f1) docker compose \
                                    -f /home/canvas/canvas/docker-compose_prod.yaml \
                                    exec canvas \
-                                   python manage.py associate_files {chip_id} canvas",
+                                   python manage.py associate_files {chip_id} canvas'",
             shell=True,
         )
 
