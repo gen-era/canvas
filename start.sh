@@ -16,4 +16,5 @@ gunicorn \
     --log-level debug \
     --access-logfile '-' \
     --error-logfile '-' \
-    --timeout 300
+    --worker-class gevent \
+    --workers 2
