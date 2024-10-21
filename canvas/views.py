@@ -117,9 +117,7 @@ def get_samples_for_user(user, samples=None):
     if user.is_staff:
         samples = samples
     else:
-        samples = samples.filter(institution__group__in=user_groups).order_by(
-            "-entry_date"
-        )
+        samples = samples.filter(institution__group__in=user_groups)
     return samples
 
 
@@ -131,12 +129,22 @@ def get_chips_for_user(user, chips=None):
     if user.is_staff:
         chips = chips
     else:
-        chips = (
-            chips.filter(chipsample__sample__institution__group__in=user_groups)
-            .distinct()
-            .order_by("-entry_date")
-        )
+        chips = chips.filter(
+            chipsample__sample__institution__group__in=user_groups
+        ).distinct()
     return chips
+
+
+def get_institutions_for_user(user, institutions=None):
+    if not institutions:
+        institutions = Institution.objects.all()
+
+    user_groups = user.groups.all()
+    if user.is_staff:
+        institutions = institutions
+    else:
+        institutions = institutions.filter(group__in=user_groups)
+    return institutions
 
 
 def index(request):
@@ -186,7 +194,7 @@ def generic_search(request, model_name, field_name):
     if model_name == "Chip":
         items = get_chips_for_user(request.user, items)
     if model_name == "Institution":
-        items = items.filter(group__in=request.user.groups.all())
+        items = get_institutions_for_user(request.user, items)
 
     items = items.order_by(field_name)
     len_items = len(items)

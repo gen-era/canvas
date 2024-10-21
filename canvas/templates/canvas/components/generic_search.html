@@ -1,7 +1,7 @@
 <details
   class="dropdown"
   x-ref="detailsElement"
-  x-data="createSearchComponent('{{ model_name }}', '{{ isSingleSelect }}', '{{ eventName }}', '{{ selectedItem }}' )"
+  x-data="createSearchComponent('{{ model_name }}-{{ label }}', '{{ isSingleSelect }}', '{{ eventName }}', '{{ selectedItem }}' )"
   x-init="
                 {% if selectedItem %}
     selectItem('{{ selectedItem }}', '{{ selectedItem.pk }}')
@@ -21,14 +21,20 @@
             :value="selectedItemPk"
             autocomplete="off"
           />
-          <span class="selected-{{ model_name }}" x-text="selectedItem"></span>
+          <span
+            class="selected-{{ model_name }}-{{ label }}"
+            x-text="selectedItem"
+          ></span>
           <a href="#" @click.prevent.stop="removeItem()">×</a>
         </span>
       </template>
       <template x-if="isSingleSelect === 'false'">
         <template x-for="item in selectedItems" :key="item">
           <span class="badge">
-            <span class="selected-{{ model_name }}" x-text="item"></span>
+            <span
+              class="selected-{{ model_name }}-{{ label }}"
+              x-text="item"
+            ></span>
             <a href="#" @click.prevent.stop="removeItem(item)">×</a>
           </span>
         </template>
