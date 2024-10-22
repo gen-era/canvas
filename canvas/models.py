@@ -18,18 +18,46 @@ class Lot(models.Model):
     def __str__(self):
         return self.lot_number
 
+def analysis_files_directory_path(instance, filename):
+    # Get the chip_id from the related ChipSample model
+    chip_type = instance.name
+    return f"analysis_files/{chip_type}/{filename}"
 
 class ChipType(models.Model):
     name = models.CharField(max_length=100)
     rows = models.IntegerField(default=12)
     cols = models.IntegerField(default=2)
 
-    bpm_path = models.CharField(max_length=100, default='')
-    csv_path = models.CharField(max_length=100, default='')
-    egt_path = models.CharField(max_length=100, default='')
-    fasta_path = models.CharField(max_length=100, default='')
-    pfb_path = models.CharField(max_length=100, default='')
-    band_path = models.CharField(max_length=100, default='')
+    bpm = models.FileField(
+        upload_to=analysis_files_directory_path,
+        validators=[FileExtensionValidator(allowed_extensions=["bpm"])],
+        blank=True
+    )
+    csv = models.FileField(
+        upload_to=analysis_files_directory_path,
+        validators=[FileExtensionValidator(allowed_extensions=["csv"])],
+        blank=True
+    )
+    egt = models.FileField(
+        upload_to=analysis_files_directory_path,
+        validators=[FileExtensionValidator(allowed_extensions=["egt"])],
+        blank=True
+    )
+    fasta = models.FileField(
+        upload_to=analysis_files_directory_path,
+        validators=[FileExtensionValidator(allowed_extensions=["fa"])],
+        blank=True
+    )
+    pfb = models.FileField(
+        upload_to=analysis_files_directory_path,
+        validators=[FileExtensionValidator(allowed_extensions=["pfb"])],
+        blank=True
+    )
+    band = models.FileField(
+        upload_to=analysis_files_directory_path,
+        validators=[FileExtensionValidator(allowed_extensions=["txt"])],
+        blank=True
+    )
     
     def __str__(self):
         return self.name
