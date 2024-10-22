@@ -51,6 +51,7 @@ def start_run(chip_id):
         HOST_IP = get_default_gateway_linux()
         MINIO_IP = socket.gethostbyname("minio")
         label = secrets.token_urlsafe(6)
+        chipType = Chip.objects.get(chip_id = chip_id).chip_type
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as ss:
             ss.write(f"sample_id\tprotocol_id\tinstitution\n")
@@ -87,12 +88,12 @@ profiles {{
         subprocess.run(
             f"ssh canvas@{HOST_IP} tsp -L {label} nextflow /home/canvas/canvas-pipeline/main.nf \
                                                 --chip_id {chip_id} \
-                                                --bpm analysis_files/manifest-cluster/GSACyto_20044998_A1.bpm \
-                                                --csv analysis_files/manifest-cluster/GSACyto_20044998_A1.csv \
-                                                --egt analysis_files/manifest-cluster/2003.egt \
-                                                --fasta analysis_files/GRCh37_genome.fa \
-                                                --pfb analysis_files/PennCNV/test/out.pfb \
-                                                --band canvas-pipeline/hg19_chrom_band.txt \
+                                                --bpm {chipType.bpm_path} \
+                                                --csv {chipType.csv_path} \
+                                                --egt {chipType.egt_path} \
+                                                --fasta {chipType.fasta_path} \
+                                                --pfb {chipType.pfb_path} \
+                                                --band {chipType.band_path} \
                                                 --tex_template canvas-pipeline/template/base_template.tex \
                                                 --output_dir canvas-pipeline-demo-results/ \
                                                 --samplesheet {ss.name} \

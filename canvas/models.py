@@ -24,6 +24,13 @@ class ChipType(models.Model):
     rows = models.IntegerField(default=12)
     cols = models.IntegerField(default=2)
 
+    bpm_path = models.CharField(max_length=100, default='')
+    csv_path = models.CharField(max_length=100, default='')
+    egt_path = models.CharField(max_length=100, default='')
+    fasta_path = models.CharField(max_length=100, default='')
+    pfb_path = models.CharField(max_length=100, default='')
+    band_path = models.CharField(max_length=100, default='')
+    
     def __str__(self):
         return self.name
 
