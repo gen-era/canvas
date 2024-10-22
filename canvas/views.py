@@ -88,12 +88,12 @@ profiles {{
         subprocess.run(
             f"ssh canvas@{HOST_IP} tsp -L {label} nextflow /home/canvas/canvas-pipeline/main.nf \
                                                 --chip_id {chip_id} \
-                                                --bpm {chipType.bpm_path} \
-                                                --csv {chipType.csv_path} \
-                                                --egt {chipType.egt_path} \
-                                                --fasta {chipType.fasta_path} \
-                                                --pfb {chipType.pfb_path} \
-                                                --band {chipType.band_path} \
+                                                --bpm s3://canvas/{chipType.bpm.name} \
+                                                --csv s3://canvas/{chipType.csv.name} \
+                                                --egt s3://canvas/{chipType.egt.name} \
+                                                --fasta s3://canvas/{chipType.fasta.name} \
+                                                --pfb s3://canvas/{chipType.pfb.name} \
+                                                --band s3://canvas/{chipType.band.name} \
                                                 --tex_template canvas-pipeline/template/base_template.tex \
                                                 --output_dir canvas-pipeline-demo-results/ \
                                                 --samplesheet {ss.name} \
