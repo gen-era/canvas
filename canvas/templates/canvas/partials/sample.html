@@ -47,6 +47,13 @@
     <strong>Sample Type:</strong>
     {{ sample.sample_type }}
   </p>
+  {% if sample.repeat %}
+    <p>
+      <strong>Repeat:</strong>
+      {{ sample.repeat }}
+    </p>
+  {% endif %}
+
   {% for chipsample in sample.chipsample.all %}
     <article>
       <header>

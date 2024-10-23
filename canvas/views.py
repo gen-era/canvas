@@ -51,7 +51,7 @@ def start_run(chip_id):
         HOST_IP = get_default_gateway_linux()
         MINIO_IP = socket.gethostbyname("minio")
         label = secrets.token_urlsafe(6)
-        chipType = Chip.objects.get(chip_id = chip_id).chip_type
+        chipType = Chip.objects.get(chip_id=chip_id).chip_type
 
         with tempfile.NamedTemporaryFile(delete_on_close=False, mode="w") as ss:
             ss.write(f"sample_id\tprotocol_id\tinstitution\n")
@@ -335,7 +335,10 @@ def sample_edit(request):
         repeat_id = request.POST.get("Sample")
 
         sample_type = SampleType.objects.get(pk=sample_type_id)
-        repeat = Sample.objects.get(pk=repeat_id)
+        if repeat_id:
+            repeat = Sample.objects.filter(pk=int(repeat_id)).first()
+        else:
+            repeat = None
 
         sample.protocol_id = protocol_id
         sample.arrival_date = parse_date(arrival_date)

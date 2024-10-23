@@ -18,10 +18,12 @@ class Lot(models.Model):
     def __str__(self):
         return self.lot_number
 
+
 def analysis_files_directory_path(instance, filename):
     # Get the chip_id from the related ChipSample model
     chip_type = instance.name
     return f"analysis_files/{chip_type}/{filename}"
+
 
 class ChipType(models.Model):
     name = models.CharField(max_length=100)
@@ -31,34 +33,34 @@ class ChipType(models.Model):
     bpm = models.FileField(
         upload_to=analysis_files_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["bpm"])],
-        blank=True
+        blank=True,
     )
     csv = models.FileField(
         upload_to=analysis_files_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["csv"])],
-        blank=True
+        blank=True,
     )
     egt = models.FileField(
         upload_to=analysis_files_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["egt"])],
-        blank=True
+        blank=True,
     )
     fasta = models.FileField(
         upload_to=analysis_files_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["fa"])],
-        blank=True
+        blank=True,
     )
     pfb = models.FileField(
         upload_to=analysis_files_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["pfb"])],
-        blank=True
+        blank=True,
     )
     band = models.FileField(
         upload_to=analysis_files_directory_path,
         validators=[FileExtensionValidator(allowed_extensions=["txt"])],
-        blank=True
+        blank=True,
     )
-    
+
     def __str__(self):
         return self.name
 
@@ -125,7 +127,7 @@ class Sample(models.Model):
     sex = models.CharField(max_length=100, choices=sex_types, null=True)
     description = models.CharField(max_length=255, null=True)
     sample_type = models.ForeignKey(SampleType, on_delete=models.PROTECT)
-    repeat = models.ManyToManyField("self", blank=True)
+    repeat = models.ForeignKey("self", blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.protocol_id}"
@@ -281,6 +283,13 @@ class Classification(models.Model):
 
 
 class Report(models.Model):
+    chipsample = models.ForeignKey(
+        ChipSample,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="report",
+    )
     classifications = models.ManyToManyField(Classification)
     entry_date = models.DateTimeField(
         auto_now_add=True
