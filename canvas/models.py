@@ -46,9 +46,14 @@ class ChipType(models.Model):
         blank=True,
     )
     fasta = models.FileField(
-        upload_to=analysis_files_directory_path,
+        upload_to="analysis_files/",
         validators=[FileExtensionValidator(allowed_extensions=["fa"])],
         blank=True,
+    )
+    fasta_index = models.FileField(
+        upload_to="analysis_files/",
+        validators=[FileExtensionValidator(allowed_extensions=["fai"])],
+        blank=True
     )
     pfb = models.FileField(
         upload_to=analysis_files_directory_path,
