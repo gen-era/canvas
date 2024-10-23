@@ -17,7 +17,96 @@
 
   igv_options[{{ chipsample.pk }}] = {
       genome: 'hg19',
+          tracks: 
+          [
+          {
+          name: "BAF CNV",
+          height: 72,
+          type: "merged",
+          min: 0,
+          max: 1,
           tracks: [
+            {
+              name: 'CNV BAF',
+              type: 'wig',
+              format: 'bedgraph',
+              url: '{{ CNV_pos_bedgraph.bedgraph.url }}',
+              min: 0,
+              max: 1,
+              graphType: 'bar',
+              windowFunction: 'max',
+              color: "rgb(255, 153, 53)",
+            },
+            {
+              name: 'BAF',
+              type: 'wig',
+              format: 'bedgraph',
+              url: '{{ baf_bedgraph.bedgraph.url }}',
+              graphType: 'points',
+              min: 0,
+              max: 1,
+              windowFunction: 'none',
+              color: "rgb(53, 53, 53)",
+              guideLines: [
+                {color: 'green', dotted: true, y: 0.5},
+              ],
+            },
+          ]
+        },
+        {
+          name: "CNV LRR",
+          height: 72,
+          type: "merged",
+          min: -1,
+          max: 1,
+          tracks: [
+            {
+              name: 'CNV LRR',
+              type: 'wig',
+              format: 'bedgraph',
+              url: '{{ CNV_pos_bedgraph.bedgraph.url }}',
+              graphType: 'bar',
+              windowFunction: 'min',
+              color: "rgb(255, 153, 53)",
+            },
+            {
+              name: 'CNV LRR',
+              type: 'wig',
+              format: 'bedgraph',
+              url: '{{ CNV_neg_bedgraph.bedgraph.url }}',
+              graphType: 'bar',
+              windowFunction: 'max',
+              color: "rgb(255, 153, 53)",
+            },
+            {
+              name: 'LRR',
+              type: 'wig',
+              format: 'bedgraph',
+              url: '{{ lrr_bedgraph.bedgraph.url }}',
+              height: 200,
+              graphType: 'points',
+              min: -1,
+              max: 1,
+              windowFunction: 'mean',
+              guideLines: [
+                  { color: 'blue', dotted: true, y: 0 },
+                  ],
+              },
+            {
+              name: 'LRR',
+              type: 'wig',
+              format: 'bedgraph',
+              url: '{{ cnv_smooth_bedgraph.bedgraph.url }}',
+              graphType: 'line',
+              windowFunction: 'mean',
+              color: "rgb(255, 53, 53)",
+              lineWidth: 20,
+              guideLines: [
+                {color: 'blue', dotted: true, y: 0},
+              ],
+            },
+          ]
+        },
               // {
               //     name: '{{ chipsample.sample.protocol_id }}',
               //     type: 'annotation',
@@ -49,35 +138,37 @@
               //     url: '{{ decipher_bedi }}',
               // },
 
-              {
-                  name: 'LRR',
-                  type: 'wig',
-                  format: 'bedgraph',
-                  url: '{{ lrr_bedgraph.bedgraph.url }}',
-                  height: 200,
-                  graphType: 'points',
-                  min: -1,
-                  max: 1,
-                  windowFunction: 'mean',
-                  guideLines: [
-                      { color: 'blue', dotted: true, y: 0 },
-                  ],
-              },
+              // {
+              //     name: 'LRR',
+              //     type: 'wig',
+              //     format: 'bedgraph',
+              //     url: '{{ lrr_bedgraph.bedgraph.url }}',
+              //     height: 200,
+              //     graphType: 'points',
+              //     min: -1,
+              //     max: 1,
+              //     windowFunction: 'mean',
+              //     guideLines: [
+              //         { color: 'blue', dotted: true, y: 0 },
+              //     ],
+              // },
 
-              {
-                  name: 'BAF',
-                  type: 'wig',
-                  format: 'bedgraph',
-                  url: '{{ baf_bedgraph.bedgraph.url }}',
-                  height: 200,
-                  graphType: 'points',
-                  min: 0,
-                  max: 1,
-                  windowFunction: 'none',
-                  guideLines: [
-                      { color: 'green', dotted: true, y: 0.5 },
-                  ],
-              }
+              // {
+              //     name: 'BAF',
+              //     type: 'wig',
+              //     format: 'bedgraph',
+              //     url: '{{ baf_bedgraph.bedgraph.url }}',
+              //     height: 200,
+              //     graphType: 'points',
+              //     min: 0,
+              //     max: 1,
+              //     windowFunction: 'none',
+              //     guideLines: [
+              //         { color: 'green', dotted: true, y: 0.5 },
+              //     ],
+              // }
+
+              
           ]
   }
   igv_browsers[{{ chipsample.pk }}] = igv.createBrowser(
