@@ -283,13 +283,7 @@ class Classification(models.Model):
 
 
 class Report(models.Model):
-    chipsample = models.ForeignKey(
-        ChipSample,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name="report",
-    )
+
     classifications = models.ManyToManyField(Classification)
     entry_date = models.DateTimeField(
         auto_now_add=True

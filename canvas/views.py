@@ -293,6 +293,10 @@ def chipsample_tab_content(request):
     bedgraphs = chipsample.bedgraph.all()
     lrr_bedgraph = None
     baf_bedgraph = None
+    cnv_pos_bedgraph = None
+    cnv_neg_bedgraph = None
+    cnv_smooth_bedgraph = None
+
     for bedgraph in bedgraphs:
         if bedgraph.bedgraph_type == "LRR":
             lrr_bedgraph = bedgraph
